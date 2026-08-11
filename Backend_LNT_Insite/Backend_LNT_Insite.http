@@ -1,0 +1,6 @@
+@Backend_LNT_Insite_HostAddress = http://localhost:5063
+
+GET {{Backend_LNT_Insite_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

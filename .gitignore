@@ -1,0 +1,9 @@
+**/node_modules/
+**/.vs/
+**/bin/
+**/obj/
+**/package-lock.json
+
+**/appsettings.json
+**/Backend_LNT_BOOST.csproj.user
+**/Backend_LNT_BOOST.csproj
