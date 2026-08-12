@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard,
-  Layers,
   Activity,
-  ShieldCheck,
-  Wrench,
   FileBarChart2,
   Database,
   Settings,
@@ -13,7 +9,11 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRightSquare,
-  LogOut
+  LogOut,
+  SquareChartGantt,
+  Columns3Cog,
+  ChartNoAxesCombined,
+  Lightbulb
 } from 'lucide-react';
 import { masterDataApi } from '../core/api/materData';
 import { useAuth } from '../app/providers/AuthProvider';
@@ -24,25 +24,25 @@ const getModuleIcon = (moduleName: string, id: string) => {
   const nameLower = moduleName.toLowerCase();
   const idLower = id.toLowerCase();
 
-  if (nameLower.includes('dashboard') || idLower.includes('dash')) {
-    return <LayoutDashboard size={20} />;
-  }
-  if (nameLower.includes('material') || nameLower.includes('vật tư') || nameLower.includes('kho')) {
-    return <Layers size={20} />;
-  }
-  if (nameLower.includes('production') || nameLower.includes('sản xuất')) {
+  if (nameLower.includes('executive') || idLower.includes('dash')) {
     return <Activity size={20} />;
   }
-  if (nameLower.includes('quality') || nameLower.includes('chất lượng')) {
-    return <ShieldCheck size={20} />;
+  if (nameLower.includes('manage') || nameLower.includes('vật tư') || nameLower.includes('kho')) {
+    return <SquareChartGantt size={20} />;
   }
-  if (nameLower.includes('maintenance') || nameLower.includes('bảo trì') || nameLower.includes('thiết bị')) {
-    return <Wrench size={20} />;
+  if (nameLower.includes('operation') || nameLower.includes('sản xuất')) {
+    return <Columns3Cog size={20} />;
   }
   if (nameLower.includes('report') || nameLower.includes('báo cáo')) {
     return <FileBarChart2 size={20} />;
   }
-  if (nameLower.includes('master') || nameLower.includes('danh mục') || nameLower.includes('hệ thống')) {
+  if (nameLower.includes('analytic') || nameLower.includes('bảo trì') || nameLower.includes('thiết bị')) {
+    return <ChartNoAxesCombined size={20} />;
+  }
+  if (nameLower.includes('insight') || nameLower.includes('bảo trì') || nameLower.includes('thiết bị')) {
+    return <Lightbulb size={20} />;
+  }
+  if (nameLower.includes('data') || nameLower.includes('danh mục') || nameLower.includes('hệ thống')) {
     return <Database size={20} />;
   }
   return <Settings size={20} />; // Mặc định
@@ -97,15 +97,16 @@ export const Sidebar: React.FC = () => {
 
   return (
     <div
-      className={`h-screen bg-slate-950 text-slate-300 flex flex-col justify-between border-r border-slate-800 transition-all duration-300 ease-in-out ${
-        isCollapsed ? 'w-20' : 'w-64'
-      }`}
+      className={`h-screen bg-slate-950 text-slate-300 flex flex-col justify-between border-r border-slate-800 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'
+        }`}
     >
       {/* Top Section - Brand/Logo */}
       <div>
         <div className="h-16 flex items-center gap-3 px-5 border-b border-slate-800/80 overflow-hidden">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 shrink-0">
-            <Activity className="text-white w-5 h-5" />
+          <div className="w-9 h-9 rounded-lg bg-slate-200 flex items-center justify-center shadow-lg shadow-indigo-500/25 shrink-0">
+            <div className="logo-symbol">
+              <img src="/lntlogo.png" alt="L" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
+            </div>
           </div>
           {!isCollapsed && (
             <div className="flex flex-col min-w-0 transition-opacity duration-200">
@@ -129,11 +130,10 @@ export const Sidebar: React.FC = () => {
                   {/* Module Master Item */}
                   <button
                     onClick={() => handleModuleClick(module.moduleMasterID)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group cursor-pointer ${
-                      isExpanded && !isCollapsed
-                        ? 'bg-slate-900 text-white'
-                        : 'hover:bg-slate-900/60 hover:text-white'
-                    }`}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group cursor-pointer ${isExpanded && !isCollapsed
+                      ? 'bg-slate-900 text-white'
+                      : 'hover:bg-slate-900/60 hover:text-white'
+                      }`}
                   >
                     <div className="flex items-center gap-3">
                       <div className="text-slate-400 group-hover:text-blue-400 transition-colors">
@@ -159,10 +159,9 @@ export const Sidebar: React.FC = () => {
                           key={sub.moduleMasterSubID}
                           to={`/dashboard`} // Tạm thời link về dashboard, sau này rẽ nhánh theo SubID
                           className={({ isActive }) =>
-                            `block px-3 py-2 text-xs font-medium rounded-md transition-colors ${
-                              isActive
-                                ? 'bg-blue-600/10 text-blue-400 font-semibold'
-                                : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
+                            `block px-3 py-2 text-xs font-medium rounded-md transition-colors ${isActive
+                              ? 'bg-blue-600/10 text-blue-400 font-semibold'
+                              : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
                             }`
                           }
                         >
@@ -188,7 +187,7 @@ export const Sidebar: React.FC = () => {
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition-colors cursor-pointer"
         >
           {isCollapsed ? <ChevronRightSquare size={20} /> : <ChevronLeft size={20} />}
-          {!isCollapsed && <span>Thu gọn menu</span>}
+          {!isCollapsed && <span>Collapse</span>}
         </button>
 
         <button
@@ -196,7 +195,7 @@ export const Sidebar: React.FC = () => {
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-rose-400 hover:bg-rose-950/20 hover:text-rose-300 transition-colors cursor-pointer"
         >
           <LogOut size={20} />
-          {!isCollapsed && <span>Đăng xuất</span>}
+          {!isCollapsed && <span>Logout</span>}
         </button>
       </div>
     </div>

@@ -18,22 +18,22 @@ export const mockKpis: KpiData = {
   hourlyOutput: {
     value: 412,
     label: 'PCS',
-    timeRange: 'Trong khoảng 15:00 - 16:00'
+    timeRange: 'During 15:00 - 16:00'
   },
   runningOutput: {
     value: 4652,
     label: 'PCS',
-    timeRange: 'Lũy kế tính đến 16:00'
+    timeRange: 'Running total until 16:00'
   },
   target: {
     value: 8000,
     label: 'PCS',
-    note: 'Kế hoạch cho Ca ngày'
+    note: 'Plan for Day Shift'
   },
   balanceToTarget: {
     value: 3348,
     label: 'PCS',
-    note: 'Cần đạt thêm để hoàn thành mục tiêu'
+    note: 'Need to reach to complete the target'
   }
 };
 

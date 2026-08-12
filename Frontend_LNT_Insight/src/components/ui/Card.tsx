@@ -14,3 +14,5 @@ export const Card: React.FC<CardProps> = ({ children, className = '', ...props }
     </div>
   );
 };
+
+// component này là biểu đồ

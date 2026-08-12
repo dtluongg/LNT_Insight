@@ -42,14 +42,14 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
             i
           </div>
         </div>
-        <span className="text-xs text-slate-400 mt-1">Cập nhật lần cuối: 16 Tháng 5 2025 16:30</span>
+        <span className="text-xs text-slate-400 mt-1">Latest Update: 12/08/2025 9:30</span>
       </div>
 
       {/* Filters & Actions */}
       <div className="flex flex-wrap items-end gap-3">
         {/* Date Input */}
         <div className="flex flex-col gap-1.5">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ngày</span>
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Day</span>
           <div className="relative flex items-center">
             <Calendar size={15} className="absolute left-3 text-slate-400 pointer-events-none" />
             <input
@@ -63,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
 
         {/* Factory Select */}
         <Select
-          label="Nhà máy"
+          label="Factory"
           options={factoryOptions}
           value={factory}
           onChange={(e) => setFactory(e.target.value)}
@@ -71,7 +71,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
 
         {/* Line / Team Select */}
         <Select
-          label="Tổ / Chuyền"
+          label="Line"
           options={lineOptions}
           value={line}
           onChange={(e) => setLine(e.target.value)}
@@ -79,7 +79,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
 
         {/* Shift Select */}
         <Select
-          label="Ca làm việc"
+          label="Time Shift"
           options={shiftOptions}
           value={shift}
           onChange={(e) => setShift(e.target.value)}
@@ -89,12 +89,12 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
         <div className="flex gap-2">
           <Button className="h-10 px-4 flex items-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 shadow-xs">
             <Search size={16} />
-            Tìm kiếm
+            Find
           </Button>
 
           <Button variant="secondary" className="h-10 px-4 flex items-center gap-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold shadow-xs">
             <Download size={16} />
-            Xuất file
+            Export file
           </Button>
         </div>
       </div>

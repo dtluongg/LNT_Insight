@@ -30,7 +30,7 @@ export const DashboardPage: React.FC = () => {
   // Cấu hình các cột cho Bảng chi tiết sản xuất theo giờ
   const columns = [
     {
-      header: 'Khung giờ',
+      header: 'Time',
       accessor: (row: HourlyProductionRow) => (
         <div className="flex items-center gap-2">
           <Clock size={14} className="text-slate-400" />
@@ -40,35 +40,35 @@ export const DashboardPage: React.FC = () => {
       className: 'w-1/6'
     },
     {
-      header: 'Sản lượng theo giờ (PCS)',
+      header: 'Hourly Output (PCS)', // Sản lượng theo giờ 
       accessor: (row: HourlyProductionRow) => (
         <span className="font-semibold">{row.hourlyOutput === 0 ? '-' : row.hourlyOutput.toLocaleString()}</span>
       ),
       className: 'text-center'
     },
     {
-      header: 'Luỹ kế thực tế (PCS)',
+      header: 'Actual Cumulative (PCS)', //Luỹ kế thực tế
       accessor: (row: HourlyProductionRow) => (
         <span className="font-bold text-slate-900">{row.runningOutput.toLocaleString()}</span>
       ),
       className: 'text-center'
     },
     {
-      header: 'Mục tiêu (PCS)',
+      header: 'Target (PCS)', // Mục tiêu
       accessor: (row: HourlyProductionRow) => (
         <span className="text-slate-500 font-semibold">{row.target.toLocaleString()}</span>
       ),
       className: 'text-center'
     },
     {
-      header: 'Chênh lệch mục tiêu (PCS)',
+      header: 'Variance to Target (PCS)', // Chênh lệch mục tiêu
       accessor: (row: HourlyProductionRow) => (
         <span className="text-amber-600 font-bold">{row.balanceToTarget.toLocaleString()}</span>
       ),
       className: 'text-center'
     },
     {
-      header: '% Đạt được (vs Target)',
+      header: 'Achievement Rate %', // Đạt được bao nhiêu 
       accessor: (row: HourlyProductionRow) => (
         <span className="text-blue-600 font-bold">{row.achievementRate.toFixed(2)}%</span>
       ),
