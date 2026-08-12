@@ -88,7 +88,7 @@ export const LoginPage: React.FC = () => {
           <Input
             id="username"
             label="Username"
-            placeholder="Enter your username..."
+            placeholder="Type your username..."
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             icon={<UserIcon size={16} className="text-slate-400" />}
@@ -101,7 +101,7 @@ export const LoginPage: React.FC = () => {
             id="password"
             label="Password"
             type="password"
-            placeholder="Nhập mật khẩu..."
+            placeholder="Type your password..."
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             icon={<Lock size={16} className="text-slate-400" />}
@@ -131,7 +131,7 @@ export const LoginPage: React.FC = () => {
             isLoading={isLoading}
             className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold py-2.5 rounded-lg shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/30 transition-all transform hover:-translate-y-[1px] active:translate-y-[1px] mt-2 cursor-pointer"
           >
-            Đăng nhập
+            Login
           </Button>
         </form>
 
