@@ -1,0 +1,65 @@
+[
+  {
+    "TeamID": 1,
+    "TeamNo": "LINE-01",
+    "TeamName": "S1|LINE-01",
+    "DayOutput": 145,
+    "DayTarget": 240
+  },
+  {
+    "TeamID": 2,
+    "TeamNo": "LINE-02",
+    "TeamName": "S1|LINE-02",
+    "DayOutput": 50,
+    "DayTarget": 176
+  },
+  {
+    "TeamID": 3,
+    "TeamNo": "LINE-03",
+    "TeamName": "S1|LINE-03",
+    "DayOutput": 33,
+    "DayTarget": 127
+  },
+  {
+    "TeamID": 4,
+    "TeamNo": "LINE-04",
+    "TeamName": "S1|LINE-04",
+    "DayOutput": 0,
+    "DayTarget": 203
+  },
+  {
+    "TeamID": 5,
+    "TeamNo": "LINE-05",
+    "TeamName": "S2|LINE-05",
+    "DayOutput": 0,
+    "DayTarget": 121
+  },
+  {
+    "TeamID": 6,
+    "TeamNo": "LINE-06",
+    "TeamName": "S2|LINE-06",
+    "DayOutput": 0,
+    "DayTarget": 115
+  },
+  {
+    "TeamID": 7,
+    "TeamNo": "LINE-07",
+    "TeamName": "S2|LINE-07",
+    "DayOutput": 0,
+    "DayTarget": null
+  },
+  {
+    "TeamID": 8,
+    "TeamNo": "LINE-08",
+    "TeamName": "S2|LINE-08",
+    "DayOutput": 0,
+    "DayTarget": 0
+  },
+  {
+    "TeamID": 12,
+    "TeamNo": "LINE-12",
+    "TeamName": "S3|LINE-12",
+    "DayOutput": 0,
+    "DayTarget": 0
+  }
+]

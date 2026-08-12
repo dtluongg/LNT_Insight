@@ -45,5 +45,13 @@ namespace Backend_LNT_Insight.Controllers
             var result = (await db.QueryAsync<dynamic>("USP_MD_GetUsers", commandType: CommandType.StoredProcedure)).ToList();
             return Ok(result);
         }
+
+        [HttpGet("company/{companyID}site/{siteID}")]
+        public async Task<IActionResult> GetProductionVsPlan(string companyID, string siteID)
+        {
+            using var db = CreateConnection();
+            var result = (await db.QueryAsync<dynamic>("USP_ProductionVsPlan", new { CompanyID = companyID, SiteID = siteID}, commandType: CommandType.StoredProcedure)).ToList();
+            return Ok(result);
+        }
     }
 }
