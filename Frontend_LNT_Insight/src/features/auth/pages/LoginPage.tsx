@@ -21,10 +21,10 @@ export const LoginPage: React.FC = () => {
   const validateForm = () => {
     const errors: { username?: string; password?: string } = {};
     if (!username.trim()) {
-      errors.username = 'Tài khoản không được để trống';
+      errors.username = 'Username cannot be empty';
     }
     if (!password) {
-      errors.password = 'Mật khẩu không được để trống';
+      errors.password = 'Password cannot be empty';
     }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -42,7 +42,7 @@ export const LoginPage: React.FC = () => {
       login(response);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Có lỗi xảy ra trong quá trình đăng nhập. Vui lòng thử lại.');
+      setError(err.message || 'An error occurred during login. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +74,7 @@ export const LoginPage: React.FC = () => {
             LNT INSIGHT
           </h2>
           <p className="text-xs text-slate-400 mt-1 uppercase tracking-wider">
-            Hệ thống báo cáo & giám sát sản xuất
+            Production Reporting & Monitoring System
           </p>
         </div>
 
@@ -87,8 +87,8 @@ export const LoginPage: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-5">
           <Input
             id="username"
-            label="Tài khoản"
-            placeholder="Nhập tên đăng nhập..."
+            label="Username"
+            placeholder="Enter your username..."
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             icon={<UserIcon size={16} className="text-slate-400" />}
@@ -99,7 +99,7 @@ export const LoginPage: React.FC = () => {
 
           <Input
             id="password"
-            label="Mật khẩu"
+            label="Password"
             type="password"
             placeholder="Nhập mật khẩu..."
             value={password}
@@ -119,10 +119,10 @@ export const LoginPage: React.FC = () => {
                 onChange={(e) => setRememberMe(e.target.checked)}
                 className="rounded-sm border-slate-800 bg-slate-950 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
               />
-              Ghi nhớ đăng nhập
+              Remember me
             </label>
             <a href="#" className="text-indigo-400 hover:text-indigo-300 transition-colors">
-              Quên mật khẩu?
+              Forgot password?
             </a>
           </div>
 
@@ -137,7 +137,7 @@ export const LoginPage: React.FC = () => {
 
         <div className="mt-8 pt-6 border-t border-slate-800/80 text-center">
           <p className="text-[11px] text-slate-500 uppercase tracking-wider">
-            &copy; 2026 LNT Technology. All rights reserved.
+            &copy; 2026 LNTSoft Team. All rights reserved.
           </p>
         </div>
       </div>
