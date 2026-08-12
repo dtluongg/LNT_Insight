@@ -1,34 +1,97 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Download, Calendar } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { Select } from '../components/ui/Select';
 import { Button } from '../components/ui/Button';
+import { companiesApi } from '../core/api/companies';
+import type { CompanyInfo, SiteInfo } from '../types';
 
 interface HeaderProps {
   title: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({ title }) => {
-  const [date, setDate] = useState('2025-05-16');
-  const [factory, setFactory] = useState('sumbiri-garments');
-  const [line, setLine] = useState('all');
-  const [shift, setShift] = useState('day-shift');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [date, setDate] = useState('2026-08-12');
+  
+  const [companies, setCompanies] = useState<CompanyInfo[]>([]);
+  const [sites, setSites] = useState<SiteInfo[]>([]);
+  
+  const [selectedCompany, setSelectedCompany] = useState(searchParams.get('companyId') || '');
+  const [selectedSite, setSelectedSite] = useState(searchParams.get('siteId') || '');
+  const [selectedDept, setSelectedDept] = useState(searchParams.get('departmentId') || 'DEP05');
 
-  const factoryOptions = [
-    { value: 'sumbiri-garments', label: 'SUMBIRI Garments' },
-    { value: 'lnt-garments', label: 'LNT Garments' }
+  // Hardcoded departments for now
+  const deptOptions = [
+    { value: 'DEP01', label: 'Department 01' },
+    { value: 'DEP02', label: 'Department 02' },
+    { value: 'DEP03', label: 'Department 03' },
+    { value: 'DEP04', label: 'Department 04' },
+    { value: 'DEP05', label: 'Department 05' },
   ];
 
-  const lineOptions = [
-    { value: 'all', label: 'All' },
-    { value: 'line-1', label: 'Line 01' },
-    { value: 'line-2', label: 'Line 02' },
-    { value: 'line-3', label: 'Line 03' }
-  ];
+  // Fetch companies on mount
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const data = await companiesApi.getCompanies();
+        setCompanies(data);
+        if (data.length > 0 && !selectedCompany) {
+          setSelectedCompany(data[0].companyId);
+        }
+      } catch (err) {
+        console.error('Failed to fetch companies', err);
+      }
+    };
+    fetchCompanies();
+  }, []);
 
-  const shiftOptions = [
-    { value: 'day-shift', label: 'Day Shift (08:00 - 17:00)' },
-    { value: 'night-shift', label: 'Night Shift (18:00 - 03:00)' }
-  ];
+  // Fetch sites when selected company changes
+  useEffect(() => {
+    if (!selectedCompany) return;
+    const fetchSites = async () => {
+      try {
+        const data = await companiesApi.getSites(selectedCompany);
+        setSites(data);
+        if (data.length > 0) {
+          const hasCurrentSite = data.some(s => s.siteId === selectedSite);
+          if (!hasCurrentSite) {
+            setSelectedSite(data[0].siteId);
+          }
+        } else {
+          setSelectedSite('');
+        }
+      } catch (err) {
+        console.error('Failed to fetch sites', err);
+      }
+    };
+    fetchSites();
+  }, [selectedCompany]);
+
+  // Sync state if URL search parameters change externally
+  useEffect(() => {
+    const urlCompany = searchParams.get('companyId');
+    const urlSite = searchParams.get('siteId');
+    const urlDept = searchParams.get('departmentId');
+
+    if (urlCompany) setSelectedCompany(urlCompany);
+    if (urlSite) setSelectedSite(urlSite);
+    if (urlDept) setSelectedDept(urlDept);
+  }, [searchParams]);
+
+  const handleSearch = () => {
+    if (selectedCompany && selectedSite) {
+      setSearchParams({
+        companyId: selectedCompany,
+        siteId: selectedSite,
+        departmentId: selectedDept,
+        date: date
+      });
+    }
+  };
+
+  const companyOptions = companies.map(c => ({ value: c.companyId, label: c.companyName }));
+  const siteOptions = sites.map(s => ({ value: s.siteId, label: s.siteName }));
 
   return (
     <header className="bg-white border-b border-slate-100 px-8 py-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between shrink-0">
@@ -42,7 +105,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
             i
           </div>
         </div>
-        <span className="text-xs text-slate-400 mt-1">Latest Update: 12/08/2025 9:30</span>
+        <span className="text-xs text-slate-400 mt-1">Latest Update: 12/08/2026 22:50</span>
       </div>
 
       {/* Filters & Actions */}
@@ -61,33 +124,37 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
           </div>
         </div>
 
-        {/* Factory Select */}
+        {/* Company Select */}
         <Select
-          label="Factory"
-          options={factoryOptions}
-          value={factory}
-          onChange={(e) => setFactory(e.target.value)}
+          label="Company"
+          options={companyOptions}
+          value={selectedCompany}
+          onChange={(e) => setSelectedCompany(e.target.value)}
         />
 
-        {/* Line / Team Select */}
+        {/* Site Select */}
         <Select
-          label="Line"
-          options={lineOptions}
-          value={line}
-          onChange={(e) => setLine(e.target.value)}
+          label="Site"
+          options={siteOptions}
+          value={selectedSite}
+          onChange={(e) => setSelectedSite(e.target.value)}
+          disabled={siteOptions.length === 0}
         />
 
-        {/* Shift Select */}
+        {/* Department Select */}
         <Select
-          label="Time Shift"
-          options={shiftOptions}
-          value={shift}
-          onChange={(e) => setShift(e.target.value)}
+          label="Department"
+          options={deptOptions}
+          value={selectedDept}
+          onChange={(e) => setSelectedDept(e.target.value)}
         />
 
         {/* Action Buttons */}
         <div className="flex gap-2">
-          <Button className="h-10 px-4 flex items-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 shadow-xs">
+          <Button 
+            onClick={handleSearch}
+            className="h-10 px-4 flex items-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 shadow-xs text-white"
+          >
             <Search size={16} />
             Find
           </Button>
