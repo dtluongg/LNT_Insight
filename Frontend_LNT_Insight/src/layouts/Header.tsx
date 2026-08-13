@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Select } from '../components/ui/Select';
 import { Button } from '../components/ui/Button';
 import { companiesApi } from '../core/api/companies';
-import type { CompanyInfo, SiteInfo } from '../types';
+import type { CompanyInfo, SiteInfo, SectionInfo } from '../types';
 
 interface HeaderProps {
   title: string;
@@ -12,23 +12,18 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ title }) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [date, setDate] = useState('2026-08-13');
+  const todayStr = new Date().toLocaleDateString('sv-SE');
+  const [date, setDate] = useState(searchParams.get('date') || todayStr); // set lại không cho chọn quá ngày hôm nay.
+
 
   const [companies, setCompanies] = useState<CompanyInfo[]>([]);
   const [sites, setSites] = useState<SiteInfo[]>([]);
+  const [sections, setSections] = useState<SectionInfo[]>([]);
 
   const [selectedCompany, setSelectedCompany] = useState(searchParams.get('companyId') || '');
   const [selectedSite, setSelectedSite] = useState(searchParams.get('siteId') || '');
-  const [selectedDept, setSelectedDept] = useState(searchParams.get('departmentId') || 'DEP05');
+  const [selectedSection, setSelectedSection] = useState(searchParams.get('sectionId') || '');
 
-  // Hardcoded departments for now
-  const deptOptions = [
-    { value: 'DEP01', label: 'Department 01' },
-    { value: 'DEP02', label: 'Department 02' },
-    { value: 'DEP03', label: 'Department 03' },
-    { value: 'DEP04', label: 'Department 04' },
-    { value: 'DEP05', label: 'Department 05' },
-  ];
 
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -67,31 +62,55 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
     fetchSites();
   }, [selectedCompany]);
 
+  // Fetch sections when selected company or site changes
+  useEffect(() => {
+    if (!selectedCompany || !selectedSite) return;
+    const fetchSections = async () => {
+      try {
+        const data = await companiesApi.getSections(selectedCompany, selectedSite);
+        setSections(data);
+        if (data.length > 0) {
+          const hasCurrentSection = data.some(s => String(s.sectionID) === String(selectedSection));
+          if (!hasCurrentSection) {
+            setSelectedSection(String(data[0].sectionID));
+          }
+        } else {
+          setSelectedSection('');
+        }
+      } catch (err) {
+        console.error('Failed to fetch sections', err);
+      }
+    };
+    fetchSections();
+  }, [selectedCompany, selectedSite]);
+
   // Sync state if URL search parameters change externally
   useEffect(() => {
     const urlCompany = searchParams.get('companyId');
     const urlSite = searchParams.get('siteId');
-    const urlDept = searchParams.get('departmentId');
+    const urlSection = searchParams.get('sectionId');
+    const urlDate = searchParams.get('date');
 
     if (urlCompany) setSelectedCompany(urlCompany);
     if (urlSite) setSelectedSite(urlSite);
-    if (urlDept) setSelectedDept(urlDept);
+    if (urlSection) setSelectedSection(urlSection);
+    if (urlDate) setDate(urlDate);
   }, [searchParams]);
 
   const handleSearch = () => {
-    if (selectedCompany && selectedSite) {
+    if (selectedCompany && selectedSite && selectedSection) {
       setSearchParams({
         companyId: selectedCompany,
         siteId: selectedSite,
-        departmentId: selectedDept,
+        sectionId: selectedSection,
         date: date
       });
     }
   };
 
   const companyOptions = companies.map(c => ({ value: c.companyID, label: c.companyName }));
-  const siteOptions = sites.map(s => ({ value: s.siteID, label: s.siteName }));
-
+  const siteOptions = sites.map(s => ({ value: s.siteID, label: s.siteCode }));
+  const sectionOptions = sections.map(se => ({ value: se.sectionID, label: se.sectionName }));
 
   return (
     <header className="bg-white border-b border-slate-100 px-8 py-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between shrink-0">
@@ -118,6 +137,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
             <input
               type="date"
               value={date}
+              max={todayStr}
               onChange={(e) => setDate(e.target.value)}
               className="h-10 rounded-lg border border-slate-200 pl-10 pr-3 text-sm font-medium text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary cursor-pointer shadow-xs"
             />
@@ -141,12 +161,13 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
           disabled={siteOptions.length === 0}
         />
 
-        {/* Department Select */}
+        {/* Section Select */}
         <Select
-          label="Department"
-          options={deptOptions}
-          value={selectedDept}
-          onChange={(e) => setSelectedDept(e.target.value)}
+          label="Section"
+          options={sectionOptions}
+          value={selectedSection}
+          onChange={(e) => setSelectedSection(e.target.value)}
+          disabled={sectionOptions.length === 0}
         />
 
         {/* Action Buttons */}

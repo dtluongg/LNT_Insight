@@ -32,7 +32,10 @@ export const DashboardPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const companyId = searchParams.get('companyId') || 'COM01';
   const siteId = searchParams.get('siteId') || 'Site1';
-  const departmentId = searchParams.get('departmentId') || 'DEP05';
+  const sectionId = parseInt(searchParams.get('sectionId') || '1', 10);
+  const todayStr = new Date().toLocaleDateString('sv-SE');
+  const dateStr = searchParams.get('date') || todayStr;
+
 
   const [productionData, setProductionData] = useState<ProductionVsPlanInfo[]>([]);
   const [sections, setSections] = useState<SectionInfo[]>([]);
@@ -42,12 +45,9 @@ export const DashboardPage: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [prodResult, sectionsResult] = await Promise.all([
-          companiesApi.getProductionVsPlan(companyId, siteId),
-          companiesApi.getSections(companyId, siteId, departmentId)
-        ]);
+        const dateObj = new Date(dateStr);
+        const prodResult = await companiesApi.getProductionVsPlan(companyId, siteId, sectionId, dateObj);
         setProductionData(prodResult);
-        setSections(sectionsResult);
       } catch (err) {
         console.error("Failed to fetch dashboard data", err);
       } finally {
@@ -55,7 +55,7 @@ export const DashboardPage: React.FC = () => {
       }
     };
     fetchData();
-  }, [companyId, siteId, departmentId]);
+  }, [companyId, siteId, sectionId, dateStr]);
 
   // Calculate dynamic stats
   const totalOutput = productionData.reduce((sum, item) => sum + (item.dayOutput || 0), 0);
@@ -142,7 +142,7 @@ export const DashboardPage: React.FC = () => {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                   <XAxis
-                    dataKey="teamNo"
+                    dataKey="teamName"
                     stroke="#94a3b8"
                     fontSize={11}
                     fontWeight={600}

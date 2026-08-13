@@ -43,16 +43,16 @@ namespace Backend_LNT_Insight.Controllers
         public async Task<IActionResult> GetSections(string companyId, string siteId, [FromQuery] string departmentId = "DEP05")
         {
             using var db = CreateConnection();
-            string sql = "SELECT SectionName FROM [lntdev-db01].[FXPRO].[dbo].[tblCompanySiteDepartmentSection] WHERE CompanyID = @CompanyID AND SiteID = @SiteID AND DepartmentID = @DepartmentID AND ActiveFlag = 1";
+            string sql = "SELECT SectionID, SectionNo, SectionName FROM [lntdev-db01].[FXPRO].[dbo].[tblCompanySiteDepartmentSection] WHERE CompanyID = @CompanyID AND SiteID = @SiteID AND DepartmentID = @DepartmentID AND ActiveFlag = 1";
             var result = (await db.QueryAsync<dynamic>(sql, new { CompanyID = companyId, SiteID = siteId, DepartmentID = departmentId })).ToList();
             return Ok(result);
         }
 
-        [HttpGet("{companyId}/sites/{siteId}/production-vs-plan")]
-        public async Task<IActionResult> GetProductionVsPlan(string companyId, string siteId)
+        [HttpGet("{companyId}/sites/{siteId}/sections/{sectionId}/date/{dateDay}/production-vs-plan")]
+        public async Task<IActionResult> GetProductionVsPlan(string companyId, string siteId, int sectionId, DateTime dateDay)
         {
             using var db = CreateConnection();
-            var result = (await db.QueryAsync<dynamic>("USP_ProductionVsPlan", new { CompanyID = companyId, SiteID = siteId }, commandType: CommandType.StoredProcedure)).ToList();
+            var result = (await db.QueryAsync<dynamic>("USP_ProductionVsPlan", new { CompanyID = companyId, SiteID = siteId, SectionID = sectionId, Date = dateDay.Date }, commandType: CommandType.StoredProcedure)).ToList();
             return Ok(result);
         }
     }

@@ -46,6 +46,8 @@ export interface SiteInfo {
 }
 
 export interface SectionInfo {
+    sectionID: string;
+    sectionNo: string;
     sectionName: string;
 }
 

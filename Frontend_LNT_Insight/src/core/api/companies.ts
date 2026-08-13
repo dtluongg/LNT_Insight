@@ -14,8 +14,9 @@ export const companiesApi = {
         const raw = await apiFetch<any[]>(`/companies/${companyId}/sites/${siteId}/sections?departmentId=${departmentId}`);
         return mapKeysToCamelCase(raw);
     },
-    getProductionVsPlan: async (companyId: string, siteId: string): Promise<ProductionVsPlanInfo[]> => {
-        const raw = await apiFetch<any[]>(`/companies/${companyId}/sites/${siteId}/production-vs-plan`);
+    getProductionVsPlan: async (companyId: string, siteId: string, sectionId: number, dateDay: Date): Promise<ProductionVsPlanInfo[]> => {
+        const formattedDate = dateDay.toISOString().split('T')[0];
+        const raw = await apiFetch<any[]>(`/companies/${companyId}/sites/${siteId}/sections/${sectionId}/date/${formattedDate}/production-vs-plan`);
         return mapKeysToCamelCase(raw);
     }
 };
