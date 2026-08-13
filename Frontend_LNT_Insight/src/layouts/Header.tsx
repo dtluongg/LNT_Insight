@@ -23,7 +23,9 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
   const [selectedCompany, setSelectedCompany] = useState(searchParams.get('companyId') || '');
   const [selectedSite, setSelectedSite] = useState(searchParams.get('siteId') || '');
   const [selectedSection, setSelectedSection] = useState(searchParams.get('sectionId') || '');
-
+  const [latestUpdate, setLatestUpdate] = useState<string>(
+    new Date().toLocaleString('vi-VN', { hour12: false })
+  );
 
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -106,6 +108,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
         date: date,
         _t: Date.now().toString()
       });
+      setLatestUpdate(new Date().toLocaleString('vi-VN', { hour12: false }));
     }
   };
 
@@ -125,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
             i
           </div>
         </div>
-        <span className="text-xs text-slate-400 mt-1">Latest Update: 13/08/2025 11:21</span>
+        <span className="text-xs text-slate-400 mt-1">Latest Update: {latestUpdate}</span>
       </div>
 
       {/* Filters & Actions */}
