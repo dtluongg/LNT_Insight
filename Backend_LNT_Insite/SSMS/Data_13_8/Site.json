@@ -1,0 +1,27 @@
+[
+    {
+        "SiteID": "Site1",
+        "SiteCode": "C1|SITE_01",
+        "SiteName": "Company1_Mfg.Site_01"
+    },
+    {
+        "SiteID": "Site2",
+        "SiteCode": "C1|SITE_02",
+        "SiteName": "Company1_Mfg.Site_02"
+    },
+    {
+        "SiteID": "Site3",
+        "SiteCode": "C1|SITE_03",
+        "SiteName": "Company1_Mfg.Site_03"
+    },
+    {
+        "SiteID": "Site4",
+        "SiteCode": "C1|SITE_04",
+        "SiteName": "Company1_Mfg.Site_04"
+    },
+    {
+        "SiteID": "Site7",
+        "SiteCode": "C1|SITE_05",
+        "SiteName": "Company1_Mfg. Site_05"
+    }
+]

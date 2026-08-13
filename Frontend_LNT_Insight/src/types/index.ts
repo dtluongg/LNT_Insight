@@ -34,13 +34,13 @@ export interface SubModuleInfo {
 }
 
 export interface CompanyInfo {
-    companyId: string;
+    companyID: string;
     companyCode: string;
     companyName: string;
 }
 
 export interface SiteInfo {
-    siteId: string;
+    siteID: string;
     siteCode: string;
     siteName: string;
 }
@@ -50,7 +50,7 @@ export interface SectionInfo {
 }
 
 export interface ProductionVsPlanInfo {
-    teamId: number;
+    teamID: number;
     teamNo: string;
     teamName: string;
     dayOutput: number;

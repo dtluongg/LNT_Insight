@@ -19,6 +19,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  LabelList,
 } from 'recharts';
 import { StatCard } from '../../../components/ui/StatCard';
 import { Table } from '../../../components/ui/Table';
@@ -116,20 +117,13 @@ export const DashboardPage: React.FC = () => {
 
       {/* Grid bên dưới: Biểu đồ & Danh sách Section */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        {/* Biểu đồ (Bên trái, col-span-9) */}
-        <div className="xl:col-span-9 flex flex-col gap-3">
+        {/* Biểu đồ */}
+        <div className="xl:col-span-12 flex flex-col gap-3">
           <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1 flex items-center gap-2">
             <Activity size={16} className="text-blue-600" />
-            Overall Sewing Team Achievement
-          </h2>
-        </div>
-
-        {/* Biểu đồ (Bên phải) */}
-        <div className="xl:col-span-5 flex flex-col gap-3">
-          <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1">
             Running Output vs Target
           </h2>
-          <Card className="flex flex-col justify-center h-[450px] p-6">
+          <Card className="flex flex-col justify-center h-[520px] p-6">
             {productionData.length === 0 ? (
               <div className="text-center text-slate-400 font-medium py-10">
                 No production data found for this company and site.
@@ -188,6 +182,7 @@ export const DashboardPage: React.FC = () => {
                     fill="url(#barGradient)"
                     radius={[4, 4, 0, 0]}
                     barSize={40}
+                    label={{ position: 'top', fill: '#ea580c', fontSize: 11, fontWeight: 600 }}
                   />
                   {/* Đường Line Target (Màu xanh dương) */}
                   <Line
@@ -198,6 +193,7 @@ export const DashboardPage: React.FC = () => {
                     strokeWidth={3}
                     dot={{ r: 5, fill: "#2563eb", stroke: "#fff", strokeWidth: 2 }}
                     activeDot={{ r: 8 }}
+                    label={{ position: 'top', fill: '#ea580c', fontSize: 11, fontWeight: 600 }}
                   />
                 </ComposedChart>
               </ResponsiveContainer>

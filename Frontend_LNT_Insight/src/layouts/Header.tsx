@@ -12,7 +12,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ title }) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [date, setDate] = useState('2026-08-12');
+  const [date, setDate] = useState('2026-08-13');
 
   const [companies, setCompanies] = useState<CompanyInfo[]>([]);
   const [sites, setSites] = useState<SiteInfo[]>([]);
@@ -36,7 +36,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
         const data = await companiesApi.getCompanies();
         setCompanies(data);
         if (data.length > 0 && !selectedCompany) {
-          setSelectedCompany(data[0].companyId);
+          setSelectedCompany(data[0].companyID);
         }
       } catch (err) {
         console.error('Failed to fetch companies', err);
@@ -53,9 +53,9 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
         const data = await companiesApi.getSites(selectedCompany);
         setSites(data);
         if (data.length > 0) {
-          const hasCurrentSite = data.some(s => s.siteId === selectedSite);
+          const hasCurrentSite = data.some(s => s.siteID === selectedSite);
           if (!hasCurrentSite) {
-            setSelectedSite(data[0].siteId);
+            setSelectedSite(data[0].siteID);
           }
         } else {
           setSelectedSite('');
@@ -89,8 +89,8 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
     }
   };
 
-  const companyOptions = companies.map(c => ({ value: c.companyId, label: c.companyName }));
-  const siteOptions = sites.map(s => ({ value: s.siteId, label: s.siteName }));
+  const companyOptions = companies.map(c => ({ value: c.companyID, label: c.companyName }));
+  const siteOptions = sites.map(s => ({ value: s.siteID, label: s.siteName }));
 
 
   return (
