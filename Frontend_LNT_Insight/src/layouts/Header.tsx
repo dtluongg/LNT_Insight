@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Download, Calendar } from 'lucide-react';
+import { Download, Calendar, RefreshCw } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { Select } from '../components/ui/Select';
 import { Button } from '../components/ui/Button';
@@ -103,7 +103,8 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
         companyId: selectedCompany,
         siteId: selectedSite,
         sectionId: selectedSection,
-        date: date
+        date: date,
+        _t: Date.now().toString()
       });
     }
   };
@@ -176,8 +177,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
             onClick={handleSearch}
             className="h-10 px-4 flex items-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 shadow-xs text-white"
           >
-            <Search size={16} />
-            Find
+            <RefreshCw size={20} />
           </Button>
 
           <Button variant="secondary" className="h-10 px-4 flex items-center gap-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold shadow-xs">
