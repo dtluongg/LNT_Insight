@@ -56,6 +56,12 @@ export const Sidebar: React.FC = () => {
   const [expandedModuleId, setExpandedModuleId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Bản đồ đường dẫn tĩnh cho từng Submodule ID
+  const routeMap: Record<string, string> = {
+    "2": "/dashboard/sewing-team-performance",
+    // Thêm các trang mới tại đây khi bạn phát triển thêm
+  };
+
   // Tải danh sách Modules chính từ API khi mount
   useEffect(() => {
     const fetchModules = async () => {
@@ -157,7 +163,7 @@ export const Sidebar: React.FC = () => {
                       {submodules[module.moduleMasterID].map((sub) => (
                         <NavLink
                           key={sub.moduleMasterSubID}
-                          to={`/dashboard`} // Tạm thời link về dashboard, sau này rẽ nhánh theo SubID
+                          to={routeMap[sub.moduleMasterSubID] || `/dashboard/pending/${sub.moduleMasterSubID}`}
                           className={({ isActive }) =>
                             `block px-3 py-2 text-xs font-medium rounded-md transition-colors ${isActive
                               ? 'bg-blue-600/10 text-blue-400 font-semibold'

@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './providers/AuthProvider';
 import { LoginPage } from '../features/auth/pages/LoginPage';
-import { DashboardPage } from '../features/dashboard/pages/DashboardPage';
+import { SewingTeamPerformance } from '../features/dashboard/components/SewingTeamPerformance';
 import { MainLayout } from '../layouts/MainLayout';
 
 // Component bảo vệ Route yêu cầu Đăng nhập
@@ -55,8 +55,13 @@ export const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/dashboard" replace />} />
-        <Route path="dashboard" element={<DashboardPage />} />
+        <Route index element={<Navigate to="/dashboard/sewing-team-performance" replace />} />
+        <Route path="dashboard/sewing-team-performance" element={<SewingTeamPerformance />} />
+        <Route path="dashboard/pending/:subId" element={
+          <div className="p-8 text-center text-slate-400 font-medium bg-white rounded-xl border border-slate-100 shadow-xs">
+            Tính năng này đang được phát triển...
+          </div>
+        } />
       </Route>
 
       {/* Route Đăng nhập */}
