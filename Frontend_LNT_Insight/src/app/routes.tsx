@@ -4,6 +4,7 @@ import { useAuth } from './providers/AuthProvider';
 import { LoginPage } from '../features/auth/pages/LoginPage';
 import { DashboardPage } from '../features/dashboard/pages/DashboardPage';
 import { MainLayout } from '../layouts/MainLayout';
+import { BlankPage } from '../features/blankPage/pages/BlankPage';
 
 // Component bảo vệ Route yêu cầu Đăng nhập
 const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
@@ -56,7 +57,14 @@ export const AppRoutes: React.FC = () => {
         }
       >
         <Route index element={<Navigate to="/dashboard" replace />} />
-        <Route path="dashboard" element={<DashboardPage />} />
+        <Route
+          path="coming-soon"
+          element={<BlankPage />}
+        />
+        <Route
+          path="sewing/team-performance"
+          element={<DashboardPage />}
+        />
       </Route>
 
       {/* Route Đăng nhập */}

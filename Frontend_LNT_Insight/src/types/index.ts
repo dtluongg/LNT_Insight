@@ -30,7 +30,7 @@ export interface ModuleMasterInfo {
 export interface SubModuleInfo {
     moduleMasterSubID: string;
     moduleMasterName: string;
-    moduleMasterID?: string;
+    moduleMasterID: string;
 }
 
 export interface CompanyInfo {
