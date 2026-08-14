@@ -112,7 +112,7 @@ export const Sidebar: React.FC = () => {
           </div>
           {!isCollapsed && (
             <div className="flex flex-col min-w-0 transition-opacity duration-200">
-              <span className="font-bold text-white tracking-wider text-sm">LNT INSIGHT</span>
+              <span className="font-bold text-white tracking-wider text-sm">FXPRO INSIGHT</span>
               <span className="text-[10px] text-slate-500 font-semibold tracking-wide uppercase">Industrial Platform</span>
             </div>
           )}
