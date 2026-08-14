@@ -1,0 +1,194 @@
+Lỗi "Maximum update depth exceeded" xảy ra do vòng lặp điều hướng vô hạn (Infinite Redirection Loop) giữa trang chủ / và /dashboard.
+
+1. Nguyên nhân chi tiết
+Hãy cùng phân tích luồng chạy của Router trong file 
+
+routes.tsx
+:
+
+Bước 1: Khi ứng dụng khởi chạy hoặc người dùng đã đăng nhập thành công:
+Nếu truy cập /, route index 
+
+<Route index element={<Navigate to="/dashboard" replace />} />
+ sẽ chuyển hướng người dùng sang /dashboard.
+Nếu ở trang /login mà đã đăng nhập, PublicRoute cũng chuyển hướng sang /dashboard (
+
+return <Navigate to="/dashboard" replace />;
+).
+Bước 2: Router nhận yêu cầu đi tới đường dẫn /dashboard. Tuy nhiên, trong danh sách các <Route> bên dưới, không hề có route nào khớp với path /dashboard.
+Bước 3: Vì không có route nào khớp, Router sẽ rơi vào route catch-all ở cuối file: 
+
+<Route path="*" element={<Navigate to="/" replace />} />
+ và chuyển hướng người dùng quay trở lại /.
+Bước 4: Tại /, ứng dụng lại thực hiện bước 1 (chuyển hướng sang /dashboard), tiếp tục lặp lại các bước trên tạo thành vòng lặp vô hạn. React phát hiện số lần re-render vượt quá giới hạn cho phép và throw lỗi crash app.
+2. Cách khắc phục
+Bạn có thể lựa chọn 1 trong 2 cách sau:
+
+Cách 1: Thay đổi đường dẫn chuyển hướng mặc định (Khuyên dùng)
+Nếu /sewing/team-performance (trang DashboardPage) là trang chủ chính sau khi đăng nhập, hãy sửa trực tiếp đích đến của các lệnh điều hướng từ /dashboard thành /sewing/team-performance:
+
+Trong file 
+
+routes.tsx
+:
+
+diff
+// Component chặn truy cập lại trang Login khi đã đăng nhập
+const PublicRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  ...
+  if (isAuthenticated) {
+-   return <Navigate to="/dashboard" replace />;
++   return <Navigate to="/sewing/team-performance" replace />;
+  }
+  return children;
+};
+export const AppRoutes: React.FC = () => {
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+-       <Route index element={<Navigate to="/dashboard" replace />} />
++       <Route index element={<Navigate to="/sewing/team-performance" replace />} />
+        ...
+      </Route>
+      ...
+    </Routes>
+  );
+};
+Cách 2: Khai báo thêm path dashboard trong routes.tsx
+Nếu bạn vẫn muốn giữ đường dẫn /dashboard làm trang đích, hãy bổ sung một route trung gian để chuyển tiếp từ /dashboard sang /sewing/team-performance:
+
+Trong file 
+
+routes.tsx
+:
+
+diff
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Navigate to="/dashboard" replace />} />
++       <Route path="dashboard" element={<Navigate to="/sewing/team-performance" replace />} />
+        <Route
+          path="coming-soon"
+          element={<BlankPage />}
+        />
+        <Route
+          path="sewing/team-performance"
+          element={<DashboardPage />}
+        />
+      </Route>
+3. Lưu ý thêm: Lỗi lệch kiểu dữ liệu (Type Mismatch) trong Sidebar
+Sau khi sửa xong lỗi điều hướng trên, bạn có thể sẽ gặp một lỗi logic nhỏ khác khiến các menu con (SubModules) khi click vào đều bị nhảy sang trang /coming-soon:
+
+Trong 
+
+types/index.ts
+, moduleMasterSubID của interface SubModuleInfo là kiểu string:
+typescript
+export interface SubModuleInfo {
+    moduleMasterSubID: string; // <-- kiểu string (ví dụ: "2")
+    ...
+}
+Trong khi đó, hàm getSubModuleRoute tại 
+
+routesConfig.ts
+ lại yêu cầu tham số thứ hai là number:
+typescript
+export const getSubModuleRoute = (
+    moduleMasterID: string,
+    subModuleMasterID: number // <-- kiểu number
+) => { ... }
+Vì sử dụng toán tử so sánh nghiêm ngặt ===, việc đối chiếu giữa 2 (number) và '2' (string) sẽ trả về false, khiến hàm không tìm được route chính xác.
+
+Giải pháp sửa nhanh: Ép kiểu number trước khi truyền vào hàm tại file 
+
+Sidebar.tsx
+:
+
+diff
+- const route = getSubModuleRoute(sub.moduleMasterID, sub.moduleMasterSubID);
++ const route = getSubModuleRoute(sub.moduleMasterID, Number(sub.moduleMasterSubID));
+10:27 PM
+tôi muốn dùng trang blankPage ( coming-soon) đc ko?
+10:29 PM
+Hoàn toàn được bạn nhé! Bạn có thể dùng trang BlankPage (coming-soon) cho 2 mục đích sau:
+
+1. Dùng làm trang mặc định sau khi đăng nhập (Landing Page)
+Nếu bạn chưa muốn đưa người dùng thẳng vào trang sản xuất mà muốn họ vào một trang trống/giới thiệu trước, bạn chỉ cần sửa đích đến của redirect trong 
+
+routes.tsx
+ về /coming-soon:
+
+typescript
+// Component chặn truy cập lại trang Login khi đã đăng nhập
+const PublicRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <div className="...">Đang tải...</div>;
+  }
+  if (isAuthenticated) {
+    // Chuyển hướng về trang coming-soon sau khi đăng nhập thành công
+    return <Navigate to="/coming-soon" replace />;
+  }
+  return children;
+};
+export const AppRoutes: React.FC = () => {
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+        {/* Chuyển hướng gốc '/' về '/coming-soon' */}
+        <Route index element={<Navigate to="/coming-soon" replace />} />
+        
+        <Route
+          path="coming-soon"
+          element={<BlankPage />}
+        />
+        <Route
+          path="sewing/team-performance"
+          element={<DashboardPage />}
+        />
+      </Route>
+      <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+};
+2. Dùng làm trang hiển thị cho các chức năng đang phát triển
+Hiện tại, logic trong 
+
+Sidebar.tsx
+ của bạn đã được cấu hình sẵn để sử dụng /coming-soon làm fallback:
+
+typescript
+// Nếu module hoặc submodule chưa được định nghĩa đường dẫn cụ thể trong routesConfig.ts,
+// hệ thống sẽ tự động trỏ về '/coming-soon'
+const modulePath = moduleRoute?.path ?? `/coming-soon`;
+const path = route?.path ?? `/coming-soon`;
+Như vậy, khi người dùng click vào bất kỳ module/submodule nào chưa được bạn làm giao diện hay cấu hình trong 
+
+routesConfig.ts
+, nó sẽ tự động render trang 
+
+BlankPage
+ này.

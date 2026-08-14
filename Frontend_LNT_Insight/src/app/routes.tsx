@@ -38,7 +38,7 @@ const PublicRoute: React.FC<{ children: React.ReactElement }> = ({ children }) =
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/coming-soon" replace />;
   }
 
   return children;
@@ -56,7 +56,7 @@ export const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route index element={<Navigate to="/coming-soon" replace />} />
         <Route
           path="coming-soon"
           element={<BlankPage />}
