@@ -18,6 +18,8 @@ import {
 import { masterDataApi } from '../core/api/materData';
 import { useAuth } from '../app/providers/AuthProvider';
 import type { ModuleMasterInfo, SubModuleInfo } from '../types';
+import { getModuleRoute, getSubModuleRoute } from '../app/routesConfig';
+
 
 // Hàm ánh xạ Icon dựa trên tên hoặc ID phân hệ
 const getModuleIcon = (moduleName: string, id: string) => {
@@ -122,52 +124,91 @@ export const Sidebar: React.FC = () => {
             <div className="text-xs text-slate-500 text-center py-4">Đang tải phân hệ...</div>
           ) : (
             modules.map((module) => {
-              const isExpanded = expandedModuleId === module.moduleMasterID;
-              const hasSubmodules = submodules[module.moduleMasterID]?.length > 0 || true; // Mặc định hiển thị chevron nếu chưa fetch
+              const isExpanded =
+                expandedModuleId === module.moduleMasterID;
+
+              const hasSubmodules =
+                submodules[module.moduleMasterID]?.length > 0 || true;
+
+              const moduleRoute =
+                getModuleRoute(module.moduleMasterID);
+
+              const modulePath =
+                moduleRoute?.path ??
+                `/coming-soon`;
 
               return (
                 <div key={module.moduleMasterID} className="flex flex-col">
                   {/* Module Master Item */}
-                  <button
-                    onClick={() => handleModuleClick(module.moduleMasterID)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group cursor-pointer ${isExpanded && !isCollapsed
-                      ? 'bg-slate-900 text-white'
-                      : 'hover:bg-slate-900/60 hover:text-white'
-                      }`}
-                  >
-                    <div className="flex items-center gap-3">
+                  <div className="flex items-center w-full">
+                    {/* Module navigation */}
+                    <NavLink
+                      to={modulePath}
+                      className={({ isActive }) =>
+                        `flex-1 flex items-center gap-3 px-3 py-2.5 rounded-l-lg text-sm font-medium transition-all group ${isActive
+                          ? 'bg-slate-900 text-white'
+                          : 'hover:bg-slate-900/60 hover:text-white'
+                        }`
+                      }
+                    >
                       <div className="text-slate-400 group-hover:text-blue-400 transition-colors">
-                        {getModuleIcon(module.moduleMasterName, module.moduleMasterID)}
+                        {getModuleIcon(
+                          module.moduleMasterName,
+                          module.moduleMasterID
+                        )}
                       </div>
-                      {!isCollapsed && (
-                        <span className="truncate text-left">{module.moduleMasterName}</span>
-                      )}
-                    </div>
 
+                      {!isCollapsed && (
+                        <span className="truncate text-left">
+                          {module.moduleMasterName}
+                        </span>
+                      )}
+                    </NavLink>
+
+                    {/* Expand / Collapse */}
                     {!isCollapsed && hasSubmodules && (
-                      <div className="text-slate-500">
-                        {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                      </div>
+                      <button
+                        onClick={() =>
+                          handleModuleClick(module.moduleMasterID)
+                        }
+                        className="px-2.5 py-2.5 rounded-r-lg text-slate-500 hover:text-white hover:bg-slate-900/60 transition-colors"
+                      >
+                        {isExpanded ? (
+                          <ChevronDown size={14} />
+                        ) : (
+                          <ChevronRight size={14} />
+                        )}
+                      </button>
                     )}
-                  </button>
+                  </div>
 
                   {/* SubModules Accordion List */}
                   {!isCollapsed && isExpanded && submodules[module.moduleMasterID] && (
                     <div className="mt-1 ml-4 pl-4 border-l border-slate-800 space-y-1.5 transition-all">
-                      {submodules[module.moduleMasterID].map((sub) => (
-                        <NavLink
-                          key={sub.moduleMasterSubID}
-                          to={`/dashboard`} // Tạm thời link về dashboard, sau này rẽ nhánh theo SubID
-                          className={({ isActive }) =>
-                            `block px-3 py-2 text-xs font-medium rounded-md transition-colors ${isActive
-                              ? 'bg-blue-600/10 text-blue-400 font-semibold'
-                              : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
-                            }`
-                          }
-                        >
-                          {sub.moduleMasterName}
-                        </NavLink>
-                      ))}
+
+
+                      {submodules[module.moduleMasterID].map((sub) => {
+                        const route = getSubModuleRoute(sub.moduleMasterID, sub.moduleMasterSubID);
+                        const path =
+                          route?.path ??
+                          `/coming-soon`;
+
+                        return (
+                          <NavLink
+                            key={`${sub.moduleMasterID}-${sub.moduleMasterSubID}`}
+                            to={path}
+                            className={({ isActive }) =>
+                              `block px-3 py-2 text-xs font-medium rounded-md transition-colors ${isActive
+                                ? 'bg-blue-600/10 text-blue-400 font-semibold'
+                                : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
+                              }`
+                            }
+                          >
+                            {sub.moduleMasterName}
+                          </NavLink>
+                        )
+                      })}
+
                       {submodules[module.moduleMasterID].length === 0 && (
                         <span className="block px-3 py-1 text-[11px] text-slate-600">Không có phân hệ con</span>
                       )}
