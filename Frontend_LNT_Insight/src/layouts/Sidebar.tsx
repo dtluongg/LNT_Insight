@@ -105,15 +105,18 @@ export const Sidebar: React.FC = () => {
       {/* Top Section - Brand/Logo */}
       <div>
         <div className="h-16 flex items-center gap-3 px-5 border-b border-slate-800/80 overflow-hidden">
-          <div className="w-9 h-9 rounded-lg bg-slate-200 flex items-center justify-center shadow-lg shadow-indigo-500/25 shrink-0">
+          <div className="w-9 h-9 rounded-lg bg-slate-900/60 border border-slate-800/60 flex items-center justify-center shadow-lg shadow-indigo-500/10 shrink-0">
             <div className="logo-symbol">
-              <img src="/lntlogo.png" alt="L" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
+              <img src="/logo_lnt_insight.png" alt="LNT Insight" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
             </div>
           </div>
           {!isCollapsed && (
             <div className="flex flex-col min-w-0 transition-opacity duration-200">
-              <span className="font-bold text-white tracking-wider text-sm">FXPRO INSIGHT</span>
-              <span className="text-[10px] text-slate-500 font-semibold tracking-wide uppercase">Industrial Platform</span>
+              <div className="flex items-center gap-1">
+                <span className="font-bold text-slate-100 tracking-wider text-sm">FXPRO</span>
+                <span className="font-extrabold bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 bg-clip-text text-transparent tracking-wider text-sm">INSIGHT</span>
+              </div>
+              <span className="text-[9px] text-slate-500 font-bold tracking-widest uppercase">Industrial Platform</span>
             </div>
           )}
         </div>
@@ -145,13 +148,13 @@ export const Sidebar: React.FC = () => {
                     <NavLink
                       to={modulePath}
                       className={({ isActive }) =>
-                        `flex-1 flex items-center gap-3 px-3 py-2.5 rounded-l-lg text-sm font-medium transition-all group ${isActive
-                          ? 'bg-slate-900 text-white'
-                          : 'hover:bg-slate-900/60 hover:text-white'
+                        `flex-1 flex items-center gap-3 py-2.5 rounded-l-lg text-sm font-medium transition-all group ${isActive
+                          ? 'bg-slate-900/90 text-slate-100 pl-2.5 border-l-2 border-cyan-400 active'
+                          : 'hover:bg-slate-900/50 hover:text-white pl-3 text-slate-400'
                         }`
                       }
                     >
-                      <div className="text-slate-400 group-hover:text-blue-400 transition-colors">
+                      <div className="text-slate-400 group-hover:text-cyan-400 group-[.active]:text-cyan-400 transition-colors">
                         {getModuleIcon(
                           module.moduleMasterName,
                           module.moduleMasterID
@@ -199,7 +202,7 @@ export const Sidebar: React.FC = () => {
                             to={path}
                             className={({ isActive }) =>
                               `block px-3 py-2 text-xs font-medium rounded-md transition-colors ${isActive
-                                ? 'bg-blue-600/10 text-blue-400 font-semibold'
+                                ? 'bg-cyan-500/10 text-cyan-400 font-semibold'
                                 : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
                               }`
                             }
@@ -225,7 +228,7 @@ export const Sidebar: React.FC = () => {
       <div className="p-3 border-t border-slate-800/80 space-y-1">
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-900 hover:text-white transition-colors cursor-pointer"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-900 hover:text-cyan-400 transition-colors cursor-pointer"
         >
           {isCollapsed ? <ChevronRightSquare size={20} /> : <ChevronLeft size={20} />}
           {!isCollapsed && <span>Collapse</span>}
