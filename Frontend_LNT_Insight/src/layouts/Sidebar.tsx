@@ -116,7 +116,7 @@ export const Sidebar: React.FC = () => {
                 <span className="font-bold text-slate-100 tracking-wider text-sm">FXPRO</span>
                 <span className="font-extrabold bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 bg-clip-text text-transparent tracking-wider text-sm">INSIGHT</span>
               </div>
-              <span className="text-[9px] text-slate-500 font-bold tracking-widest uppercase">Industrial Platform</span>
+              <span className="text-[9px] text-slate-500 font-bold tracking-widest uppercase">Intelligent Business</span>
             </div>
           )}
         </div>
