@@ -96,7 +96,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
     }, [draftFilter.companyID]);
     // =========================================================
 
-
     // Fetch sections when selected company or site changes
     useEffect(() => {
         if (!draftFilter.companyID || !draftFilter.siteID) return;
@@ -106,9 +105,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                 setSections(data);
                 const currentSection = data.find(
                     section =>
-                        section.sectionID === draftFilter.sectionID
+                        String(section.sectionID) === draftFilter.sectionID
                 );
-
                 if (!currentSection) {
                     const firstSection = data[0];
                     if (firstSection) {
@@ -131,37 +129,100 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             }
         };
         fetchSections();
-    }, [draftFilter.companyID, draftFilter.sectionID]);
+    }, [draftFilter.companyID, draftFilter.siteID]);
+    // =========================================================
 
-    // Sync state if URL search parameters change externally
-    useEffect(() => {
-        const urlCompany = searchParams.get('companyId');
-        const urlSite = searchParams.get('siteId');
-        const urlSection = searchParams.get('sectionId');
-        const urlDate = searchParams.get('date');
+    // Handle for Company Change:
+    const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => { // chưa hiểu hàm này cho lắm
+        const companyID = e.target.value;
+        const company = companies.find(item => item.companyID === companyID);
+        setDraftFilter(prev => ({
+            ...prev,
+            companyID,
+            companyName: company?.companyName || '',
+            siteID: '',
+            siteCode: '',
+            sectionID: '',
+            sectionName: ''
+        }))
+    }
+    // =========================================================
 
-        if (urlCompany) setSelectedCompany(urlCompany);
-        if (urlSite) setSelectedSite(urlSite);
-        if (urlSection) setSelectedSection(urlSection);
-        if (urlDate) setDate(urlDate);
-    }, [searchParams]);
+    // Handle for Site Change:
+    const handleSiteChange = (e: React.ChangeEvent<HTMLSelectElement>) => { // chưa hiểu hàm này cho lắm
+        const siteID = e.target.value;
+        const site = sites.find(item => item.siteID === siteID);
+        setDraftFilter(prev => ({
+            ...prev,
+            siteID,
+            siteCode: site?.siteCode || '',
+            sectionID: '',
+            sectionName: ''
+        }))
+    }
+    // =========================================================
 
-    const handleSearch = () => {
-        if (selectedCompany && selectedSite && selectedSection) {
-            setSearchParams({
-                companyId: selectedCompany,
-                siteId: selectedSite,
-                sectionId: selectedSection,
-                date: date,
-                _t: Date.now().toString()
-            });
-            setLatestUpdate(new Date().toLocaleString('vi-VN', { hour12: false }));
-        }
+    // Handle for Section Change:
+    const handleSectionChange = (e: React.ChangeEvent<HTMLSelectElement>) => { // chưa hiểu hàm này cho lắm
+        const sectionID = e.target.value;
+        const section = sections.find(item => item.sectionID === sectionID);
+        setDraftFilter(prev => ({
+            ...prev,
+            sectionID,
+            sectionName: section?.sectionName || ''
+        }))
+    }
+    // =========================================================
+
+    // Date change
+    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setDraftFilter(prev => ({
+            ...prev,
+            date: e.target.value
+        }));
     };
+    // =========================================================
 
-    const companyOptions = companies.map(c => ({ value: c.companyID, label: c.companyName }));
-    const siteOptions = sites.map(s => ({ value: s.siteID, label: s.siteCode }));
-    const sectionOptions = sections.map(se => ({ value: se.sectionID, label: se.sectionName }));
+
+    // Apply filter:
+    const handleSearch = () => {
+        if (!draftFilter.companyID || !draftFilter.siteID || !draftFilter.sectionID || !draftFilter.date) {
+            return;
+        }
+        console.log('draftFilter before apply:', draftFilter);
+        onApplyFilter({
+            ...draftFilter // không hiểu lắm
+        });
+        setLatestUpdate(
+            new Date().toLocaleString('vi-VN', { hour12: false })
+        );
+    }
+    // =========================================================
+
+
+
+    // Options for combobox:
+
+    // companyOptionList:
+    const companyOptions = companies.map(co => ({
+        value: co.companyID,
+        label: co.companyName
+    }));
+    // =========================================================
+
+    // siteOptionList:
+    const siteOptions = sites.map(si => ({
+        value: si.siteID,
+        label: si.siteCode
+    }));
+    // =========================================================
+
+    // sectionOptionList:
+    const sectionOptions = sections.map(se => ({
+        value: se.sectionID,
+        label: se.sectionName
+    }));
+    // =========================================================
 
     return (
         <header className="bg-white border-b border-slate-100 px-8 py-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between shrink-0">
@@ -189,7 +250,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                             type="date"
                             value={date}
                             max={todayStr}
-                            onChange={(e) => setDate(e.target.value)}
+                            onChange={handleDateChange}
                             className="h-10 rounded-lg border border-slate-200 pl-10 pr-3 text-sm font-medium text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary cursor-pointer shadow-xs"
                         />
                     </div>
@@ -199,16 +260,16 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                 <Select
                     label="Company"
                     options={companyOptions}
-                    value={selectedCompany}
-                    onChange={(e) => setSelectedCompany(e.target.value)}
+                    value={draftFilter.companyID}
+                    onChange={handleCompanyChange}
                 />
 
                 {/* Site Select */}
                 <Select
                     label="Site"
                     options={siteOptions}
-                    value={selectedSite}
-                    onChange={(e) => setSelectedSite(e.target.value)}
+                    value={draftFilter.siteID}
+                    onChange={handleSiteChange}
                     disabled={siteOptions.length === 0}
                 />
 
@@ -216,8 +277,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                 <Select
                     label="Section"
                     options={sectionOptions}
-                    value={selectedSection}
-                    onChange={(e) => setSelectedSection(e.target.value)}
+                    value={draftFilter.sectionID}
+                    onChange={handleSectionChange}
                     disabled={sectionOptions.length === 0}
                 />
 
@@ -230,10 +291,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                         <RefreshCw size={20} />
                     </Button>
 
-                    <Button variant="secondary" className="h-10 px-4 flex items-center gap-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold shadow-xs">
+                    {/* <Button variant="secondary" className="h-10 px-4 flex items-center gap-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold shadow-xs">
                         <Download size={16} />
                         Export file
-                    </Button>
+                    </Button> */}
                 </div>
             </div>
         </header>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { DashboardHeader } from '../components/DashboardHeader';
+import { ProductionDetailModal } from '../components/ProductionDetailModal';
 import {
   Clock,
   TrendingUp,
@@ -55,13 +56,18 @@ export const DashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   // =========================================================
 
+  // Select Dashboard Chart
+  const [selectedProduction, setSelectedProduction] = useState<ProductionVsPlanInfo | null>(null);
+  // =========================================================
+
+
   // Load Dashboard Data
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
         const dateObj = new Date(filter.date);
-        const prodResult = await companiesApi.getProductionVsPlan(filter.companyID, filter.siteID, Number(filter.sectionID), dateObj); // ? tại sao lại number?
+        const prodResult = await companiesApi.getProductionVsPlan(filter.companyID, filter.siteID, Number(filter.sectionID), dateObj); // ? tại sao lại number? => Vì param này nhận number để đưa xuống sql
         setProductionData(prodResult);
       } catch (err) {
         console.error('Failed to fetch dashboard data', err);
@@ -115,6 +121,8 @@ export const DashboardPage: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <DashboardHeader
+        filter={filter}
+        onApplyFilter={handleApplyFilter}
       />
 
       {/* 4 Cards KPI ở trên cùng */}
@@ -224,6 +232,8 @@ export const DashboardPage: React.FC = () => {
                     radius={[4, 4, 0, 0]}
                     barSize={40}
                     label={{ position: 'top', fill: '#ea580c', fontSize: 11, fontWeight: 600 }}
+                    onClick={(data) => { setSelectedProduction(data.payload) }}
+                    cursor="pointer"
                   />
                   {/* Đường Line Target (Màu xanh dương) */}
                   <Line
@@ -242,6 +252,12 @@ export const DashboardPage: React.FC = () => {
           </Card>
         </div>
       </div>
+      <ProductionDetailModal
+        open={selectedProduction !== null}
+        filter={filter}
+        production={selectedProduction}
+        onClose={() => setSelectedProduction(null)}
+      />
     </div>
   );
 };
