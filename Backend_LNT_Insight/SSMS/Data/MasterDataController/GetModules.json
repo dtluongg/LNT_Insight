@@ -1,0 +1,37 @@
+[
+    {
+        "ModuleMasterID": "MD001",
+        "ModuleMasterName": "Executive Dashboard",
+        "ActiveFlag": true
+    },
+    {
+        "ModuleMasterID": "MD002",
+        "ModuleMasterName": "Management Dashboard",
+        "ActiveFlag": true
+    },
+    {
+        "ModuleMasterID": "MD003",
+        "ModuleMasterName": "Operational Dashboard",
+        "ActiveFlag": true
+    },
+    {
+        "ModuleMasterID": "MD004",
+        "ModuleMasterName": "BI Reports",
+        "ActiveFlag": true
+    },
+    {
+        "ModuleMasterID": "MD005",
+        "ModuleMasterName": "KPI Analytics",
+        "ActiveFlag": true
+    },
+    {
+        "ModuleMasterID": "MD006",
+        "ModuleMasterName": "AI Insights",
+        "ActiveFlag": true
+    },
+    {
+        "ModuleMasterID": "MD007",
+        "ModuleMasterName": "Data Explorer",
+        "ActiveFlag": true
+    }
+]

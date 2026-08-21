@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { DashboardHeader } from '../components/DashboardHeader';
 import {
   Clock,
   TrendingUp,
@@ -26,43 +27,77 @@ import { Table } from '../../../components/ui/Table';
 import { Card } from '../../../components/ui/Card';
 import { companiesApi } from '../../../core/api/companies';
 import type { ProductionVsPlanInfo, SectionInfo } from '../../../types';
+import type { DashboardFilter } from '../types/TeamSewingFilters';
 
 export const DashboardPage: React.FC = () => {
   // Cấu hình các cột cho Bảng chi tiết sản xuất theo giờ
-  const [searchParams] = useSearchParams();
-  const companyId = searchParams.get('companyId') || 'COM01';
-  const siteId = searchParams.get('siteId') || 'Site1';
-  const sectionId = parseInt(searchParams.get('sectionId') || '1', 10);
+  const [searchParams, setSearchParams] = useSearchParams();
   const todayStr = new Date().toLocaleDateString('sv-SE');
-  const dateStr = searchParams.get('date') || todayStr;
+  // =========================================================
 
+
+  // Dashboard Filter
+  // Đây là filter chính của Dashboard
+  const [filter, setFilter] = useState<DashboardFilter>({
+    companyID: searchParams.get('companyId') || 'COM01',
+    companyName: '',
+
+    siteID: searchParams.get('siteId') || 'Site1',
+    siteCode: '',
+
+    sectionID: searchParams.get('sectionId') || '1',
+    sectionName: '',
+
+    date: searchParams.get('date') || todayStr,
+  });
 
   const [productionData, setProductionData] = useState<ProductionVsPlanInfo[]>([]);
-  const [sections, setSections] = useState<SectionInfo[]>([]);
   const [loading, setLoading] = useState(true);
+  // =========================================================
 
+  // Load Dashboard Data
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const dateObj = new Date(dateStr);
-        const prodResult = await companiesApi.getProductionVsPlan(companyId, siteId, sectionId, dateObj);
+        const dateObj = new Date(filter.date);
+        const prodResult = await companiesApi.getProductionVsPlan(filter.companyID, filter.siteID, Number(filter.sectionID), dateObj); // ? tại sao lại number?
         setProductionData(prodResult);
       } catch (err) {
-        console.error("Failed to fetch dashboard data", err);
+        console.error('Failed to fetch dashboard data', err);
+        setProductionData([]);
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
-  }, [companyId, siteId, sectionId, dateStr]);
+    if (filter.companyID && filter.siteID && filter.sectionID && filter.date) {
+      fetchData();
+    }
+  }, [filter.companyID, filter.siteID, filter.sectionID, filter.date]);
+  // =========================================================
+
+
+  // Apply Filter từ DashboardHeader
+  const handleApplyFilter = (newFilter: DashboardFilter) => {
+    setFilter(newFilter);
+    // Đồng bộ filter ID lên URL
+    setSearchParams({
+      companyId: newFilter.companyID,
+      siteId: newFilter.siteID,
+      sectionId: newFilter.sectionID,
+      date: newFilter.date,
+    });
+  };
+  // =========================================================
 
   // Calculate dynamic stats
   const totalOutput = productionData.reduce((sum, item) => sum + (item.dayOutput || 0), 0);
   const totalTarget = productionData.reduce((sum, item) => sum + (item.dayTarget || 0), 0);
   const achievementRate = totalTarget > 0 ? (totalOutput / totalTarget) * 100 : 0;
   const activeLines = productionData.length;
+  // =========================================================
 
+  // Loading
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -73,9 +108,15 @@ export const DashboardPage: React.FC = () => {
       </div>
     );
   }
+  // =========================================================
 
+  // Render
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <DashboardHeader
+      />
+
       {/* 4 Cards KPI ở trên cùng */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         <StatCard
@@ -199,18 +240,6 @@ export const DashboardPage: React.FC = () => {
               </ResponsiveContainer>
             )}
           </Card>
-        </div>
-      </div>
-
-      {/* Box thông báo ghi chú phía dưới */}
-      <div className="flex gap-3 p-4 bg-blue-50/50 border border-blue-100 rounded-xl text-xs text-blue-700 leading-relaxed">
-        <Info size={16} className="shrink-0 text-blue-500" />
-        <div className="space-y-1">
-          <p className="font-semibold">Lưu ý:</p>
-          <ul className="list-disc list-inside space-y-1">
-            <li>Sản lượng lũy kế thực tế (Day Output) được tổng hợp trực tiếp từ cơ sở dữ liệu giám sát chuyền.</li>
-            <li>Đường mục tiêu (Day Target) thể hiện hạn mức kế hoạch ngày cho từng tổ may tương ứng.</li>
-          </ul>
         </div>
       </div>
     </div>
