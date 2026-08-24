@@ -255,6 +255,7 @@ export const DashboardPage: React.FC = () => {
                     dot={{ r: 5, fill: "#2563eb", stroke: "#fff", strokeWidth: 2 }}
                     activeDot={{ r: 8 }}
                     label={{ position: 'top', fill: '#ea580c', fontSize: 11, fontWeight: 600 }}
+
                   />
                 </ComposedChart>
               </ResponsiveContainer>

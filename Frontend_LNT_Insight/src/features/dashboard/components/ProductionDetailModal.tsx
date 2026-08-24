@@ -1,6 +1,7 @@
 import React from 'react';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
 import type { ProductionVsPlanInfo } from '../../../types';
+import FinalSewingOutput from '../../../assets/image/FinalSewingOutput.png';
 
 interface ProductionDetailModalProps {
     open: boolean;
@@ -115,15 +116,23 @@ export const ProductionDetailModal: React.FC<ProductionDetailModalProps> = ({
                     </div>
                 </div>
 
-                {/* Detail Chart - để dành cho bước tiếp theo */}
+                {/* Detail Chart - để dành cho bước tiếp theo
                 <div className="px-6 pb-6">
                     <div className="flex h-64 items-center justify-center rounded-lg border border-dashed border-slate-300">
                         <span className="text-sm text-slate-400">
                             Detail chart will be displayed here
                         </span>
                     </div>
+                </div> */}
+                <div className="px-6 pb-6">
+                    <img
+                        src={FinalSewingOutput}
+                        alt="Final Sewing Output"
+                        className="w-[65%] rounded-lg border border-slate-200 object-contain"
+                    />
                 </div>
             </div>
+
         </div>
     );
 };
