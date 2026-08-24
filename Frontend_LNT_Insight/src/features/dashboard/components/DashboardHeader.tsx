@@ -54,13 +54,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                         ...prev,
                         companyName: currentCompany.companyName
                     }));
-                    // Đồng bộ lên filter cha ở DashboardPage nếu chưa có tên
-                    if (!filter.companyName) {
-                        onApplyFilter({
-                            ...filter,
-                            companyName: currentCompany.companyName
-                        });
-                    }
+                    // // Đồng bộ lên filter cha ở DashboardPage nếu chưa có tên
+                    // if (!filter.companyName) {
+                    //     onApplyFilter({
+                    //         ...filter,
+                    //         companyName: currentCompany.companyName
+                    //     });
+                    // }
                 }
             } catch (err) {
                 console.error('Failed to fetch companies', err);
@@ -87,12 +87,12 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                         siteCode: currentSite.siteCode
                     }));
                     // Đồng bộ lên filter cha ở DashboardPage nếu chưa có siteCode
-                    if (!filter.siteCode) {
-                        onApplyFilter({
-                            ...filter,
-                            siteCode: currentSite.siteCode
-                        });
-                    }
+                    // if (!filter.siteCode) {
+                    //     onApplyFilter({
+                    //         ...filter,
+                    //         siteCode: currentSite.siteCode
+                    //     });
+                    // }
                 } else {
                     const firstSite = data[0];
                     if (firstSite) {
@@ -139,12 +139,12 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                         sectionName: currentSection.sectionName
                     }));
                     // Đồng bộ lên filter cha ở DashboardPage nếu chưa có sectionName
-                    if (!filter.sectionName) {
-                        onApplyFilter({
-                            ...filter,
-                            sectionName: currentSection.sectionName
-                        });
-                    }
+                    // if (!filter.sectionName) {
+                    //     onApplyFilter({
+                    //         ...filter,
+                    //         sectionName: currentSection.sectionName
+                    //     });
+                    // }
                 } else {
                     const firstSection = data[0];
                     if (firstSection) {
@@ -169,7 +169,25 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
         fetchSections();
     }, [draftFilter.companyID, draftFilter.siteID]);
     // =========================================================
-
+    // Đồng bộ đầy đủ companyName, siteCode, sectionName lên filter cha khi tất cả master data đã sẵn sàng
+    useEffect(() => {
+        if (companies.length > 0 && sites.length > 0 && sections.length > 0) {
+            const currentCompany = companies.find(c => c.companyID === filter.companyID);
+            const currentSite = sites.find(s => s.siteID === filter.siteID);
+            const currentSection = sections.find(s => String(s.sectionID) === filter.sectionID);
+            if (currentCompany && currentSite && currentSection) {
+                // Chỉ đồng bộ khi filter cha còn thiếu ít nhất một trường tên
+                if (!filter.companyName || !filter.siteCode || !filter.sectionName) {
+                    onApplyFilter({
+                        ...filter,
+                        companyName: currentCompany.companyName,
+                        siteCode: currentSite.siteCode,
+                        sectionName: currentSection.sectionName
+                    });
+                }
+            }
+        }
+    }, [companies, sites, sections, filter.companyID, filter.siteID, filter.sectionID]);
     // Handle for Company Change:
     const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => { // chưa hiểu hàm này cho lắm
         const companyID = e.target.value;
