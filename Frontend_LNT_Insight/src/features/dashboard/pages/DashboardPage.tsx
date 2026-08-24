@@ -100,7 +100,8 @@ export const DashboardPage: React.FC = () => {
   const totalOutput = productionData.reduce((sum, item) => sum + (item.dayOutput || 0), 0);
   const totalTarget = productionData.reduce((sum, item) => sum + (item.dayTarget || 0), 0);
   const achievementRate = totalTarget > 0 ? (totalOutput / totalTarget) * 100 : 0;
-  const activeLines = productionData.length;
+  const inspection = 0;
+  const defectGMT = 0;
   // =========================================================
 
   // Loading
@@ -118,7 +119,7 @@ export const DashboardPage: React.FC = () => {
 
   // Render
   return (
-    <div className="space-y-6">
+    <div className="space-y-2">
       {/* Header */}
       <DashboardHeader
         filter={filter}
@@ -126,7 +127,7 @@ export const DashboardPage: React.FC = () => {
       />
 
       {/* 4 Cards KPI ở trên cùng */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
         <StatCard
           title="TOTAL OUTPUT"
           value={totalOutput.toLocaleString()}
@@ -155,9 +156,18 @@ export const DashboardPage: React.FC = () => {
         />
 
         <StatCard
-          title="ACTIVE LINES"
-          value={activeLines.toString()}
-          subtitle="Sewing Lines Monitored"
+          title="INSPECTION"
+          value={inspection.toString()}
+          subtitle="Sewing End line Inspection"
+          icon={<Layers size={22} />}
+          iconColorClass="text-purple-600"
+          iconBgClass="bg-purple-50"
+        />
+
+        <StatCard
+          title="INSPECTION"
+          value={defectGMT.toString()}
+          subtitle="Defect / End line Inspection"
           icon={<Layers size={22} />}
           iconColorClass="text-purple-600"
           iconBgClass="bg-purple-50"

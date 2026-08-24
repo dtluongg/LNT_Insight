@@ -30,7 +30,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
         useState<DashboardFilter>(filter);
     // =========================================================
 
-    const [date, setDate] = useState(searchParams.get('date') || todayStr); // set lại không cho chọn quá ngày hôm nay.
+    // const [date, setDate] = useState(searchParams.get('date') || todayStr); // set lại không cho chọn quá ngày hôm nay.
     const [latestUpdate, setLatestUpdate] = useState<string>(
         new Date().toLocaleString('vi-VN', { hour12: false })
     );
@@ -47,12 +47,28 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             try {
                 const data = await companiesApi.getCompanies();
                 setCompanies(data);
+                // Tìm company name tương ứng với ID hiện tại
+                const currentCompany = data.find(c => c.companyID === draftFilter.companyID);
+                if (currentCompany) {
+                    setDraftFilter(prev => ({
+                        ...prev,
+                        companyName: currentCompany.companyName
+                    }));
+                    // Đồng bộ lên filter cha ở DashboardPage nếu chưa có tên
+                    if (!filter.companyName) {
+                        onApplyFilter({
+                            ...filter,
+                            companyName: currentCompany.companyName
+                        });
+                    }
+                }
             } catch (err) {
                 console.error('Failed to fetch companies', err);
             }
         };
         fetchCompanies();
     }, []);
+
 
     // Fetch sites when selected company changes
     useEffect(() => {
@@ -65,12 +81,23 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                     site =>
                         site.siteID === draftFilter.siteID
                 );
-                if (!currentSite) {
+                if (currentSite) {
+                    setDraftFilter(prev => ({
+                        ...prev,
+                        siteCode: currentSite.siteCode
+                    }));
+                    // Đồng bộ lên filter cha ở DashboardPage nếu chưa có siteCode
+                    if (!filter.siteCode) {
+                        onApplyFilter({
+                            ...filter,
+                            siteCode: currentSite.siteCode
+                        });
+                    }
+                } else {
                     const firstSite = data[0];
                     if (firstSite) {
                         setDraftFilter(prev => ({
                             ...prev,
-
                             siteID: firstSite.siteID,
                             siteCode: firstSite.siteCode,
                             sectionID: '',
@@ -79,7 +106,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                     } else {
                         setDraftFilter(prev => ({
                             ...prev,
-
                             siteID: '',
                             siteCode: '',
                             sectionID: '',
@@ -107,12 +133,24 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                     section =>
                         String(section.sectionID) === draftFilter.sectionID
                 );
-                if (!currentSection) {
+                if (currentSection) {
+                    setDraftFilter(prev => ({
+                        ...prev,
+                        sectionName: currentSection.sectionName
+                    }));
+                    // Đồng bộ lên filter cha ở DashboardPage nếu chưa có sectionName
+                    if (!filter.sectionName) {
+                        onApplyFilter({
+                            ...filter,
+                            sectionName: currentSection.sectionName
+                        });
+                    }
+                } else {
                     const firstSection = data[0];
                     if (firstSection) {
                         setDraftFilter(prev => ({
                             ...prev,
-                            sectionID: firstSection.sectionID,
+                            sectionID: String(firstSection.sectionID),
                             sectionName: firstSection.sectionName
                         }))
                     } else {
@@ -240,7 +278,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             </div>
 
             {/* Filters & Actions */}
-            <div className="flex flex-wrap items-end gap-3">
+            <div className="flex items-end gap-3">
                 {/* Date Input */}
                 <div className="flex flex-col gap-1.5">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Day</span>
@@ -248,7 +286,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                         <Calendar size={15} className="absolute left-3 text-slate-400 pointer-events-none" />
                         <input
                             type="date"
-                            value={date}
+                            value={draftFilter.date}
                             max={todayStr}
                             onChange={handleDateChange}
                             className="h-10 rounded-lg border border-slate-200 pl-10 pr-3 text-sm font-medium text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary cursor-pointer shadow-xs"
