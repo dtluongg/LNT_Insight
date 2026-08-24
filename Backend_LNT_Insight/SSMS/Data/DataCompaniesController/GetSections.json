@@ -1,0 +1,27 @@
+[
+    {
+        "SectionID": 1,
+        "SectionNo": "S1",
+        "SectionName": "Section-A"
+    },
+    {
+        "SectionID": 2,
+        "SectionNo": "S2",
+        "SectionName": "Section-B"
+    },
+    {
+        "SectionID": 3,
+        "SectionNo": "S3",
+        "SectionName": "Section-C"
+    },
+    {
+        "SectionID": 4,
+        "SectionNo": "S4",
+        "SectionName": "Section-D"
+    },
+    {
+        "SectionID": 5,
+        "SectionNo": "S5",
+        "SectionName": "Section-E"
+    }
+]

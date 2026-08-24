@@ -2,8 +2,9 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './providers/AuthProvider';
 import { LoginPage } from '../features/auth/pages/LoginPage';
-import { SewingTeamPerformance } from '../features/dashboard/components/SewingTeamPerformance';
+import { DashboardPage } from '../features/dashboard/pages/DashboardPage';
 import { MainLayout } from '../layouts/MainLayout';
+import { BlankPage } from '../features/blankPage/pages/BlankPage';
 
 // Component bảo vệ Route yêu cầu Đăng nhập
 const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
@@ -37,7 +38,7 @@ const PublicRoute: React.FC<{ children: React.ReactElement }> = ({ children }) =
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/coming-soon" replace />;
   }
 
   return children;
@@ -55,13 +56,15 @@ export const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/dashboard/sewing-team-performance" replace />} />
-        <Route path="dashboard/sewing-team-performance" element={<SewingTeamPerformance />} />
-        <Route path="dashboard/pending/:subId" element={
-          <div className="p-8 text-center text-slate-400 font-medium bg-white rounded-xl border border-slate-100 shadow-xs">
-            Tính năng này đang được phát triển...
-          </div>
-        } />
+        <Route index element={<Navigate to="/coming-soon" replace />} />
+        <Route
+          path="coming-soon"
+          element={<BlankPage />}
+        />
+        <Route
+          path="sewing/team-performance"
+          element={<DashboardPage />}
+        />
       </Route>
 
       {/* Route Đăng nhập */}

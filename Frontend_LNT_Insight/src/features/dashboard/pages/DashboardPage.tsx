@@ -1,16 +1,274 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import { submoduleComponentRegistry, DefaultPendingComponent } from '../../../app/pageRegistry';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { DashboardHeader } from '../components/DashboardHeader';
+import { ProductionDetailModal } from '../components/ProductionDetailModal';
+import {
+  Clock,
+  TrendingUp,
+  Target as TargetIcon,
+  Scale,
+  Info,
+  Activity,
+  Layers
+} from 'lucide-react';
+import {
+  ResponsiveContainer,
+  ComposedChart,
+  Bar,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  LabelList,
+} from 'recharts';
+import { StatCard } from '../../../components/ui/StatCard';
+import { Table } from '../../../components/ui/Table';
+import { Card } from '../../../components/ui/Card';
+import { companiesApi } from '../../../core/api/companies';
+import type { ProductionVsPlanInfo, SectionInfo } from '../../../types';
+import type { DashboardFilter } from '../types/TeamSewingFilters';
 
 export const DashboardPage: React.FC = () => {
-  const { subModuleId } = useParams<{ subModuleId: string }>();
+  // Cấu hình các cột cho Bảng chi tiết sản xuất theo giờ
+  const [searchParams, setSearchParams] = useSearchParams();
+  const todayStr = new Date().toLocaleDateString('sv-SE');
+  // =========================================================
 
-  const TargetComponent = submoduleComponentRegistry[subModuleId || ''] 
-    || (() => <DefaultPendingComponent subId={subModuleId || ''} />);
 
+  // Dashboard Filter
+  // Đây là filter chính của Dashboard
+  const [filter, setFilter] = useState<DashboardFilter>({
+    companyID: searchParams.get('companyId') || 'COM01',
+    companyName: '',
+
+    siteID: searchParams.get('siteId') || 'Site1',
+    siteCode: '',
+
+    sectionID: searchParams.get('sectionId') || '1',
+    sectionName: '',
+
+    date: searchParams.get('date') || todayStr,
+  });
+
+  const [productionData, setProductionData] = useState<ProductionVsPlanInfo[]>([]);
+  const [loading, setLoading] = useState(true);
+  // =========================================================
+
+  // Select Dashboard Chart
+  const [selectedProduction, setSelectedProduction] = useState<ProductionVsPlanInfo | null>(null);
+  // =========================================================
+
+
+  // Load Dashboard Data
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const dateObj = new Date(filter.date);
+        const prodResult = await companiesApi.getProductionVsPlan(filter.companyID, filter.siteID, Number(filter.sectionID), dateObj); // ? tại sao lại number? => Vì param này nhận number để đưa xuống sql
+        setProductionData(prodResult);
+      } catch (err) {
+        console.error('Failed to fetch dashboard data', err);
+        setProductionData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (filter.companyID && filter.siteID && filter.sectionID && filter.date) {
+      fetchData();
+    }
+  }, [filter.companyID, filter.siteID, filter.sectionID, filter.date]);
+  // =========================================================
+
+
+  // Apply Filter từ DashboardHeader
+  const handleApplyFilter = (newFilter: DashboardFilter) => {
+    setFilter(newFilter);
+    // Đồng bộ filter ID lên URL
+    setSearchParams({
+      companyId: newFilter.companyID,
+      siteId: newFilter.siteID,
+      sectionId: newFilter.sectionID,
+      date: newFilter.date,
+    });
+  };
+  // =========================================================
+
+  // Calculate dynamic stats
+  const totalOutput = productionData.reduce((sum, item) => sum + (item.dayOutput || 0), 0);
+  const totalTarget = productionData.reduce((sum, item) => sum + (item.dayTarget || 0), 0);
+  const achievementRate = totalTarget > 0 ? (totalOutput / totalTarget) * 100 : 0;
+  const inspection = 0;
+  const defectGMT = 0;
+  // =========================================================
+
+  // Loading
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-sm font-semibold text-slate-500">Loading production dashboard...</span>
+        </div>
+      </div>
+    );
+  }
+  // =========================================================
+
+  // Render
   return (
-    <div className="space-y-6">
-      <TargetComponent />
+    <div className="space-y-2">
+      {/* Header */}
+      <DashboardHeader
+        filter={filter}
+        onApplyFilter={handleApplyFilter}
+      />
+
+      {/* 4 Cards KPI ở trên cùng */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
+        <StatCard
+          title="TOTAL OUTPUT"
+          value={totalOutput.toLocaleString()}
+          subtitle="Cumulative Actual Output (PCS)"
+          icon={<Clock size={22} />}
+          iconColorClass="text-blue-600"
+          iconBgClass="bg-blue-50"
+        />
+
+        <StatCard
+          title="TOTAL TARGET"
+          value={totalTarget.toLocaleString()}
+          subtitle="Overall Shift Plan (PCS)"
+          icon={<TargetIcon size={22} />}
+          iconColorClass="text-blue-600"
+          iconBgClass="bg-blue-50"
+        />
+
+        <StatCard
+          title="ACHIEVEMENT RATE"
+          value={`${achievementRate.toFixed(1)}%`}
+          subtitle="Actual Output / Shift Plan"
+          icon={<TrendingUp size={22} />}
+          iconColorClass={achievementRate >= 90 ? "text-emerald-600" : "text-amber-600"}
+          iconBgClass={achievementRate >= 90 ? "bg-emerald-50" : "bg-amber-50"}
+        />
+
+        <StatCard
+          title="INSPECTION"
+          value={inspection.toString()}
+          subtitle="Sewing End line Inspection"
+          icon={<Layers size={22} />}
+          iconColorClass="text-purple-600"
+          iconBgClass="bg-purple-50"
+        />
+
+        <StatCard
+          title="INSPECTION"
+          value={defectGMT.toString()}
+          subtitle="Defect / End line Inspection"
+          icon={<Layers size={22} />}
+          iconColorClass="text-purple-600"
+          iconBgClass="bg-purple-50"
+        />
+      </div>
+
+      {/* Grid bên dưới: Biểu đồ & Danh sách Section */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+        {/* Biểu đồ */}
+        <div className="xl:col-span-12 flex flex-col gap-3">
+          <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1 flex items-center gap-2">
+            <Activity size={16} className="text-blue-600" />
+            Running Output vs Target
+          </h2>
+          <Card className="flex flex-col justify-center h-[520px] p-6">
+            {productionData.length === 0 ? (
+              <div className="text-center text-slate-400 font-medium py-10">
+                No production data found for this company and site.
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart
+                  data={productionData}
+                  margin={{ top: 20, right: 20, bottom: 20, left: 10 }}
+                >
+                  <defs>
+                    <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#f97316" stopOpacity={0.95} />
+                      <stop offset="100%" stopColor="#ea580c" stopOpacity={0.75} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                  <XAxis
+                    dataKey="teamName"
+                    stroke="#94a3b8"
+                    fontSize={11}
+                    fontWeight={600}
+                    tickLine={false}
+                    dy={10}
+                  />
+                  <YAxis
+                    stroke="#94a3b8"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                    dx={-10}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: '12px',
+                      border: 'none',
+                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+                      fontFamily: 'sans-serif'
+                    }}
+                    formatter={(value: any, name: string) => {
+                      if (name === "dayOutput") return [value ? value.toLocaleString() : '0', 'Day Output (Actual)'];
+                      if (name === "dayTarget") return [value ? value.toLocaleString() : '-', 'Day Target (Plan)'];
+                      return [value, name];
+                    }}
+                  />
+                  <Legend
+                    verticalAlign="bottom"
+                    height={36}
+                    iconType="circle"
+                    wrapperStyle={{ fontSize: '12px', fontWeight: 500 }}
+                  />
+                  {/* Cột Actual Output (Màu cam gradient) */}
+                  <Bar
+                    dataKey="dayOutput"
+                    name="Day Output"
+                    fill="url(#barGradient)"
+                    radius={[4, 4, 0, 0]}
+                    barSize={40}
+                    label={{ position: 'top', fill: '#ea580c', fontSize: 11, fontWeight: 600 }}
+                    onClick={(data) => { setSelectedProduction(data.payload) }}
+                    cursor="pointer"
+                  />
+                  {/* Đường Line Target (Màu xanh dương) */}
+                  <Line
+                    type="monotone"
+                    dataKey="dayTarget"
+                    name="Day Target"
+                    stroke="#2563eb"
+                    strokeWidth={3}
+                    dot={{ r: 5, fill: "#2563eb", stroke: "#fff", strokeWidth: 2 }}
+                    activeDot={{ r: 8 }}
+                    label={{ position: 'top', fill: '#ea580c', fontSize: 11, fontWeight: 600 }}
+
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
+            )}
+          </Card>
+        </div>
+      </div>
+      <ProductionDetailModal
+        open={selectedProduction !== null}
+        filter={filter}
+        production={selectedProduction}
+        onClose={() => setSelectedProduction(null)}
+      />
     </div>
   );
 };

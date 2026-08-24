@@ -30,29 +30,31 @@ export interface ModuleMasterInfo {
 export interface SubModuleInfo {
     moduleMasterSubID: string;
     moduleMasterName: string;
-    moduleMasterID?: string;
+    moduleMasterID: string;
 }
 
 export interface CompanyInfo {
-    companyId: string;
+    companyID: string;
     companyCode: string;
     companyName: string;
 }
 
 export interface SiteInfo {
-    siteId: string;
+    siteID: string;
     siteCode: string;
     siteName: string;
 }
 
 export interface SectionInfo {
+    sectionID: string;
+    sectionNo: string;
     sectionName: string;
 }
 
 export interface ProductionVsPlanInfo {
-    teamId: number;
+    teamID: number;
     teamNo: string;
     teamName: string;
     dayOutput: number;
     dayTarget: number | null;
-}
+}
