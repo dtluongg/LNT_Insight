@@ -22,29 +22,29 @@ import { getModuleRoute, getSubModuleRoute } from '../app/routesConfig';
 
 
 // Hàm ánh xạ Icon dựa trên tên hoặc ID phân hệ
-const getModuleIcon = (moduleName: string, id: string) => {
-  const nameLower = moduleName.toLowerCase();
-  const idLower = id.toLowerCase();
+const getModuleIcon = (ModuleName: string, id: string) => {
+  // const ModuleName = ModuleName.toLowerCase();
+  // const idLower = id.toLowerCase();
 
-  if (nameLower.includes('executive') || idLower.includes('dash')) {
+  if (String(ModuleName).toLowerCase().includes('executive')) {
     return <Activity size={20} />;
   }
-  if (nameLower.includes('manage') || nameLower.includes('vật tư') || nameLower.includes('kho')) {
+  if (String(ModuleName).toLowerCase().includes('manage') || String(ModuleName).toLowerCase().includes('vật tư') || String(ModuleName).toLowerCase().includes('kho')) {
     return <SquareChartGantt size={20} />;
   }
-  if (nameLower.includes('operation') || nameLower.includes('sản xuất')) {
+  if (String(ModuleName).includes('operation') || String(ModuleName).includes('sản xuất')) {
     return <Columns3Cog size={20} />;
   }
-  if (nameLower.includes('report') || nameLower.includes('báo cáo')) {
+  if (String(ModuleName).includes('report') || String(ModuleName).includes('báo cáo')) {
     return <FileBarChart2 size={20} />;
   }
-  if (nameLower.includes('analytic') || nameLower.includes('bảo trì') || nameLower.includes('thiết bị')) {
+  if (String(ModuleName).includes('analytic') || String(ModuleName).includes('bảo trì') || String(ModuleName).includes('thiết bị')) {
     return <ChartNoAxesCombined size={20} />;
   }
-  if (nameLower.includes('insight') || nameLower.includes('bảo trì') || nameLower.includes('thiết bị')) {
+  if (String(ModuleName).includes('insight') || String(ModuleName).includes('bảo trì') || String(ModuleName).includes('thiết bị')) {
     return <Lightbulb size={20} />;
   }
-  if (nameLower.includes('data') || nameLower.includes('danh mục') || nameLower.includes('hệ thống')) {
+  if (String(ModuleName).includes('data') || String(ModuleName).includes('danh mục') || String(ModuleName).includes('hệ thống')) {
     return <Database size={20} />;
   }
   return <Settings size={20} />; // Mặc định
@@ -128,20 +128,20 @@ export const Sidebar: React.FC = () => {
           ) : (
             modules.map((module) => {
               const isExpanded =
-                expandedModuleId === module.moduleMasterID;
+                expandedModuleId === module.ModuleMasterID;
 
               const hasSubmodules =
-                submodules[module.moduleMasterID]?.length > 0 || true;
+                submodules[module.ModuleMasterID]?.length > 0 || true;
 
               const moduleRoute =
-                getModuleRoute(module.moduleMasterID);
+                getModuleRoute(module.ModuleMasterID);
 
               const modulePath =
                 moduleRoute?.path ??
                 `/coming-soon`;
 
               return (
-                <div key={module.moduleMasterID} className="flex flex-col">
+                <div key={module.ModuleMasterID} className="flex flex-col">
                   {/* Module Master Item */}
                   <div className="flex items-center w-full">
                     {/* Module navigation */}
@@ -156,14 +156,14 @@ export const Sidebar: React.FC = () => {
                     >
                       <div className="text-slate-400 group-hover:text-cyan-400 group-[.active]:text-cyan-400 transition-colors">
                         {getModuleIcon(
-                          module.moduleMasterName,
-                          module.moduleMasterID
+                          module.ModuleMasterName,
+                          module.ModuleMasterID
                         )}
                       </div>
 
                       {!isCollapsed && (
                         <span className="truncate text-left">
-                          {module.moduleMasterName}
+                          {module.ModuleMasterName}
                         </span>
                       )}
                     </NavLink>
@@ -172,7 +172,7 @@ export const Sidebar: React.FC = () => {
                     {!isCollapsed && hasSubmodules && (
                       <button
                         onClick={() =>
-                          handleModuleClick(module.moduleMasterID)
+                          handleModuleClick(module.ModuleMasterID)
                         }
                         className="px-2.5 py-2.5 rounded-r-lg text-slate-500 hover:text-white hover:bg-slate-900/60 transition-colors"
                       >
@@ -186,19 +186,19 @@ export const Sidebar: React.FC = () => {
                   </div>
 
                   {/* SubModules Accordion List */}
-                  {!isCollapsed && isExpanded && submodules[module.moduleMasterID] && (
+                  {!isCollapsed && isExpanded && submodules[module.ModuleMasterID] && (
                     <div className="mt-1 ml-4 pl-4 border-l border-slate-800 space-y-1.5 transition-all">
 
 
-                      {submodules[module.moduleMasterID].map((sub) => {
-                        const route = getSubModuleRoute(sub.moduleMasterID, sub.moduleMasterSubID);
+                      {submodules[module.ModuleMasterID].map((sub) => {
+                        const route = getSubModuleRoute(sub.ModuleMasterID, sub.ModuleMasterSubID);
                         const path =
                           route?.path ??
                           `/coming-soon`;
 
                         return (
                           <NavLink
-                            key={`${sub.moduleMasterID}-${sub.moduleMasterSubID}`}
+                            key={`${sub.ModuleMasterID}-${sub.ModuleMasterSubID}`}
                             to={path}
                             className={({ isActive }) =>
                               `block px-3 py-2 text-xs font-medium rounded-md transition-colors ${isActive
@@ -207,12 +207,12 @@ export const Sidebar: React.FC = () => {
                               }`
                             }
                           >
-                            {sub.moduleMasterName}
+                            {sub.ModuleMasterName}
                           </NavLink>
                         )
                       })}
 
-                      {submodules[module.moduleMasterID].length === 0 && (
+                      {submodules[module.ModuleMasterID].length === 0 && (
                         <span className="block px-3 py-1 text-[11px] text-slate-600">Không có phân hệ con</span>
                       )}
                     </div>

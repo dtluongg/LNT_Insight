@@ -1,12 +1,12 @@
 export interface DashboardFilter {
-    companyID: string;
-    companyName: string;
+    CompanyID: string;
+    CompanyName: string;
 
-    siteID: string;
-    siteCode: string;
+    SiteID: string;
+    SiteCode: string;
 
-    sectionID: string;
-    sectionName: string;
+    SectionID: string;
+    SectionName: string;
 
-    date: string;
+    Date: string;
 }

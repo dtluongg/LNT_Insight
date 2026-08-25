@@ -35,7 +35,7 @@ export const ProductionDetailModal: React.FC<ProductionDetailModalProps> = ({
                         </h2>
 
                         <p className="mt-1 text-sm text-slate-400">
-                            {production.teamName}
+                            {production.TeamName}
                         </p>
                     </div>
 
@@ -54,7 +54,7 @@ export const ProductionDetailModal: React.FC<ProductionDetailModalProps> = ({
                             Company
                         </p>
                         <p className="mt-1 text-sm font-semibold text-slate-700">
-                            {filter.companyName}
+                            {filter.CompanyName}
                         </p>
                     </div>
 
@@ -63,7 +63,7 @@ export const ProductionDetailModal: React.FC<ProductionDetailModalProps> = ({
                             Site
                         </p>
                         <p className="mt-1 text-sm font-semibold text-slate-700">
-                            {filter.siteCode}
+                            {filter.SiteCode}
                         </p>
                     </div>
 
@@ -72,7 +72,7 @@ export const ProductionDetailModal: React.FC<ProductionDetailModalProps> = ({
                             Section
                         </p>
                         <p className="mt-1 text-sm font-semibold text-slate-700">
-                            {filter.sectionName}
+                            {filter.SectionName}
                         </p>
                     </div>
 
@@ -81,7 +81,7 @@ export const ProductionDetailModal: React.FC<ProductionDetailModalProps> = ({
                             Date
                         </p>
                         <p className="mt-1 text-sm font-semibold text-slate-700">
-                            {filter.date}
+                            {filter.Date}
                         </p>
                     </div>
                 </div>
@@ -93,7 +93,7 @@ export const ProductionDetailModal: React.FC<ProductionDetailModalProps> = ({
                             Team
                         </p>
                         <p className="mt-1 text-lg font-semibold text-slate-800">
-                            {production.teamName}
+                            {production.TeamName}
                         </p>
                     </div>
 
@@ -102,7 +102,7 @@ export const ProductionDetailModal: React.FC<ProductionDetailModalProps> = ({
                             Day Output
                         </p>
                         <p className="mt-1 text-lg font-semibold text-orange-600">
-                            {production.dayOutput?.toLocaleString() ?? 0}
+                            {production.DayOutput?.toLocaleString() ?? 0}
                         </p>
                     </div>
 
@@ -111,7 +111,7 @@ export const ProductionDetailModal: React.FC<ProductionDetailModalProps> = ({
                             Day Target
                         </p>
                         <p className="mt-1 text-lg font-semibold text-blue-600">
-                            {production.dayTarget?.toLocaleString() ?? 0}
+                            {production.DayTarget?.toLocaleString() ?? 0}
                         </p>
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-import { apiFetch, mapKeysToCamelCase } from '../../core/api/httpClient';
+import { apiFetch } from '../../core/api/httpClient';
 import type {
     MastUserInfo,
     ModuleMasterInfo,
@@ -9,14 +9,14 @@ import type {
 export const masterDataApi = {
     getUsers: async (): Promise<MastUserInfo[]> => {
         const raw = await apiFetch<any[]>('/MasterData/users');
-        return mapKeysToCamelCase(raw);
+        return raw;
     },
     getModules: async (): Promise<ModuleMasterInfo[]> => {
         const raw = await apiFetch<any[]>('/MasterData/modules');
-        return mapKeysToCamelCase(raw);
+        return raw;
     },
     getSubModules: async (moduleMasterID: string): Promise<SubModuleInfo[]> => {
         const raw = await apiFetch<any[]>(`/MasterData/subModules/${moduleMasterID}`);
-        return mapKeysToCamelCase(raw);
+        return raw;
     }
-}
+}

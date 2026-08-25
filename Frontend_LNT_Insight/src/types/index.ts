@@ -23,38 +23,38 @@ export interface MastUserInfo {
     isNewUser: boolean | null;
 }
 export interface ModuleMasterInfo {
-    moduleMasterID: string;
-    moduleMasterName: string;
+    ModuleMasterID: string;
+    ModuleMasterName: string;
     icon?: string;
 }
 export interface SubModuleInfo {
-    moduleMasterSubID: string;
-    moduleMasterName: string;
-    moduleMasterID: string;
+    ModuleMasterSubID: string;
+    ModuleMasterName: string;
+    ModuleMasterID: string;
 }
 
 export interface CompanyInfo {
-    companyID: string;
-    companyCode: string;
-    companyName: string;
+    CompanyID: string;
+    CompanyCode: string;
+    CompanyName: string;
 }
 
 export interface SiteInfo {
-    siteID: string;
-    siteCode: string;
-    siteName: string;
+    SiteID: string;
+    SiteCode: string;
+    SiteName: string;
 }
 
 export interface SectionInfo {
-    sectionID: string;
-    sectionNo: string;
-    sectionName: string;
+    SectionID: string;
+    SectionNo: string;
+    SectionName: string;
 }
 
 export interface ProductionVsPlanInfo {
-    teamID: number;
-    teamNo: string;
-    teamName: string;
-    dayOutput: number;
-    dayTarget: number | null;
+    TeamID: number;
+    TeamNo: string;
+    TeamName: string;
+    DayOutput: number;
+    DayTarget: number | null;
 }

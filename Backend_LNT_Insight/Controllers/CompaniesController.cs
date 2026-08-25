@@ -10,7 +10,7 @@ namespace Backend_LNT_Insight.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    // [Authorize]
     public class CompaniesController : ControllerBase
     {
         private readonly string _connectionString;
@@ -52,8 +52,8 @@ namespace Backend_LNT_Insight.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{companyId}/sites")]
-        public async Task<IActionResult> GetSites(string companyId)
+        [HttpGet("{companyID}/sites")]
+        public async Task<IActionResult> GetSites(string companyID)
         {
             if (_useLocalMockData)
             {
@@ -62,12 +62,12 @@ namespace Backend_LNT_Insight.Controllers
 
             using var db = CreateConnection();
             string sql = "SELECT SiteID, SiteCode, SiteName FROM [lntdev-db01].[FXPRO].[dbo].[tblCompanySiteInformation] WHERE CompanyID = @CompanyID AND ManufacturingSiteFlag = 1 AND ActiveFlag = 1";
-            var result = (await db.QueryAsync<dynamic>(sql, new { CompanyID = companyId })).ToList();
+            var result = (await db.QueryAsync<dynamic>(sql, new { CompanyID = companyID })).ToList();
             return Ok(result);
         }
 
-        [HttpGet("{companyId}/sites/{siteId}/sections")]
-        public async Task<IActionResult> GetSections(string companyId, string siteId, [FromQuery] string departmentId = "DEP05")
+        [HttpGet("{companyID}/sites/{siteID}/sections")]
+        public async Task<IActionResult> GetSections(string companyID, string siteID, [FromQuery] string departmentID = "DEP05")
         {
             if (_useLocalMockData)
             {
@@ -76,12 +76,12 @@ namespace Backend_LNT_Insight.Controllers
 
             using var db = CreateConnection();
             string sql = "SELECT SectionID, SectionNo, SectionName FROM [lntdev-db01].[FXPRO].[dbo].[tblCompanySiteDepartmentSection] WHERE CompanyID = @CompanyID AND SiteID = @SiteID AND DepartmentID = @DepartmentID AND ActiveFlag = 1";
-            var result = (await db.QueryAsync<dynamic>(sql, new { CompanyID = companyId, SiteID = siteId, DepartmentID = departmentId })).ToList();
+            var result = (await db.QueryAsync<dynamic>(sql, new { CompanyID = companyID, SiteID = siteID, DepartmentID = departmentID })).ToList();
             return Ok(result);
         }
 
-        [HttpGet("{companyId}/sites/{siteId}/sections/{sectionId}/date/{dateDay}/production-vs-plan")]
-        public async Task<IActionResult> GetProductionVsPlan(string companyId, string siteId, int sectionId, DateTime dateDay)
+        [HttpGet("{companyID}/sites/{siteID}/sections/{sectionID}/date/{dateDay}/production-vs-plan")]
+        public async Task<IActionResult> GetProductionVsPlan(string companyID, string siteID, int sectionID, DateTime dateDay)
         {
             if (_useLocalMockData)
             {
@@ -89,7 +89,33 @@ namespace Backend_LNT_Insight.Controllers
             }
 
             using var db = CreateConnection();
-            var result = (await db.QueryAsync<dynamic>("USP_ProductionVsPlan", new { CompanyID = companyId, SiteID = siteId, SectionID = sectionId, Date = dateDay.Date }, commandType: CommandType.StoredProcedure)).ToList();
+            var result = (await db.QueryAsync<dynamic>("USP_ProductionVsPlan", new { CompanyID = companyID, SiteID = siteID, SectionID = sectionID, Date = dateDay.Date }, commandType: CommandType.StoredProcedure)).ToList();
+            return Ok(result);
+        }
+        [HttpGet("{companyID}/sites/{siteID}/date/{dateDay}/section/{sectionID}/shift_work")]
+
+        public async Task<IActionResult> GetShiftWorkList(string companyID, string siteID, DateTime dateDay, int sectionID)
+        {
+            if (_useLocalMockData)
+            {
+                return GetMockData("GetShiftWorkList.json");
+            }
+
+            using var db = CreateConnection();
+            var result = (await db.QueryAsync<dynamic>("USP_Dashboard_WorkShift_GetList", new { CompanyID = companyID, SiteID = siteID, WorkDate = dateDay.Date, SectionID = sectionID }, commandType: CommandType.StoredProcedure)).ToList();
+            return Ok(result);
+        }
+        [HttpGet("{companyID}/sites/{siteID}/date/{dateDay}/team/{teamID}/shift_work/{shiftWorkID}/sewing_output")]
+
+         public async Task<IActionResult> GetDataSewingTeamOutputAnalysis(string companyID, string siteID, DateTime dateDay, int teamID, int shiftWorkID)
+        {
+            if (_useLocalMockData)
+            {
+                return GetMockData("GetDataSewingOutputAnalysis.json");
+            }
+
+            using var db = CreateConnection();
+            var result = (await db.QueryAsync<dynamic>("USP_Dashboard_SewingTeamOutputAnalysis_GetData", new { CompanyID = companyID, SiteID = siteID, Date = dateDay.Date, TeamID = teamID, ShiftWorkID = shiftWorkID }, commandType: CommandType.StoredProcedure)).ToList();
             return Ok(result);
         }
     }

@@ -40,16 +40,16 @@ export const DashboardPage: React.FC = () => {
   // Dashboard Filter
   // Đây là filter chính của Dashboard
   const [filter, setFilter] = useState<DashboardFilter>({
-    companyID: searchParams.get('companyId') || 'COM01',
-    companyName: '',
+    CompanyID: searchParams.get('companyId') || 'COM01',
+    CompanyName: '',
 
-    siteID: searchParams.get('siteId') || 'Site1',
-    siteCode: '',
+    SiteID: searchParams.get('siteId') || 'Site1',
+    SiteCode: '',
 
-    sectionID: searchParams.get('sectionId') || '1',
-    sectionName: '',
+    SectionID: searchParams.get('sectionId') || '1',
+    SectionName: '',
 
-    date: searchParams.get('date') || todayStr,
+    Date: searchParams.get('date') || todayStr,
   });
 
   const [productionData, setProductionData] = useState<ProductionVsPlanInfo[]>([]);
@@ -66,8 +66,8 @@ export const DashboardPage: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const dateObj = new Date(filter.date);
-        const prodResult = await companiesApi.getProductionVsPlan(filter.companyID, filter.siteID, Number(filter.sectionID), dateObj); // ? tại sao lại number? => Vì param này nhận number để đưa xuống sql
+        const dateObj = new Date(filter.Date);
+        const prodResult = await companiesApi.getProductionVsPlan(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj); // ? tại sao lại number? => Vì param này nhận number để đưa xuống sql
         setProductionData(prodResult);
       } catch (err) {
         console.error('Failed to fetch dashboard data', err);
@@ -76,10 +76,10 @@ export const DashboardPage: React.FC = () => {
         setLoading(false);
       }
     };
-    if (filter.companyID && filter.siteID && filter.sectionID && filter.date) {
+    if (filter.CompanyID && filter.SiteID && filter.SectionID && filter.Date) {
       fetchData();
     }
-  }, [filter.companyID, filter.siteID, filter.sectionID, filter.date]);
+  }, [filter.CompanyID, filter.SiteID, filter.SectionID, filter.Date]);
   // =========================================================
 
 
@@ -88,17 +88,17 @@ export const DashboardPage: React.FC = () => {
     setFilter(newFilter);
     // Đồng bộ filter ID lên URL
     setSearchParams({
-      companyId: newFilter.companyID,
-      siteId: newFilter.siteID,
-      sectionId: newFilter.sectionID,
-      date: newFilter.date,
+      CompanyId: newFilter.CompanyID,
+      SiteId: newFilter.SiteID,
+      SectionId: newFilter.SectionID,
+      Date: newFilter.Date,
     });
   };
   // =========================================================
 
   // Calculate dynamic stats
-  const totalOutput = productionData.reduce((sum, item) => sum + (item.dayOutput || 0), 0);
-  const totalTarget = productionData.reduce((sum, item) => sum + (item.dayTarget || 0), 0);
+  const totalOutput = productionData.reduce((sum, item) => sum + (item.DayOutput || 0), 0);
+  const totalTarget = productionData.reduce((sum, item) => sum + (item.DayTarget || 0), 0);
   const achievementRate = totalTarget > 0 ? (totalOutput / totalTarget) * 100 : 0;
   const inspection = 0;
   const defectGMT = 0;
@@ -201,7 +201,7 @@ export const DashboardPage: React.FC = () => {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                   <XAxis
-                    dataKey="teamName"
+                    dataKey="TeamName"
                     stroke="#94a3b8"
                     fontSize={11}
                     fontWeight={600}
@@ -223,8 +223,8 @@ export const DashboardPage: React.FC = () => {
                       fontFamily: 'sans-serif'
                     }}
                     formatter={(value: any, name: string) => {
-                      if (name === "dayOutput") return [value ? value.toLocaleString() : '0', 'Day Output (Actual)'];
-                      if (name === "dayTarget") return [value ? value.toLocaleString() : '-', 'Day Target (Plan)'];
+                      if (name === "DayOutput") return [value ? value.toLocaleString() : '0', 'Day Output (Actual)'];
+                      if (name === "DayTarget") return [value ? value.toLocaleString() : '-', 'Day Target (Plan)'];
                       return [value, name];
                     }}
                   />
@@ -236,7 +236,7 @@ export const DashboardPage: React.FC = () => {
                   />
                   {/* Cột Actual Output (Màu cam gradient) */}
                   <Bar
-                    dataKey="dayOutput"
+                    dataKey="DayOutput"
                     name="Day Output"
                     fill="url(#barGradient)"
                     radius={[4, 4, 0, 0]}
@@ -248,7 +248,7 @@ export const DashboardPage: React.FC = () => {
                   {/* Đường Line Target (Màu xanh dương) */}
                   <Line
                     type="monotone"
-                    dataKey="dayTarget"
+                    dataKey="DayTarget"
                     name="Day Target"
                     stroke="#2563eb"
                     strokeWidth={3}

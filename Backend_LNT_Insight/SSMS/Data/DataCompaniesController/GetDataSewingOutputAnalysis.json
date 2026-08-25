@@ -1,0 +1,47 @@
+[
+    {
+        "ShiftHourID": "2WH",
+        "ShiftHourWithTime": "2WH (08:15 - 09:15)",
+        "OutputQty": 12,
+        "HourlyPlan": 19,
+        "Achievement": 63.1600,
+        "RunningOutput": 12,
+        "OutputVariance": 7
+    },
+    {
+        "ShiftHourID": "4WH",
+        "ShiftHourWithTime": "4WH (10:15 - 11:30)",
+        "OutputQty": 23,
+        "HourlyPlan": 19,
+        "Achievement": 121.0500,
+        "RunningOutput": 35,
+        "OutputVariance": -4
+    },
+    {
+        "ShiftHourID": "5WH",
+        "ShiftHourWithTime": "5WH (12:30 - 13:30)",
+        "OutputQty": 21,
+        "HourlyPlan": 19,
+        "Achievement": 110.5300,
+        "RunningOutput": 56,
+        "OutputVariance": -2
+    },
+    {
+        "ShiftHourID": "6WH",
+        "ShiftHourWithTime": "6WH (13:30 - 14:30)",
+        "OutputQty": 35,
+        "HourlyPlan": 19,
+        "Achievement": 184.2100,
+        "RunningOutput": 91,
+        "OutputVariance": -16
+    },
+    {
+        "ShiftHourID": "7WH",
+        "ShiftHourWithTime": "7WH (14:30 - 15:30)",
+        "OutputQty": 42,
+        "HourlyPlan": 19,
+        "Achievement": 221.0500,
+        "RunningOutput": 133,
+        "OutputVariance": -23
+    }
+]

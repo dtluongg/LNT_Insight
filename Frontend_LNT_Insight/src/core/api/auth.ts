@@ -1,4 +1,4 @@
-import { apiFetch, mapKeysToCamelCase } from "./httpClient";
+import { apiFetch } from "./httpClient";
 import type { LoginResponse } from "../../types";
 
 export const authApi = {
@@ -8,6 +8,6 @@ export const authApi = {
             method: 'POST',
             body: JSON.stringify({ username, password }),
         });
-        return mapKeysToCamelCase(raw) as LoginResponse;
+        return raw as LoginResponse;
     }
 }

@@ -48,11 +48,11 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                 const data = await companiesApi.getCompanies();
                 setCompanies(data);
                 // Tìm company name tương ứng với ID hiện tại
-                const currentCompany = data.find(c => c.companyID === draftFilter.companyID);
+                const currentCompany = data.find(c => c.CompanyID === draftFilter.CompanyID);
                 if (currentCompany) {
                     setDraftFilter(prev => ({
                         ...prev,
-                        companyName: currentCompany.companyName
+                        CompanyName: currentCompany.CompanyName
                     }));
                     // // Đồng bộ lên filter cha ở DashboardPage nếu chưa có tên
                     // if (!filter.companyName) {
@@ -72,19 +72,19 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
 
     // Fetch sites when selected company changes
     useEffect(() => {
-        if (!draftFilter.companyID) return;
+        if (!draftFilter.CompanyID) return;
         const fetchSites = async () => {
             try {
-                const data = await companiesApi.getSites(draftFilter.companyID);
+                const data = await companiesApi.getSites(draftFilter.CompanyID);
                 setSites(data);
                 const currentSite = data.find(
                     site =>
-                        site.siteID === draftFilter.siteID
+                        site.SiteID === draftFilter.SiteID
                 );
                 if (currentSite) {
                     setDraftFilter(prev => ({
                         ...prev,
-                        siteCode: currentSite.siteCode
+                        SiteCode: currentSite.SiteCode
                     }));
                     // Đồng bộ lên filter cha ở DashboardPage nếu chưa có siteCode
                     // if (!filter.siteCode) {
@@ -98,18 +98,18 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                     if (firstSite) {
                         setDraftFilter(prev => ({
                             ...prev,
-                            siteID: firstSite.siteID,
-                            siteCode: firstSite.siteCode,
-                            sectionID: '',
-                            sectionName: ''
+                            SiteID: firstSite.SiteID,
+                            SiteCode: firstSite.SiteCode,
+                            SectionID: '',
+                            SectionName: ''
                         }));
                     } else {
                         setDraftFilter(prev => ({
                             ...prev,
-                            siteID: '',
-                            siteCode: '',
-                            sectionID: '',
-                            sectionName: ''
+                            SiteID: '',
+                            SiteCode: '',
+                            SectionID: '',
+                            SectionName: ''
                         }));
                     }
                 }
@@ -119,24 +119,24 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             }
         };
         fetchSites();
-    }, [draftFilter.companyID]);
+    }, [draftFilter.CompanyID]);
     // =========================================================
 
     // Fetch sections when selected company or site changes
     useEffect(() => {
-        if (!draftFilter.companyID || !draftFilter.siteID) return;
+        if (!draftFilter.CompanyID || !draftFilter.SiteID) return;
         const fetchSections = async () => {
             try {
-                const data = await companiesApi.getSections(draftFilter.companyID, draftFilter.siteID);
+                const data = await companiesApi.getSections(draftFilter.CompanyID, draftFilter.SiteID);
                 setSections(data);
                 const currentSection = data.find(
                     section =>
-                        String(section.sectionID) === draftFilter.sectionID
+                        String(section.SectionID) === draftFilter.SectionID
                 );
                 if (currentSection) {
                     setDraftFilter(prev => ({
                         ...prev,
-                        sectionName: currentSection.sectionName
+                        sectionName: currentSection.SectionName
                     }));
                     // Đồng bộ lên filter cha ở DashboardPage nếu chưa có sectionName
                     // if (!filter.sectionName) {
@@ -150,14 +150,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                     if (firstSection) {
                         setDraftFilter(prev => ({
                             ...prev,
-                            sectionID: String(firstSection.sectionID),
-                            sectionName: firstSection.sectionName
+                            SectionID: String(firstSection.SectionID),
+                            SectionName: firstSection.SectionName
                         }))
                     } else {
                         setDraftFilter(prev => ({
                             ...prev,
-                            sectionID: '',
-                            sectionName: ''
+                            SectionID: '',
+                            SectionName: ''
                         }))
                     }
                 }
@@ -167,39 +167,39 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             }
         };
         fetchSections();
-    }, [draftFilter.companyID, draftFilter.siteID]);
+    }, [draftFilter.CompanyID, draftFilter.SiteID]);
     // =========================================================
     // Đồng bộ đầy đủ companyName, siteCode, sectionName lên filter cha khi tất cả master data đã sẵn sàng
     useEffect(() => {
         if (companies.length > 0 && sites.length > 0 && sections.length > 0) {
-            const currentCompany = companies.find(c => c.companyID === filter.companyID);
-            const currentSite = sites.find(s => s.siteID === filter.siteID);
-            const currentSection = sections.find(s => String(s.sectionID) === filter.sectionID);
+            const currentCompany = companies.find(c => c.CompanyID === filter.CompanyID);
+            const currentSite = sites.find(s => s.SiteID === filter.SiteID);
+            const currentSection = sections.find(s => String(s.SectionID) === filter.SectionID);
             if (currentCompany && currentSite && currentSection) {
                 // Chỉ đồng bộ khi filter cha còn thiếu ít nhất một trường tên
-                if (!filter.companyName || !filter.siteCode || !filter.sectionName) {
+                if (!filter.CompanyName || !filter.SiteCode || !filter.SectionName) {
                     onApplyFilter({
                         ...filter,
-                        companyName: currentCompany.companyName,
-                        siteCode: currentSite.siteCode,
-                        sectionName: currentSection.sectionName
+                        CompanyName: currentCompany.CompanyName,
+                        SiteCode: currentSite.SiteCode,
+                        SectionName: currentSection.SectionName
                     });
                 }
             }
         }
-    }, [companies, sites, sections, filter.companyID, filter.siteID, filter.sectionID]);
+    }, [companies, sites, sections, filter.CompanyID, filter.SiteID, filter.SectionID]);
     // Handle for Company Change:
     const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => { // chưa hiểu hàm này cho lắm
         const companyID = e.target.value;
-        const company = companies.find(item => item.companyID === companyID);
+        const company = companies.find(item => item.CompanyID === companyID);
         setDraftFilter(prev => ({
             ...prev,
-            companyID,
-            companyName: company?.companyName || '',
-            siteID: '',
-            siteCode: '',
-            sectionID: '',
-            sectionName: ''
+            CompanyID: companyID,
+            CompanyName: company?.CompanyName || '',
+            SiteID: '',
+            SiteCode: '',
+            SectionID: '',
+            SectionName: ''
         }))
     }
     // =========================================================
@@ -207,13 +207,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
     // Handle for Site Change:
     const handleSiteChange = (e: React.ChangeEvent<HTMLSelectElement>) => { // chưa hiểu hàm này cho lắm
         const siteID = e.target.value;
-        const site = sites.find(item => item.siteID === siteID);
+        const site = sites.find(item => item.SiteID === siteID);
         setDraftFilter(prev => ({
             ...prev,
-            siteID,
-            siteCode: site?.siteCode || '',
-            sectionID: '',
-            sectionName: ''
+            SiteID: siteID,
+            SiteCode: site?.SiteCode || '',
+            SectionID: '',
+            SectionName: ''
         }))
     }
     // =========================================================
@@ -221,11 +221,11 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
     // Handle for Section Change:
     const handleSectionChange = (e: React.ChangeEvent<HTMLSelectElement>) => { // chưa hiểu hàm này cho lắm
         const sectionID = e.target.value;
-        const section = sections.find(item => item.sectionID === sectionID);
+        const section = sections.find(item => item.SectionID === sectionID);
         setDraftFilter(prev => ({
             ...prev,
-            sectionID,
-            sectionName: section?.sectionName || ''
+            SectionID: sectionID,
+            SectionName: section?.SectionName || ''
         }))
     }
     // =========================================================
@@ -242,7 +242,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
 
     // Apply filter:
     const handleSearch = () => {
-        if (!draftFilter.companyID || !draftFilter.siteID || !draftFilter.sectionID || !draftFilter.date) {
+        if (!draftFilter.CompanyID || !draftFilter.SiteID || !draftFilter.SectionID || !draftFilter.Date) {
             return;
         }
         console.log('draftFilter before apply:', draftFilter);
@@ -261,22 +261,22 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
 
     // companyOptionList:
     const companyOptions = companies.map(co => ({
-        value: co.companyID,
-        label: co.companyName
+        value: co.CompanyID,
+        label: co.CompanyName
     }));
     // =========================================================
 
     // siteOptionList:
     const siteOptions = sites.map(si => ({
-        value: si.siteID,
-        label: si.siteCode
+        value: si.SiteID,
+        label: si.SiteCode
     }));
     // =========================================================
 
     // sectionOptionList:
     const sectionOptions = sections.map(se => ({
-        value: se.sectionID,
-        label: se.sectionName
+        value: se.SectionID,
+        label: se.SectionName
     }));
     // =========================================================
 
@@ -304,7 +304,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                         <Calendar size={15} className="absolute left-3 text-slate-400 pointer-events-none" />
                         <input
                             type="date"
-                            value={draftFilter.date}
+                            value={draftFilter.Date}
                             max={todayStr}
                             onChange={handleDateChange}
                             className="h-10 rounded-lg border border-slate-200 pl-10 pr-3 text-sm font-medium text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary cursor-pointer shadow-xs"
@@ -316,7 +316,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                 <Select
                     label="Company"
                     options={companyOptions}
-                    value={draftFilter.companyID}
+                    value={draftFilter.CompanyID}
                     onChange={handleCompanyChange}
                 />
 
@@ -324,7 +324,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                 <Select
                     label="Site"
                     options={siteOptions}
-                    value={draftFilter.siteID}
+                    value={draftFilter.SiteID}
                     onChange={handleSiteChange}
                     disabled={siteOptions.length === 0}
                 />
@@ -333,7 +333,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                 <Select
                     label="Section"
                     options={sectionOptions}
-                    value={draftFilter.sectionID}
+                    value={draftFilter.SectionID}
                     onChange={handleSectionChange}
                     disabled={sectionOptions.length === 0}
                 />

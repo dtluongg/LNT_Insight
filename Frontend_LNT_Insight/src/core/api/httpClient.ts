@@ -140,20 +140,20 @@ async function getErrorMessage(res: Response): Promise<string> {
 }
 
 // Bộ chuyển đổi khoá: Đổi PascalCase (C#/Dapper) thành camelCase (JavaScript)
-export function mapKeysToCamelCase(obj: any): any {
-    if (Array.isArray(obj)) {
-        return obj.map(mapKeysToCamelCase);
-    } else if (obj !== null && typeof obj === 'object') {
-        const newObj: any = {};
-        for (const key of Object.keys(obj)) {
-            let camelCase = key.charAt(0).toLowerCase() + key.slice(1);
-            // Đồng bộ hoá đuôi Id thành ID viết để dễ gõ kiểu:
-            if (camelCase.endsWith('Id') && camelCase !== 'isNewUser') {
-                camelCase = camelCase.slice(0, -2) + 'ID';
-            }
-            newObj[camelCase] = mapKeysToCamelCase(obj[key]);
-        }
-        return newObj;
-    }
-    return obj;
-}
+// export function mapKeysToCamelCase(obj: any): any {
+//     if (Array.isArray(obj)) {
+//         return obj.map(mapKeysToCamelCase);
+//     } else if (obj !== null && typeof obj === 'object') {
+//         const newObj: any = {};
+//         for (const key of Object.keys(obj)) {
+//             let camelCase = key.charAt(0).toLowerCase() + key.slice(1);
+//             // Đồng bộ hoá đuôi Id thành ID viết để dễ gõ kiểu:
+//             if (camelCase.endsWith('Id') && camelCase !== 'isNewUser') {
+//                 camelCase = camelCase.slice(0, -2) + 'ID';
+//             }
+//             newObj[camelCase] = mapKeysToCamelCase(obj[key]);
+//         }
+//         return newObj;
+//     }
+//     return obj;
+// }
