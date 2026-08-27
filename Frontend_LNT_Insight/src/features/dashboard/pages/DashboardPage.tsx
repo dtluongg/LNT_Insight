@@ -104,15 +104,10 @@ export const DashboardPage: React.FC = () => {
   const totalOutput = dataSewingTeamSummary[0]?.DayOutput ?? 0;
   const totalTarget = dataSewingTeamSummary[0]?.DayTarget ?? 0;
   const achievementRate = totalTarget > 0 ? (totalOutput / totalTarget) * 100 : 0;
-<<<<<<< Updated upstream
-  const inspection = dataSewingTeamSummary[0]?.InspectedQty??0;
+  const inspection = dataSewingTeamSummary[0]?.InspectedQty ?? 0;
   const defect = dataSewingTeamSummary[0]?.DefectQty ?? 0;
   const defectRate = dataSewingTeamSummary[0]?.DefectRate ?? 0;
   const defectGMT = `${defect} / ${defectRate}`;
-=======
-  const inspection = "XXX";
-  const defectGMT = "XXX / XX%";
->>>>>>> Stashed changes
   // =========================================================
 
   // Loading
