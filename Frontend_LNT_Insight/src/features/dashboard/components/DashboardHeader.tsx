@@ -136,7 +136,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                 if (currentSection) {
                     setDraftFilter(prev => ({
                         ...prev,
-                        sectionName: currentSection.SectionName
+                        SectionName: currentSection.SectionName
                     }));
                     // Đồng bộ lên filter cha ở DashboardPage nếu chưa có sectionName
                     // if (!filter.sectionName) {
@@ -234,7 +234,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setDraftFilter(prev => ({
             ...prev,
-            date: e.target.value
+            Date: e.target.value
         }));
     };
     // =========================================================

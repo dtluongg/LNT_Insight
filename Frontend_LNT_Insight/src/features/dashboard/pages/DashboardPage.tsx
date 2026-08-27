@@ -27,7 +27,7 @@ import { StatCard } from '../../../components/ui/StatCard';
 import { Table } from '../../../components/ui/Table';
 import { Card } from '../../../components/ui/Card';
 import { companiesApi } from '../../../core/api/companies';
-import type { ProductionVsPlanInfo, SectionInfo } from '../../../types';
+import type { ProductionVsPlanInfo, SewingTeamSummay, SewingTeamDetail } from '../../../types';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
 
 export const DashboardPage: React.FC = () => {
@@ -53,6 +53,7 @@ export const DashboardPage: React.FC = () => {
   });
 
   const [productionData, setProductionData] = useState<ProductionVsPlanInfo[]>([]);
+  const [dataSewingTeamSummary, setDataSewingTeamSummary] = useState<SewingTeamSummay[]>([]);
   const [loading, setLoading] = useState(true);
   // =========================================================
 
@@ -69,6 +70,9 @@ export const DashboardPage: React.FC = () => {
         const dateObj = new Date(filter.Date);
         const prodResult = await companiesApi.getProductionVsPlan(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj); // ? tại sao lại number? => Vì param này nhận number để đưa xuống sql
         setProductionData(prodResult);
+        const getDataSewingTeamSummary = await companiesApi.getTeamSewingSummary(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj);
+        setDataSewingTeamSummary(getDataSewingTeamSummary);
+        console.log(getDataSewingTeamSummary)
       } catch (err) {
         console.error('Failed to fetch dashboard data', err);
         setProductionData([]);
@@ -97,11 +101,13 @@ export const DashboardPage: React.FC = () => {
   // =========================================================
 
   // Calculate dynamic stats
-  const totalOutput = productionData.reduce((sum, item) => sum + (item.DayOutput || 0), 0);
-  const totalTarget = productionData.reduce((sum, item) => sum + (item.DayTarget || 0), 0);
+  const totalOutput = dataSewingTeamSummary[0]?.DayOutput ?? 0;
+  const totalTarget = dataSewingTeamSummary[0]?.DayTarget ?? 0;
   const achievementRate = totalTarget > 0 ? (totalOutput / totalTarget) * 100 : 0;
-  const inspection = 0;
-  const defectGMT = 0;
+  const inspection = dataSewingTeamSummary[0]?.InspectedQty??0;
+  const defect = dataSewingTeamSummary[0]?.DefectQty ?? 0;
+  const defectRate = dataSewingTeamSummary[0]?.DefectRate ?? 0;
+  const defectGMT = `${defect} / ${defectRate}`;
   // =========================================================
 
   // Loading
@@ -156,7 +162,7 @@ export const DashboardPage: React.FC = () => {
         />
 
         <StatCard
-          title="INSPECTION"
+          title="QUALITY INSPECTED GMT"
           value={inspection.toString()}
           subtitle="Sewing End line Inspection"
           icon={<Layers size={22} />}
@@ -165,12 +171,12 @@ export const DashboardPage: React.FC = () => {
         />
 
         <StatCard
-          title="INSPECTION"
+          title="DEFECT GMT"
           value={defectGMT.toString()}
-          subtitle="Defect / End line Inspection"
+          subtitle="Defect (PCS) / Defect Rate "
           icon={<Layers size={22} />}
-          iconColorClass="text-purple-600"
-          iconBgClass="bg-purple-50"
+          iconColorClass="text-green-600"
+          iconBgClass="bg-green-50"
         />
       </div>
 

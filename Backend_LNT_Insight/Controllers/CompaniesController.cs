@@ -92,30 +92,54 @@ namespace Backend_LNT_Insight.Controllers
             var result = (await db.QueryAsync<dynamic>("USP_ProductionVsPlan", new { CompanyID = companyID, SiteID = siteID, SectionID = sectionID, Date = dateDay.Date }, commandType: CommandType.StoredProcedure)).ToList();
             return Ok(result);
         }
-        [HttpGet("{companyID}/sites/{siteID}/date/{dateDay}/section/{sectionID}/shift_work")]
+        // [HttpGet("{companyID}/sites/{siteID}/date/{dateDay}/section/{sectionID}/shift_work")]
+        // public async Task<IActionResult> GetShiftWorkList(string companyID, string siteID, DateTime dateDay, int sectionID)
+        // {
+        //     if (_useLocalMockData)
+        //     {
+        //         return GetMockData("GetProductionVsPlan.json");
+        //     }
 
-        public async Task<IActionResult> GetShiftWorkList(string companyID, string siteID, DateTime dateDay, int sectionID)
+        //     using var db = CreateConnection();
+        //     var result = (await db.QueryAsync<dynamic>("USP_Dashboard_WorkShift_GetList", new { CompanyID = companyID, SiteID = siteID, Date = dateDay.Date, SectionID = sectionID }, commandType: CommandType.StoredProcedure)).ToList();
+        //     return Ok(result);
+        // }
+        // [HttpGet("{companyID}/sites/{siteID}/date/{dateDay}/team/{teamID}/shift_work/{shiftWorkID}/sewing_output")]
+        //  public async Task<IActionResult> GetDataSewingTeamOutputAnalysis(string companyID, string siteID, DateTime dateDay, int teamID, int shiftWorkID)
+        // {
+        //     if (_useLocalMockData)
+        //     {
+        //         return GetMockData("GetProductionVsPlan.json");
+        //     }
+
+        //     using var db = CreateConnection();
+        //     var result = (await db.QueryAsync<dynamic>("USP_Dashboard_SewingTeamOutputAnalysis_GetData", new { CompanyID = companyID, SiteID = siteID, Date = dateDay.Date, TeamID = teamID, ShiftWorkID = shiftWorkID }, commandType: CommandType.StoredProcedure)).ToList();
+        //     return Ok(result);
+        // }
+
+        [HttpGet("{companyID}/sites/{siteID}/sections/{sectionID}/date/{dateDay}/sewing_summary")]
+        public async Task<IActionResult> GetSewingTeamPerformanceSummary(string companyID, string siteID, int sectionID, DateTime dateDay)
         {
             if (_useLocalMockData)
             {
-                return GetMockData("GetShiftWorkList.json");
+                return GetMockData("GetProductionVsPlan.json");
             }
 
             using var db = CreateConnection();
-            var result = (await db.QueryAsync<dynamic>("USP_Dashboard_WorkShift_GetList", new { CompanyID = companyID, SiteID = siteID, WorkDate = dateDay.Date, SectionID = sectionID }, commandType: CommandType.StoredProcedure)).ToList();
+            var result = (await db.QueryAsync<dynamic>("USP_FXPRO_Insight_SewingTeamPerformance_Summary", new { CompanyID = companyID, SiteID = siteID, SectionID = sectionID, Date = dateDay.Date }, commandType: CommandType.StoredProcedure)).ToList();
             return Ok(result);
         }
-        [HttpGet("{companyID}/sites/{siteID}/date/{dateDay}/team/{teamID}/shift_work/{shiftWorkID}/sewing_output")]
 
-         public async Task<IActionResult> GetDataSewingTeamOutputAnalysis(string companyID, string siteID, DateTime dateDay, int teamID, int shiftWorkID)
+        [HttpGet("{companyID}/sites/{siteID}/sections/{sectionID}/date/{dateDay}/sewing_detail")]
+        public async Task<IActionResult> GetSewingTeamPerformanceDetails(string companyID, string siteID, int sectionID, DateTime dateDay)
         {
             if (_useLocalMockData)
             {
-                return GetMockData("GetDataSewingOutputAnalysis.json");
+                return GetMockData("GetProductionVsPlan.json");
             }
 
             using var db = CreateConnection();
-            var result = (await db.QueryAsync<dynamic>("USP_Dashboard_SewingTeamOutputAnalysis_GetData", new { CompanyID = companyID, SiteID = siteID, Date = dateDay.Date, TeamID = teamID, ShiftWorkID = shiftWorkID }, commandType: CommandType.StoredProcedure)).ToList();
+            var result = (await db.QueryAsync<dynamic>("USP_FXPRO_Insight_SewingTeamPerformance_Detail", new { CompanyID = companyID, SiteID = siteID, SectionID = sectionID, Date = dateDay.Date }, commandType: CommandType.StoredProcedure)).ToList();
             return Ok(result);
         }
     }

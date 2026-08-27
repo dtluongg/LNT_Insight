@@ -58,3 +58,21 @@ export interface ProductionVsPlanInfo {
     DayOutput: number;
     DayTarget: number | null;
 }
+
+export interface SewingTeamSummay {
+    DayOutput: number;
+    DayTarget: number;
+    InspectedQty: number;
+    DefectQty: number; 
+    DefectRate: number;
+}
+
+export interface SewingTeamDetail {
+    TeamNo: string;
+    TeamName: string;
+    DayOutput: number;
+    DayTarget: number;
+    InspectedQty: number;
+    DefectQty: number; 
+    DefectRate: number;
+}
