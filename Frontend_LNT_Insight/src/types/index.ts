@@ -68,6 +68,7 @@ export interface SewingTeamSummay {
 }
 
 export interface SewingTeamDetail {
+    TeamID: number;
     TeamNo: string;
     TeamName: string;
     DayOutput: number;

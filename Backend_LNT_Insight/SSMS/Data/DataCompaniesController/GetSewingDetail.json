@@ -1,0 +1,112 @@
+[
+  {
+    "TeamID": 1,
+    "TeamNo": "LINE-01",
+    "TeamName": "S1|LINE-01",
+    "DayOutput": 85,
+    "DayTarget": 264,
+    "InspectedQty": 105,
+    "DefectQty": 5,
+    "DefectRate": 4.76
+  },
+  {
+    "TeamID": 2,
+    "TeamNo": "LINE-02",
+    "TeamName": "S1|LINE-02",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 100,
+    "DefectQty": 5,
+    "DefectRate": 5.00
+  },
+  {
+    "TeamID": 3,
+    "TeamNo": "LINE-03",
+    "TeamName": "S1|LINE-03",
+    "DayOutput": 28,
+    "DayTarget": 146,
+    "InspectedQty": 105,
+    "DefectQty": 5,
+    "DefectRate": 4.76
+  },
+  {
+    "TeamID": 4,
+    "TeamNo": "LINE-04",
+    "TeamName": "S1|LINE-04",
+    "DayOutput": 0,
+    "DayTarget": 208,
+    "InspectedQty": 60,
+    "DefectQty": 4,
+    "DefectRate": 6.67
+  },
+  {
+    "TeamID": 5,
+    "TeamNo": "LINE-05",
+    "TeamName": "S1|LINE-05",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "TeamID": 6,
+    "TeamNo": "LINE-06",
+    "TeamName": "S1|LINE-06",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "TeamID": 7,
+    "TeamNo": "LINE-07",
+    "TeamName": "S1|LINE-07",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "TeamID": 8,
+    "TeamNo": "LINE-08",
+    "TeamName": "S1|LINE-08",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "TeamID": 9,
+    "TeamNo": "LINE-09",
+    "TeamName": "S1|LINE-09",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "TeamID": 10,
+    "TeamNo": "LINE-10",
+    "TeamName": "S1|LINE-10",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "TeamID": 19,
+    "TeamNo": "LINE-01&03",
+    "TeamName": "S1|LINE-01&03",
+    "DayOutput": 27,
+    "DayTarget": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  }
+]

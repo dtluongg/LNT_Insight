@@ -1,0 +1,92 @@
+[
+  {
+    "ShiftHourID": "1WH",
+    "ShiftHourWithTime": "1WH (07:15 - 08:15)",
+    "OutputQty": null,
+    "HourlyPlan": 33,
+    "Achievement": null,
+    "RunningOutput": 0,
+    "OutputVariance": null,
+    "CumulativePlan": 33
+  },
+  {
+    "ShiftHourID": "2WH",
+    "ShiftHourWithTime": "2WH (08:15 - 09:15)",
+    "OutputQty": null,
+    "HourlyPlan": 33,
+    "Achievement": null,
+    "RunningOutput": 0,
+    "OutputVariance": null,
+    "CumulativePlan": 66
+  },
+  {
+    "ShiftHourID": "3WH",
+    "ShiftHourWithTime": "3WH (09:15 - 10:15)",
+    "OutputQty": 31,
+    "HourlyPlan": 33,
+    "Achievement": 93.9400,
+    "RunningOutput": 31,
+    "OutputVariance": 2,
+    "CumulativePlan": 99
+  },
+  {
+    "ShiftHourID": "4WH",
+    "ShiftHourWithTime": "4WH (10:15 - 11:30)",
+    "OutputQty": 40,
+    "HourlyPlan": 33,
+    "Achievement": 121.2100,
+    "RunningOutput": 71,
+    "OutputVariance": -7,
+    "CumulativePlan": 132
+  },
+  {
+    "ShiftHourID": "5WH",
+    "ShiftHourWithTime": "5WH (12:30 - 13:30)",
+    "OutputQty": 14,
+    "HourlyPlan": 33,
+    "Achievement": 42.4200,
+    "RunningOutput": 85,
+    "OutputVariance": 19,
+    "CumulativePlan": 165
+  },
+  {
+    "ShiftHourID": "6WH",
+    "ShiftHourWithTime": "6WH (13:30 - 14:30)",
+    "OutputQty": null,
+    "HourlyPlan": 33,
+    "Achievement": null,
+    "RunningOutput": 85,
+    "OutputVariance": null,
+    "CumulativePlan": 198
+  },
+  {
+    "ShiftHourID": "7WH",
+    "ShiftHourWithTime": "7WH (14:30 - 15:30)",
+    "OutputQty": null,
+    "HourlyPlan": 33,
+    "Achievement": null,
+    "RunningOutput": 85,
+    "OutputVariance": null,
+    "CumulativePlan": 231
+  },
+  {
+    "ShiftHourID": "8WH",
+    "ShiftHourWithTime": "8WH (15:30 - 16:15)",
+    "OutputQty": null,
+    "HourlyPlan": 33,
+    "Achievement": null,
+    "RunningOutput": 85,
+    "OutputVariance": null,
+    "CumulativePlan": 264
+  },
+  {
+    "ShiftHourID": "AFH",
+    "ShiftHourWithTime": "AFH",
+    "OutputQty": null,
+    "HourlyPlan": 0,
+    "Achievement": null,
+    "RunningOutput": 85,
+    "OutputVariance": null,
+    "CumulativePlan": 264
+  }
+]

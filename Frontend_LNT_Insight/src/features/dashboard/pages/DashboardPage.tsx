@@ -27,7 +27,7 @@ import { StatCard } from '../../../components/ui/StatCard';
 import { Table } from '../../../components/ui/Table';
 import { Card } from '../../../components/ui/Card';
 import { companiesApi } from '../../../core/api/companies';
-import type { ProductionVsPlanInfo, SewingTeamSummay, SewingTeamDetail } from '../../../types';
+import type { SewingTeamSummay, SewingTeamDetail } from '../../../types';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
 
 export const DashboardPage: React.FC = () => {
@@ -52,13 +52,13 @@ export const DashboardPage: React.FC = () => {
     Date: searchParams.get('date') || todayStr,
   });
 
-  const [productionData, setProductionData] = useState<ProductionVsPlanInfo[]>([]);
+  const [productionData, setProductionData] = useState<SewingTeamDetail[]>([]);
   const [dataSewingTeamSummary, setDataSewingTeamSummary] = useState<SewingTeamSummay[]>([]);
   const [loading, setLoading] = useState(true);
   // =========================================================
 
   // Select Dashboard Chart
-  const [selectedProduction, setSelectedProduction] = useState<ProductionVsPlanInfo | null>(null);
+  const [selectedProduction, setSelectedProduction] = useState<SewingTeamDetail | null>(null);
   // =========================================================
 
 
@@ -68,7 +68,7 @@ export const DashboardPage: React.FC = () => {
       setLoading(true);
       try {
         const dateObj = new Date(filter.Date);
-        const prodResult = await companiesApi.getProductionVsPlan(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj); // ? tại sao lại number? => Vì param này nhận number để đưa xuống sql
+        const prodResult = await companiesApi.getTeamSewingDetail(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj); // ? tại sao lại number? => Vì param này nhận number để đưa xuống sql
         setProductionData(prodResult);
         const getDataSewingTeamSummary = await companiesApi.getTeamSewingSummary(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj);
         setDataSewingTeamSummary(getDataSewingTeamSummary);
@@ -107,7 +107,7 @@ export const DashboardPage: React.FC = () => {
   const inspection = dataSewingTeamSummary[0]?.InspectedQty ?? 0;
   const defect = dataSewingTeamSummary[0]?.DefectQty ?? 0;
   const defectRate = dataSewingTeamSummary[0]?.DefectRate ?? 0;
-  const defectGMT = `${defect} / ${defectRate}`;
+  const defectGMT = `${defect}/${defectRate}%`;
   // =========================================================
 
   // Loading
@@ -200,9 +200,13 @@ export const DashboardPage: React.FC = () => {
                   margin={{ top: 20, right: 20, bottom: 20, left: 10 }}
                 >
                   <defs>
-                    <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#f97316" stopOpacity={0.95} />
-                      <stop offset="100%" stopColor="#ea580c" stopOpacity={0.75} />
+                    <linearGradient id="barDayOutput" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#F59E0B" stopOpacity={0.95} />
+                      <stop offset="100%" stopColor="#D97706" stopOpacity={0.75} />
+                    </linearGradient>
+                    <linearGradient id="barInspectedQty" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#14B8A6" stopOpacity={0.95} />
+                      <stop offset="100%" stopColor="#0F766E" stopOpacity={0.75} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
@@ -235,19 +239,30 @@ export const DashboardPage: React.FC = () => {
                     }}
                   />
                   <Legend
-                    verticalAlign="bottom"
+                    // verticalAlign="bottom"
                     height={36}
                     iconType="circle"
-                    wrapperStyle={{ fontSize: '12px', fontWeight: 500 }}
+                    wrapperStyle={{ fontSize: '13px', fontWeight: 500 }}
+                    
                   />
                   {/* Cột Actual Output (Màu cam gradient) */}
                   <Bar
                     dataKey="DayOutput"
                     name="Day Output"
-                    fill="url(#barGradient)"
+                    fill="url(#barDayOutput)"
                     radius={[4, 4, 0, 0]}
                     barSize={40}
-                    label={{ position: 'top', fill: '#ea580c', fontSize: 11, fontWeight: 600 }}
+                    label={{ position: 'top', fill: '#0F766E', fontSize: 11, fontWeight: 600 }}
+                    onClick={(data) => { setSelectedProduction(data.payload) }}
+                    cursor="pointer"
+                  />
+                  <Bar
+                    dataKey="InspectedQty"
+                    name="Inspected Qty"
+                    fill="url(#barInspectedQty)"
+                    radius={[4, 4, 0, 0]}
+                    barSize={40}
+                    label={{ position: 'top', fill: '#2a8caa', fontSize: 11, fontWeight: 600 }}
                     onClick={(data) => { setSelectedProduction(data.payload) }}
                     cursor="pointer"
                   />
@@ -256,11 +271,11 @@ export const DashboardPage: React.FC = () => {
                     type="monotone"
                     dataKey="DayTarget"
                     name="Day Target"
-                    stroke="#2563eb"
+                    stroke="#3B82F6"
                     strokeWidth={3}
-                    dot={{ r: 5, fill: "#2563eb", stroke: "#fff", strokeWidth: 2 }}
+                    dot={{ r: 5, fill: "#3B82F6", stroke: "#fff", strokeWidth: 2 }}
                     activeDot={{ r: 8 }}
-                    label={{ position: 'top', fill: '#ea580c', fontSize: 11, fontWeight: 600 }}
+                    label={{ position: 'top', fill: '#2563EB', fontSize: 11, fontWeight: 600 }}
 
                   />
                 </ComposedChart>

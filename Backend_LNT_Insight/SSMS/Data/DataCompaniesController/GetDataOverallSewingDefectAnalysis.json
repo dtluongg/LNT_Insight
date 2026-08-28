@@ -1,0 +1,57 @@
+[
+  {
+    "DefectID": 1005,
+    "DefectName": "Dây câu/Rubbing",
+    "DefectQty": 3
+  },
+  {
+    "DefectID": 1006,
+    "DefectName": "Nút đóng vào sp bị logo bị ngược/Attack button,logo wrong way",
+    "DefectQty": 5
+  },
+  {
+    "DefectID": 1007,
+    "DefectName": "Nút tét tâm/ gãy chân/móp/ Broken button",
+    "DefectQty": 4
+  },
+  {
+    "DefectID": 1008,
+    "DefectName": "Bỏ mũi/Skip stitch ",
+    "DefectQty": 41
+  },
+  {
+    "DefectID": 1009,
+    "DefectName": "Đứt chỉ/Broken stitch",
+    "DefectQty": 40
+  },
+  {
+    "DefectID": 1010,
+    "DefectName": "Xếp ly/Wavy seam , Puckered Seam (Đường may xếp ly, đúp dính thân hoặc lót)",
+    "DefectQty": 18
+  },
+  {
+    "DefectID": 1011,
+    "DefectName": "Bung, xì/Open seam (Đường may bị xì, hở mép vải)",
+    "DefectQty": 58
+  },
+  {
+    "DefectID": 1012,
+    "DefectName": "Sụp mí, le mí/Caught parts or Inclusion (Đường may ráp bị nhăn, đường diễu vặn)",
+    "DefectQty": 45
+  },
+  {
+    "DefectID": 1013,
+    "DefectName": "Nhăn vặn/Twisted or roped seam (Đường may ráp bị nhăn, đường diễu vặn)",
+    "DefectQty": 3
+  },
+  {
+    "DefectID": 1014,
+    "DefectName": "Đùn gợn/Uneven Gathering or Shirring (Cổ đùn, túi đùn, nẹp đùn, DK gợn, đầu cổ không thẳng, lai cong)",
+    "DefectQty": 12
+  },
+  {
+    "DefectID": 1015,
+    "DefectName": "Không đều/Seam Slippage (Mí - Diễu không đều, To bản không đều, lai không thẳng, lai cong)",
+    "DefectQty": 13
+  }
+]
