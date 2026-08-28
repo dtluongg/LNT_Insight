@@ -77,3 +77,28 @@ export interface SewingTeamDetail {
     DefectQty: number; 
     DefectRate: number;
 }
+
+export interface OverallDefectAnalysis {
+    DefectID: number;
+    DefectName: string;
+    DefectQty: number;
+}
+
+export interface WorkshiftInfo {
+    ShiftWorkID: number;
+    ShiftWorkName: string;
+    ShiftWorkStartTime: string;
+    ShiftWorkCompleteTime: string;
+    ShiftWorkNameWithTime: string;
+}
+
+export interface SewingTeamAnalysis {
+    ShiftHourID: string;
+    ShiftHourWithTime: string;
+    OutputQty: number | null;
+    HourlyPlan: number;
+    Achievement: number | null;
+    RunningOutput: number;
+    OutputVariance: number | null;
+    CumulativePlan: number;
+}

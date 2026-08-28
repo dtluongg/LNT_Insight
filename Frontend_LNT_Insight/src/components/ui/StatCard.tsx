@@ -10,6 +10,7 @@ interface StatCardProps {
   iconBgClass?: string;
   trendText?: string;
   trendType?: 'up' | 'down' | 'neutral';
+  onClick?: () => void;
 }
 
 export const StatCard: React.FC<StatCardProps> = ({
@@ -21,6 +22,7 @@ export const StatCard: React.FC<StatCardProps> = ({
   iconBgClass = 'bg-blue-50',
   trendText,
   trendType = 'neutral',
+  onClick,
 }) => {
   const trendColors = {
     up: 'text-emerald-600',
@@ -29,7 +31,10 @@ export const StatCard: React.FC<StatCardProps> = ({
   };
 
   return (
-    <Card className='flex-col gap-5'>
+    <Card 
+      className={`flex-col gap-5 ${onClick ? 'cursor-pointer hover:shadow-lg transition-all duration-200' : ''}`}
+      onClick={onClick}
+    >
       <div className="flex rounded-xl items-center gap-5 hover:shadow-md transition-shadow duration-200">
         <div className={`p-4 rounded-xl flex items-center justify-center ${iconBgClass} ${iconColorClass}`}>
           {icon}

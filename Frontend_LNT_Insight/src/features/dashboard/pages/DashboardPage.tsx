@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { DashboardHeader } from '../components/DashboardHeader';
-import { ProductionDetailModal } from '../components/ProductionDetailModal';
+import { TeamProductionDetailModal } from '../components/TeamProductionDetailModal';
+import { OverallDefectDetailModal } from '../components/OverallDefectDetailModal';
 import {
   Clock,
   TrendingUp,
@@ -59,6 +60,7 @@ export const DashboardPage: React.FC = () => {
 
   // Select Dashboard Chart
   const [selectedProduction, setSelectedProduction] = useState<SewingTeamDetail | null>(null);
+  const [isDefectModalOpen, setIsDefectModalOpen] = useState(false);
   // =========================================================
 
 
@@ -177,6 +179,7 @@ export const DashboardPage: React.FC = () => {
           icon={<Layers size={22} />}
           iconColorClass="text-green-600"
           iconBgClass="bg-green-50"
+          onClick={() => setIsDefectModalOpen(true)}
         />
       </div>
 
@@ -186,7 +189,7 @@ export const DashboardPage: React.FC = () => {
         <div className="xl:col-span-12 flex flex-col gap-3">
           <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1 flex items-center gap-2">
             <Activity size={16} className="text-blue-600" />
-            Running Output vs Target
+            PRODUCTION OUTPUT STATUS
           </h2>
           <Card className="flex flex-col justify-center h-[520px] p-6">
             {productionData.length === 0 ? (
@@ -284,11 +287,19 @@ export const DashboardPage: React.FC = () => {
           </Card>
         </div>
       </div>
-      <ProductionDetailModal
+      <TeamProductionDetailModal
         open={selectedProduction !== null}
         filter={filter}
         production={selectedProduction}
         onClose={() => setSelectedProduction(null)}
+      />
+      <OverallDefectDetailModal
+        open={isDefectModalOpen}
+        filter={filter}
+        onClose={() => setIsDefectModalOpen(false)}
+        inspectedQty={inspection}
+        defectQty={defect}
+        defectRate={defectRate}
       />
     </div>
   );

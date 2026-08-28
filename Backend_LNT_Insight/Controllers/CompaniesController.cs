@@ -117,12 +117,13 @@ namespace Backend_LNT_Insight.Controllers
         //     return Ok(result);
         // }
 
+        // data for 5 card summary
         [HttpGet("{companyID}/sites/{siteID}/sections/{sectionID}/date/{dateDay}/sewing_summary")]
         public async Task<IActionResult> GetSewingTeamPerformanceSummary(string companyID, string siteID, int sectionID, DateTime dateDay)
         {
             if (_useLocalMockData)
             {
-                return GetMockData("GetProductionVsPlan.json");
+                return GetMockData("GetSewingSummary.json");
             }
 
             using var db = CreateConnection();
@@ -130,12 +131,25 @@ namespace Backend_LNT_Insight.Controllers
             return Ok(result);
         }
 
+        // data for click Defect GMT open popup table column
+        [HttpGet("{companyID}/sites/{siteID}/date/{dateDay}/defect/defectID/OverallDefectAnalysis")]
+        public async Task<IActionResult> GetDataOverallSewingDefectAnalysis(string companyID, string siteID, DateTime dateDay, [FromQuery]int teamID = 0)
+        {
+            if(_useLocalMockData){
+                return GetMockData ("GetOverallDefectAnalysis.json");
+            }
+            using var db = CreateConnection();
+            var result = (await db.QueryAsync<dynamic>("USP_FXPRO_Insight_SewingTeamPerformance_DefectDetail", new {CompanyID = companyID, SiteID = siteID, Date = dateDay.Date, TeamID = teamID}, commandType: CommandType.StoredProcedure)).ToList();
+            return Ok(result);
+        }
+
+        // data for detail table chart
         [HttpGet("{companyID}/sites/{siteID}/sections/{sectionID}/date/{dateDay}/sewing_detail")]
         public async Task<IActionResult> GetSewingTeamPerformanceDetails(string companyID, string siteID, int sectionID, DateTime dateDay)
         {
             if (_useLocalMockData)
             {
-                return GetMockData("GetProductionVsPlan.json");
+                return GetMockData("GetSewingDetail.json");
             }
 
             using var db = CreateConnection();
@@ -143,28 +157,7 @@ namespace Backend_LNT_Insight.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{companyID}/sites/{siteID}/date/{dateDay}/OverallDefectAnalysis")]
-        public async Task<IActionResult> GetDataOverallSewingDefectAnalysis(string companyID, string siteID, DateTime dateDay, [FromQuery]int teamID = 0)
-        {
-            if(_useLocalMockData){
-                return GetMockData ("GetDataOverallSewingDefectAnalysis.json");
-            }
-            using var db = CreateConnection();
-            var result = (await db.QueryAsync<dynamic>("USP_FXPRO_Insight_SewingTeamPerformance_DefectDetail", new {CompanyID = companyID, SiteID = siteID, Date = dateDay.Date, TeamID = teamID}, commandType: CommandType.StoredProcedure)).ToList();
-            return Ok(result);
-        }
-
-        [HttpGet("{companyID}/sites/{siteID}/date/{dateDay}/team/{teamID}/team_defect_analysis")]
-        public async Task<IActionResult> GetDataTeamSewingDefectAnalysis(string companyID, string siteID, DateTime dateDay, int teamID )
-        {
-            if(_useLocalMockData){
-                return GetMockData ("GetDataTeamSewingDefectAnalysis.json");
-            }
-            using var db = CreateConnection();
-            var result = (await db.QueryAsync<dynamic>("USP_FXPRO_Insight_SewingTeamPerformance_DefectDetail", new {CompanyID = companyID, SiteID = siteID, Date = dateDay.Date, TeamID = teamID}, commandType: CommandType.StoredProcedure)).ToList();
-            return Ok(result);
-        }
-
+         
         // GET list workshiftID
         [HttpGet("{companyID}/sites/{siteID}/date/{dateDay}/section/{sectionID}/workshift")]
         public async Task<IActionResult> GetWorkshiftList(string companyID, string siteID, DateTime dateDay, int sectionID)
@@ -177,7 +170,7 @@ namespace Backend_LNT_Insight.Controllers
             var result = (await db.QueryAsync<dynamic>("USP_Dashboard_WorkShift_GetList", new{CompanyID = companyID, SiteID = siteID, WorkDate = dateDay.Date, SectionID = sectionID}, commandType: CommandType.StoredProcedure)).ToList();
             return Ok(result);
         }
-
+        // Get Analysis data by shiftwork for show on popup when click bar on chart table.
         [HttpGet("{companyID}/sites/{siteID}/date/{dateDay}/team/{teamID}/shiftwork/{shiftworkID}/sewing_analysis")]
         public async Task<IActionResult> GetDataSewingTeamAnalysis(string companyID, string siteID, DateTime dateDay, int teamID, int shiftworkID)
         {
@@ -189,5 +182,18 @@ namespace Backend_LNT_Insight.Controllers
             var result = (await db.QueryAsync<dynamic>("USP_Dashboard_SewingTeamOutputAnalysis_GetData", new{CompanyID = companyID, SiteID = siteID, Date = dateDay.Date, TeamID = teamID, ShiftWorkID = shiftworkID}, commandType: CommandType.StoredProcedure)).ToList();
             return Ok(result);
         }
+
+        // data for after popup when click bar on table chart
+        [HttpGet("{companyID}/sites/{siteID}/date/{dateDay}/team/{teamID}/team_defect_analysis")]
+        public async Task<IActionResult> GetDataTeamSewingDefectAnalysis(string companyID, string siteID, DateTime dateDay, int teamID )
+        {
+            if(_useLocalMockData){
+                return GetMockData ("GetTeamDefectAnalysis.json");
+            }
+            using var db = CreateConnection();
+            var result = (await db.QueryAsync<dynamic>("USP_FXPRO_Insight_SewingTeamPerformance_DefectDetail", new {CompanyID = companyID, SiteID = siteID, Date = dateDay.Date, TeamID = teamID}, commandType: CommandType.StoredProcedure)).ToList();
+            return Ok(result);
+        }
+       
     }
 }
