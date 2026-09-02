@@ -102,9 +102,9 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
     const [selectedShiftworkID, setSelectedShiftworkID] = useState<number | null>(null);
     const [hourlyAnalysis, setHourlyAnalysis] = useState<SewingTeamAnalysis[]>([]);
     const [teamDefects, setTeamDefects] = useState<OverallDefectAnalysis[]>([]);
-    
+
     const [activeTab, setActiveTab] = useState<'hourly_output' | 'defects'>('hourly_output');
-    
+
     const [loadingShiftworks, setLoadingShiftworks] = useState(false);
     const [loadingAnalysis, setLoadingAnalysis] = useState(false);
     const [loadingDefects, setLoadingDefects] = useState(false);
@@ -113,7 +113,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
     useEffect(() => {
         if (open && production) {
             const dateObj = new Date(filter.Date);
-            
+
             // 1. Fetch workshifts
             const fetchWorkshifts = async () => {
                 setLoadingShiftworks(true);
@@ -324,21 +324,19 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                     {/* Tabs Selector Navigation */}
                     <div className="flex border-b border-slate-200 px-6 flex-shrink-0">
                         <button
-                            className={`py-3 px-6 text-sm font-semibold border-b-2 transition-all duration-200 ${
-                                activeTab === 'hourly_output'
-                                    ? 'border-blue-600 text-blue-600'
-                                    : 'border-transparent text-slate-400 hover:text-slate-700'
-                            }`}
+                            className={`py-3 px-6 text-sm font-semibold border-b-2 transition-all duration-200 ${activeTab === 'hourly_output'
+                                ? 'border-blue-600 text-blue-600'
+                                : 'border-transparent text-slate-400 hover:text-slate-700'
+                                }`}
                             onClick={() => setActiveTab('hourly_output')}
                         >
                             Hourly Output Analysis
                         </button>
                         <button
-                            className={`py-3 px-6 text-sm font-semibold border-b-2 transition-all duration-200 ${
-                                activeTab === 'defects'
-                                    ? 'border-blue-600 text-blue-600'
-                                    : 'border-transparent text-slate-400 hover:text-slate-700'
-                            }`}
+                            className={`py-3 px-6 text-sm font-semibold border-b-2 transition-all duration-200 ${activeTab === 'defects'
+                                ? 'border-blue-600 text-blue-600'
+                                : 'border-transparent text-slate-400 hover:text-slate-700'
+                                }`}
                             onClick={() => setActiveTab('defects')}
                         >
                             Team Defect Analysis
@@ -352,7 +350,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                 <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1">
                                     Hourly Output Status (Actual vs Target Plan)
                                 </h3>
-                                
+
                                 {loadingAnalysis ? (
                                     <div className="flex flex-1 items-center justify-center border border-slate-100 rounded-xl bg-slate-50/20">
                                         <div className="flex flex-col items-center gap-3">

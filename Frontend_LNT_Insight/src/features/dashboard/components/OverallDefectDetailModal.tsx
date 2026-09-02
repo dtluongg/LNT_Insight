@@ -57,9 +57,9 @@ const CustomizedContent = (props: any) => {
                     x={x + width / 2}
                     y={y + height / 2 - 4}
                     textAnchor="middle"
-                    fill="#fff"
-                    fontSize={11}
-                    fontWeight={600}
+                    fill="#0f172a"
+                    fontSize={16}
+                    fontWeight={100}
                     className="select-none pointer-events-none"
                 >
                     {name.split('/')[0]}
@@ -70,9 +70,9 @@ const CustomizedContent = (props: any) => {
                     x={x + width / 2}
                     y={y + height / 2 + 12}
                     textAnchor="middle"
-                    fill="#fff"
-                    fontSize={10}
-                    fontWeight={500}
+                    fill="#0f172a"
+                    fontSize={14}
+                    fontWeight={100}
                     opacity={0.95}
                     className="select-none pointer-events-none"
                 >
@@ -130,7 +130,7 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
             onClick={onClose}
         >
             <div
-                className="w-full max-w-5xl rounded-xl bg-white shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+                className="w-full max-w-8xl rounded-xl bg-white shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
@@ -194,21 +194,21 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
 
                     {/* KPI Cards */}
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                        <div className="rounded-xl border border-purple-100 bg-purple-50/50 p-5 transition-all hover:shadow-xs">
-                            <p className="text-xs font-bold uppercase tracking-wider text-purple-400">
+                        <div className="rounded-xl border border-green-100 bg-green-300-50/50 p-5 transition-all hover:shadow-xs">
+                            <p className="text-xs font-bold uppercase tracking-wider text-green-400">
                                 Inspected Qty
                             </p>
-                            <p className="mt-1.5 text-2xl font-black text-purple-700">
+                            <p className="mt-1.5 text-2xl font-semibold text-green-700">
                                 {inspectedQty.toLocaleString()}
                             </p>
-                            <p className="mt-0.5 text-xs text-purple-500 font-medium">Total sewing inspected</p>
+                            <p className="mt-0.5 text-xs text-green-500 font-medium">Total sewing inspected</p>
                         </div>
 
                         <div className="rounded-xl border border-rose-100 bg-rose-50/50 p-5 transition-all hover:shadow-xs">
                             <p className="text-xs font-bold uppercase tracking-wider text-rose-400">
                                 Defect Qty
                             </p>
-                            <p className="mt-1.5 text-2xl font-black text-rose-600">
+                            <p className="mt-1.5 text-2xl font-semibold text-rose-600">
                                 {defectQty.toLocaleString()}
                             </p>
                             <p className="mt-0.5 text-xs text-rose-500 font-medium">Total defective pieces</p>
@@ -218,7 +218,7 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
                             <p className="text-xs font-bold uppercase tracking-wider text-amber-400">
                                 Defect Rate
                             </p>
-                            <p className="mt-1.5 text-2xl font-black text-amber-600">
+                            <p className="mt-1.5 text-2xl font-semibold text-amber-600">
                                 {defectRate.toFixed(2)}%
                             </p>
                             <p className="mt-0.5 text-xs text-amber-500 font-medium">Defective pieces ratio</p>
@@ -250,7 +250,7 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
                                     <Treemap
                                         data={chartData}
                                         dataKey="value"
-                                        stroke="#fff"
+                                        stroke="#000"
                                         fill="#8884d8"
                                         content={<CustomizedContent />}
                                     >
