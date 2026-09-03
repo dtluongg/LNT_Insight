@@ -179,7 +179,22 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                         production.TeamID,
                         selectedShiftworkID
                     );
-                    setHourlyAnalysis(analysis);
+                    // setHourlyAnalysis(analysis);
+                    if (analysis) {
+                        let sumOutputQty = 0;
+                        let sumHourlyPlan = 0;
+                        const newAnalysis = analysis.map(item => {
+                            sumOutputQty += item.OutputQty;
+                            sumHourlyPlan += item.HourlyPlan;
+                            return {
+                                ...item,
+                                OutputQty: sumOutputQty,
+                                HourlyPlan: sumHourlyPlan
+                            };
+                        });
+                        setHourlyAnalysis(newAnalysis);
+                    }
+
                 } catch (error) {
                     console.error('Failed to fetch hourly team analysis', error);
                     setHourlyAnalysis([]);
@@ -206,7 +221,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
             onClick={onClose}
         >
             <div
-                className="w-full max-w-5xl rounded-xl bg-white shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+                className="w-full max-w-8xl rounded-xl bg-white shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
@@ -382,14 +397,14 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                 <XAxis
                                                     dataKey="ShiftHourWithTime"
                                                     stroke="#94a3b8"
-                                                    fontSize={10}
+                                                    fontSize={13}
                                                     fontWeight={600}
                                                     tickLine={false}
                                                     dy={10}
                                                 />
                                                 <YAxis
                                                     stroke="#94a3b8"
-                                                    fontSize={10}
+                                                    fontSize={13}
                                                     tickLine={false}
                                                     axisLine={false}
                                                     dx={-10}
