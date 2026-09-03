@@ -29,12 +29,18 @@ export const companiesApi = {
         const raw = await apiFetch<any[]>(`/companies/${companyID}/sites/${siteID}/sections/${sectionID}/date/${formattedDate}/sewing_detail`);
         return raw;
     },
-    getOverallDefectAnalysis: async (companyID: string, siteID: string, dateDay: Date, teamID?: number): Promise<OverallDefectAnalysis[]> => {
+    getOverallDefectAnalysis: async (companyID: string, siteID: string, sectionID: number, dateDay: Date, teamID?: number): Promise<OverallDefectAnalysis[]> => {
         const formattedDate = dateDay.toISOString().split('T')[0];
-        const url = `/companies/${companyID}/sites/${siteID}/date/${formattedDate}/defect/defectID/OverallDefectAnalysis${teamID !== undefined ? `?teamID=${teamID}` : ''}`;
+        const url = `/companies/${companyID}/sites/${siteID}/sections/${sectionID}/date/${formattedDate}/defect/defectID/OverallDefectAnalysis${teamID !== undefined ? `?teamID=${teamID}` : ''}`;
         const raw = await apiFetch<any[]>(url);
         return raw;
     },
+    // getOverallDefectAnalysis: async (companyID: string, siteID: string, sectionID: number, dateDay: Date, teamID?: number): Promise<OverallDefectAnalysis[]> => {
+    //     const formattedDate = dateDay.toISOString().split('T')[0];
+    //     const url = `/companies/${companyID}/sites/${siteID}/sections/${sectionID}/date/${formattedDate}/OverallDefectAnalysis${teamID !== undefined ? `?teamID=${teamID}` : ''}`;
+    //     const raw = await apiFetch<any[]>(url);
+    //     return raw;
+    // },
     getWorkshiftList: async (companyID: string, siteID: string, dateDay: Date, sectionID: number): Promise<WorkshiftInfo[]> => {
         const formattedDate = dateDay.toISOString().split('T')[0];
         const raw = await apiFetch<any[]>(`/companies/${companyID}/sites/${siteID}/date/${formattedDate}/section/${sectionID}/workshift`);
@@ -45,9 +51,9 @@ export const companiesApi = {
         const raw = await apiFetch<any[]>(`/companies/${companyID}/sites/${siteID}/date/${formattedDate}/team/${teamID}/shiftwork/${shiftworkID}/sewing_analysis`);
         return raw;
     },
-    getTeamDefectAnalysis: async (companyID: string, siteID: string, dateDay: Date, teamID: number): Promise<OverallDefectAnalysis[]> => {
+    getTeamDefectAnalysis: async (companyID: string, siteID: string, sectionID: number, dateDay: Date, teamID: number): Promise<OverallDefectAnalysis[]> => {
         const formattedDate = dateDay.toISOString().split('T')[0];
-        const raw = await apiFetch<any[]>(`/companies/${companyID}/sites/${siteID}/date/${formattedDate}/team/${teamID}/team_defect_analysis`);
+        const raw = await apiFetch<any[]>(`/companies/${companyID}/sites/${siteID}/sections/${sectionID}/date/${formattedDate}/team/${teamID}/team_defect_analysis`);
         return raw;
     }
 };

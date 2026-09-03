@@ -146,6 +146,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                     const defects = await companiesApi.getTeamDefectAnalysis(
                         filter.CompanyID,
                         filter.SiteID,
+                        Number(filter.SectionID),
                         dateObj,
                         production.TeamID
                     );

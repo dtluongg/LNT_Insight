@@ -103,6 +103,7 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
                     const data = await companiesApi.getOverallDefectAnalysis(
                         filter.CompanyID,
                         filter.SiteID,
+                        Number(filter.SectionID),
                         dateObj
                     );
                     setDefects(data);
