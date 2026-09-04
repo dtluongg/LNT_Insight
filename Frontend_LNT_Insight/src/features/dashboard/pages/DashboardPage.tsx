@@ -3,12 +3,12 @@ import { useSearchParams } from 'react-router-dom';
 import { DashboardHeader } from '../components/DashboardHeader';
 import { TeamProductionDetailModal } from '../components/TeamProductionDetailModal';
 import { OverallDefectDetailModal } from '../components/OverallDefectDetailModal';
+import { ProductionOutputTableModal } from '../components/ProductionOutputTableModal';
 import {
   Clock,
   TrendingUp,
   Target as TargetIcon,
-  Scale,
-  Info,
+  Ellipsis,
   Activity,
   Layers
 } from 'lucide-react';
@@ -22,47 +22,40 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  LabelList,
 } from 'recharts';
 import { StatCard } from '../../../components/ui/StatCard';
-import { Table } from '../../../components/ui/Table';
 import { Card } from '../../../components/ui/Card';
 import { companiesApi } from '../../../core/api/companies';
 import type { SewingTeamSummay, SewingTeamDetail } from '../../../types';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
 
 export const DashboardPage: React.FC = () => {
-  // Cấu hình các cột cho Bảng chi tiết sản xuất theo giờ
   const [searchParams, setSearchParams] = useSearchParams();
   const todayStr = new Date().toLocaleDateString('sv-SE');
-  // =========================================================
-
 
   // Dashboard Filter
-  // Đây là filter chính của Dashboard
   const [filter, setFilter] = useState<DashboardFilter>({
-    CompanyID: searchParams.get('companyId') || 'COM01',
+    CompanyID: searchParams.get('companyId') || searchParams.get('CompanyId') || 'COM01',
     CompanyName: '',
 
-    SiteID: searchParams.get('siteId') || 'Site1',
+    SiteID: searchParams.get('siteId') || searchParams.get('SiteId') || 'Site1',
     SiteCode: '',
 
-    SectionID: searchParams.get('sectionId') || '1',
+    SectionID: searchParams.get('sectionId') || searchParams.get('SectionId') || '1',
     SectionName: '',
 
-    Date: searchParams.get('date') || todayStr,
+    Date: searchParams.get('date') || searchParams.get('Date') || todayStr,
   });
 
   const [productionData, setProductionData] = useState<SewingTeamDetail[]>([]);
   const [dataSewingTeamSummary, setDataSewingTeamSummary] = useState<SewingTeamSummay[]>([]);
   const [loading, setLoading] = useState(true);
-  // =========================================================
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Select Dashboard Chart
+  // Modals state
   const [selectedProduction, setSelectedProduction] = useState<SewingTeamDetail | null>(null);
   const [isDefectModalOpen, setIsDefectModalOpen] = useState(false);
-  // =========================================================
-
+  const [isTableModalOpen, setIsTableModalOpen] = useState(false);
 
   // Load Dashboard Data
   useEffect(() => {
@@ -70,14 +63,16 @@ export const DashboardPage: React.FC = () => {
       setLoading(true);
       try {
         const dateObj = new Date(filter.Date);
-        const prodResult = await companiesApi.getTeamSewingDetail(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj); // ? tại sao lại number? => Vì param này nhận number để đưa xuống sql
+        const [prodResult, summaryResult] = await Promise.all([
+          companiesApi.getTeamSewingDetail(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj),
+          companiesApi.getTeamSewingSummary(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj)
+        ]);
         setProductionData(prodResult);
-        const getDataSewingTeamSummary = await companiesApi.getTeamSewingSummary(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj);
-        setDataSewingTeamSummary(getDataSewingTeamSummary);
-        console.log(getDataSewingTeamSummary)
+        setDataSewingTeamSummary(summaryResult);
       } catch (err) {
         console.error('Failed to fetch dashboard data', err);
         setProductionData([]);
+        setDataSewingTeamSummary([]);
       } finally {
         setLoading(false);
       }
@@ -85,22 +80,20 @@ export const DashboardPage: React.FC = () => {
     if (filter.CompanyID && filter.SiteID && filter.SectionID && filter.Date) {
       fetchData();
     }
-  }, [filter.CompanyID, filter.SiteID, filter.SectionID, filter.Date]);
-  // =========================================================
-
+  }, [filter.CompanyID, filter.SiteID, filter.SectionID, filter.Date, refreshTrigger]);
 
   // Apply Filter từ DashboardHeader
   const handleApplyFilter = (newFilter: DashboardFilter) => {
     setFilter(newFilter);
+    setRefreshTrigger(prev => prev + 1);
     // Đồng bộ filter ID lên URL
     setSearchParams({
-      CompanyId: newFilter.CompanyID,
-      SiteId: newFilter.SiteID,
-      SectionId: newFilter.SectionID,
-      Date: newFilter.Date,
+      companyId: newFilter.CompanyID,
+      siteId: newFilter.SiteID,
+      sectionId: newFilter.SectionID,
+      date: newFilter.Date,
     });
   };
-  // =========================================================
 
   // Calculate dynamic stats
   const totalOutput = dataSewingTeamSummary[0]?.DayOutput ?? 0;
@@ -110,20 +103,6 @@ export const DashboardPage: React.FC = () => {
   const defect = dataSewingTeamSummary[0]?.DefectQty ?? 0;
   const defectRate = dataSewingTeamSummary[0]?.DefectRate ?? 0;
   const defectGMT = `${defect}/${defectRate}%`;
-  // =========================================================
-
-  // Loading
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-sm font-semibold text-slate-500">Loading production dashboard...</span>
-        </div>
-      </div>
-    );
-  }
-  // =========================================================
 
   // Render
   return (
@@ -132,7 +111,18 @@ export const DashboardPage: React.FC = () => {
       <DashboardHeader
         filter={filter}
         onApplyFilter={handleApplyFilter}
+        isLoading={loading}
       />
+
+      {loading && productionData.length === 0 ? (
+        <div className="flex items-center justify-center h-96">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-sm font-semibold text-slate-500">Loading production dashboard...</span>
+          </div>
+        </div>
+      ) : (
+        <div className={`space-y-2 transition-opacity duration-200 ${loading ? 'opacity-70 pointer-events-none' : 'opacity-100'}`}>
 
       {/* 4 Cards KPI ở trên cùng */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
@@ -187,10 +177,21 @@ export const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
         {/* Biểu đồ */}
         <div className="xl:col-span-12 flex flex-col gap-3">
-          <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1 flex items-center gap-2">
-            <Activity size={16} className="text-blue-600" />
-            PRODUCTION OUTPUT STATUS
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1 flex items-center gap-2">
+              <Activity size={16} className="text-blue-600" />
+              PRODUCTION OUTPUT STATUS
+            </h2>
+            <button
+              type="button"
+              onClick={() => setIsTableModalOpen(true)}
+              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
+              title="View production data table"
+            >
+              <Ellipsis size={18} />
+            </button>
+          </div>
+          
           <Card className="flex flex-col justify-center h-[520px] p-6">
             {productionData.length === 0 ? (
               <div className="text-center text-slate-400 font-medium py-10">
@@ -287,6 +288,16 @@ export const DashboardPage: React.FC = () => {
           </Card>
         </div>
       </div>
+        </div>
+      )}
+
+      {/* Modals */}
+      <ProductionOutputTableModal
+        open={isTableModalOpen}
+        filter={filter}
+        data={productionData}
+        onClose={() => setIsTableModalOpen(false)}
+      />
       <TeamProductionDetailModal
         open={selectedProduction !== null}
         filter={filter}

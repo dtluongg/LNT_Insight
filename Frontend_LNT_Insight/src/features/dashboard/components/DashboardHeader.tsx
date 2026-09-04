@@ -8,11 +8,12 @@ import type { CompanyInfo, SiteInfo, SectionInfo } from '../../../types';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
 
 interface DashboardHeaderProps {
-    filter: DashboardFilter,
+    filter: DashboardFilter;
     onApplyFilter: (filter: DashboardFilter) => void;
+    isLoading?: boolean;
 }
 
-export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onApplyFilter }) => {
+export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onApplyFilter, isLoading = false }) => {
 
     const todayStr = new Date().toLocaleDateString('sv-SE');
 
@@ -342,9 +343,11 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                 <div className="flex gap-2">
                     <Button
                         onClick={handleSearch}
-                        className="h-10 px-4 flex items-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 shadow-xs text-white"
+                        disabled={isLoading}
+                        title="Refresh data"
+                        className="h-10 px-4 flex items-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 shadow-xs text-white disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                     >
-                        <RefreshCw size={20} />
+                        <RefreshCw size={20} className={isLoading ? 'animate-spin' : ''} />
                     </Button>
 
                     {/* <Button variant="secondary" className="h-10 px-4 flex items-center gap-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold shadow-xs">
