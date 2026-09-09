@@ -13,9 +13,12 @@ import {
     LabelList,
     ReferenceLine
 } from 'recharts';
+import { Ellipsis } from 'lucide-react';
 import { companiesApi } from '../../../core/api/companies';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
 import type { ProductionVsPlanInfo, WorkshiftInfo, SewingTeamAnalysis, OverallDefectAnalysis } from '../../../types';
+import { SewingTeamTableModal } from './SewingTeamTableModal';
+import { EndlineDefectAnalysisTableModal } from './EndlineDefectAnalysisTableModal';
 
 interface TeamProductionDetailModalProps {
     open: boolean;
@@ -110,6 +113,10 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
     const [loadingShiftworks, setLoadingShiftworks] = useState(false);
     const [loadingAnalysis, setLoadingAnalysis] = useState(false);
     const [loadingDefects, setLoadingDefects] = useState(false);
+
+    // Modal:
+    const [isTableModalOpen, setIsTableModalOpen] = useState(false);
+    const [isTableModalOpen2, setIsTableModalOpen2] = useState(false);
 
     // Fetch Shiftwork List & Team Defects on Modal Open
     useEffect(() => {
@@ -221,7 +228,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
     const varianceChartData = hourlyAnalysis.map((item) => {
         const variance = item.OutputVariance ?? 0;
         return {
-            ...item, 
+            ...item,
             // if variance > 0 then not change 
             PositiveVariance: variance > 0 ? variance : 0,
             // if variance < 0 then set variance to 0
@@ -352,34 +359,34 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                     </div>
 
                     {/* Tabs Selector Navigation */}
-                    <div className="flex border-b border-slate-200 px-6 flex-shrink-0">
+                    <div className="flex items-center justify-between">
+                        <div className="flex border-b border-slate-200 px-6 flex-shrink-0">
+                            <button
+                                className={`py-3 px-6 text-sm font-semibold border-b-2 transition-all duration-200 ${activeTab === 'hourly_cumulative_output'
+                                    ? 'border-blue-600 text-blue-600'
+                                    : 'border-transparent text-slate-400 hover:text-slate-700'
+                                    }`}
+                                onClick={() => setActiveTab('hourly_cumulative_output')}
+                            >
+                                Cumulative Output Analysis
+                            </button>
+                            <button
+                                className={`py-3 px-6 text-sm font-semibold border-b-2 transition-all duration-200 ${activeTab === 'hourly_production_output'
+                                    ? 'border-blue-600 text-blue-600'
+                                    : 'border-transparent text-slate-400 hover:text-slate-700'
+                                    }`}
+                                onClick={() => setActiveTab('hourly_production_output')}
+                            >
+                                Production Output Analysis
+                            </button>
+                        </div>
                         <button
-                            className={`py-3 px-6 text-sm font-semibold border-b-2 transition-all duration-200 ${activeTab === 'hourly_cumulative_output'
-                                ? 'border-blue-600 text-blue-600'
-                                : 'border-transparent text-slate-400 hover:text-slate-700'
-                                }`}
-                            onClick={() => setActiveTab('hourly_cumulative_output')}
+                            type="button"
+                            onClick={() => setIsTableModalOpen(true)}
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
+                            title="View production data table"
                         >
-                            Cumulative Output Analysis
-                        </button>
-
-                        {/* <button
-                            className={`py-3 px-6 text-sm font-semibold border-b-2 transition-all duration-200 ${activeTab === 'defects'
-                                ? 'border-blue-600 text-blue-600'
-                                : 'border-transparent text-slate-400 hover:text-slate-700'
-                                }`}
-                            onClick={() => setActiveTab('defects')}
-                        >
-                            Team Defect Analysis
-                        </button> */}
-                        <button
-                            className={`py-3 px-6 text-sm font-semibold border-b-2 transition-all duration-200 ${activeTab === 'hourly_production_output'
-                                ? 'border-blue-600 text-blue-600'
-                                : 'border-transparent text-slate-400 hover:text-slate-700'
-                                }`}
-                            onClick={() => setActiveTab('hourly_production_output')}
-                        >
-                            Production Output Analysis
+                            <Ellipsis size={18} />
                         </button>
                     </div>
 
@@ -390,7 +397,6 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                 <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1">
                                     Cumulative Output vs. Target
                                 </h3>
-
                                 {loadingAnalysis ? (
                                     <div className="flex flex-1 items-center justify-center border border-slate-100 rounded-xl bg-slate-50/20">
                                         <div className="flex flex-col items-center gap-3">
@@ -444,11 +450,6 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                         boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
                                                         fontFamily: 'sans-serif'
                                                     }}
-                                                // formatter={(value: any, name: string) => {
-                                                //     if (name === "OutputQty") return [value !== null ? value.toLocaleString() : '0', 'Actual Output'];
-                                                //     if (name === "HourlyPlan") return [value !== null ? value.toLocaleString() : '-', 'Plan Target'];
-                                                //     return [value, name];
-                                                // }}
                                                 />
                                                 <Legend
                                                     height={36}
@@ -488,64 +489,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                     </div>
                                 )}
                             </div>
-                        ) 
-                        : activeTab === 'defects' ? (
-                            <div className="h-full flex flex-col gap-4">
-                                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1">
-                                    Defect
-                                </h3>
-
-                                {loadingDefects ? (
-                                    <div className="flex flex-1 items-center justify-center border border-slate-100 rounded-xl bg-slate-50/20">
-                                        <div className="flex flex-col items-center gap-3">
-                                            <div className="w-8 h-8 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
-                                            <span className="text-xs font-semibold text-slate-400">Loading defect data...</span>
-                                        </div>
-                                    </div>
-                                ) : teamDefects.length === 0 ? (
-                                    <div className="flex flex-1 items-center justify-center border border-dashed border-slate-200 rounded-xl bg-slate-50/10">
-                                        <span className="text-sm text-slate-400 font-medium">
-                                            No defect data found for this team.
-                                        </span>
-                                    </div>
-                                ) : (
-                                    <div className="bg-slate-50/30 p-4 rounded-xl border border-slate-100/80 flex-1 flex flex-col">
-                                        <ResponsiveContainer width="100%" height={360}>
-                                            <Treemap
-                                                data={defectChartData}
-                                                dataKey="value"
-                                                stroke="#fff"
-                                                fill="#8884d8"
-                                                content={<CustomizedContent />}
-                                            >
-                                                <Tooltip
-                                                    content={({ active, payload }) => {
-                                                        if (active && payload && payload.length) {
-                                                            const data = payload[0].payload;
-                                                            return (
-                                                                <div className="bg-white p-3 rounded-lg shadow-lg border border-slate-100 max-w-xs">
-                                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Defect Category</p>
-                                                                    <p className="text-xs font-bold text-slate-800 mt-1 leading-snug">{data.name}</p>
-                                                                    <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100 justify-between">
-                                                                        <div className="flex items-center gap-1.5">
-                                                                            <div className="w-2 h-2 rounded-full bg-rose-500" />
-                                                                            <span className="text-xs text-slate-500 font-semibold">Qty</span>
-                                                                        </div>
-                                                                        <span className="text-xs font-bold text-rose-600">{data.value} PCS</span>
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        }
-                                                        return null;
-                                                    }}
-                                                />
-                                            </Treemap>
-                                        </ResponsiveContainer>
-                                    </div>
-                                )}
-                            </div>
-                        ) 
-                        : (
+                        ) : (
                             <div className="h-full flex flex-col gap-4">
                                 <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1">
                                     Production Output vs. Target Variance
@@ -621,7 +565,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     stackId="varianceStack"
                                                     fill="url(#popupRunningOutput)"
                                                     barSize={32}
-                                                    label = {{position: 'center', fill: '#fff', fontSize: 20, fontWeight: 400}}
+                                                    label={{ position: 'center', fill: '#fff', fontSize: 20, fontWeight: 400 }}
                                                 />
                                                 <Bar
                                                     dataKey="PositiveVariance"
@@ -650,7 +594,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     fill="#EF4444"
                                                     barSize={32}
                                                     radius={[0, 0, 4, 4]}
-                                                    label = {{position: 'top', fill: '#000', fontSize: 20, fontWeight: 400}}
+                                                    label={{ position: 'top', fill: '#000', fontSize: 20, fontWeight: 400 }}
                                                 />
                                             </ComposedChart>
                                         </ResponsiveContainer>
@@ -659,61 +603,83 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                             </div>
                         )}
                         <div className="h-full flex flex-col gap-4 mt-6">
+                            {/* <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1">
+                                Team End-Line Defect Analysis
+                            </h3> */}
+                            <div className="flex items-center justify-between">
                                 <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1">
                                     Team End-Line Defect Analysis
                                 </h3>
-
-                                {loadingDefects ? (
-                                    <div className="flex flex-1 items-center justify-center border border-slate-100 rounded-xl bg-slate-50/20">
-                                        <div className="flex flex-col items-center gap-3">
-                                            <div className="w-8 h-8 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
-                                            <span className="text-xs font-semibold text-slate-400">Loading defect data...</span>
-                                        </div>
-                                    </div>
-                                ) : teamDefects.length === 0 ? (
-                                    <div className="flex flex-1 items-center justify-center border border-dashed border-slate-200 rounded-xl bg-slate-50/10">
-                                        <span className="text-sm text-slate-400 font-medium">
-                                            No defect data found for this team.
-                                        </span>
-                                    </div>
-                                ) : (
-                                    <div className="bg-slate-50/30 p-4 rounded-xl border border-slate-100/80 flex-1 flex flex-col">
-                                        <ResponsiveContainer width="100%" height={360}>
-                                            <Treemap
-                                                data={defectChartData}
-                                                dataKey="value"
-                                                stroke="#fff"
-                                                fill="#8884d8"
-                                                content={<CustomizedContent />}
-                                            >
-                                                <Tooltip
-                                                    content={({ active, payload }) => {
-                                                        if (active && payload && payload.length) {
-                                                            const data = payload[0].payload;
-                                                            return (
-                                                                <div className="bg-white p-3 rounded-lg shadow-lg border border-slate-100 max-w-xs">
-                                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Defect Category</p>
-                                                                    <p className="text-xs font-bold text-slate-800 mt-1 leading-snug">{data.name}</p>
-                                                                    <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100 justify-between">
-                                                                        <div className="flex items-center gap-1.5">
-                                                                            <div className="w-2 h-2 rounded-full bg-rose-500" />
-                                                                            <span className="text-xs text-slate-500 font-semibold">Qty</span>
-                                                                        </div>
-                                                                        <span className="text-xs font-bold text-rose-600">{data.value} PCS</span>
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        }
-                                                        return null;
-                                                    }}
-                                                />
-                                            </Treemap>
-                                        </ResponsiveContainer>
-                                    </div>
-                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => setIsTableModalOpen2(true)}
+                                    className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
+                                    title="View production data table"
+                                >
+                                    <Ellipsis size={18} />
+                                </button>
                             </div>
+                            {loadingDefects ? (
+                                <div className="flex flex-1 items-center justify-center border border-slate-100 rounded-xl bg-slate-50/20">
+                                    <div className="flex flex-col items-center gap-3">
+                                        <div className="w-8 h-8 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
+                                        <span className="text-xs font-semibold text-slate-400">Loading defect data...</span>
+                                    </div>
+                                </div>
+                            ) : teamDefects.length === 0 ? (
+                                <div className="flex flex-1 items-center justify-center border border-dashed border-slate-200 rounded-xl bg-slate-50/10">
+                                    <span className="text-sm text-slate-400 font-medium">
+                                        No defect data found for this team.
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className="bg-slate-50/30 p-4 rounded-xl border border-slate-100/80 flex-1 flex flex-col">
+                                    <ResponsiveContainer width="100%" height={360}>
+                                        <Treemap
+                                            data={defectChartData}
+                                            dataKey="value"
+                                            stroke="#fff"
+                                            fill="#8884d8"
+                                            content={<CustomizedContent />}
+                                        >
+                                            <Tooltip
+                                                content={({ active, payload }) => {
+                                                    if (active && payload && payload.length) {
+                                                        const data = payload[0].payload;
+                                                        return (
+                                                            <div className="bg-white p-3 rounded-lg shadow-lg border border-slate-100 max-w-xs">
+                                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Defect Category</p>
+                                                                <p className="text-xs font-bold text-slate-800 mt-1 leading-snug">{data.name}</p>
+                                                                <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100 justify-between">
+                                                                    <div className="flex items-center gap-1.5">
+                                                                        <div className="w-2 h-2 rounded-full bg-rose-500" />
+                                                                        <span className="text-xs text-slate-500 font-semibold">Qty</span>
+                                                                    </div>
+                                                                    <span className="text-xs font-bold text-rose-600">{data.value} PCS</span>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    }
+                                                    return null;
+                                                }}
+                                            />
+                                        </Treemap>
+                                    </ResponsiveContainer>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
+                <SewingTeamTableModal
+                    open={isTableModalOpen}
+                    data={hourlyAnalysis}
+                    onClose={() => setIsTableModalOpen(false)}
+                />
+                <EndlineDefectAnalysisTableModal
+                    open={isTableModalOpen2}
+                    data={teamDefects}
+                    onClose={() => setIsTableModalOpen2(false)}
+                />
             </div>
         </div>
     );

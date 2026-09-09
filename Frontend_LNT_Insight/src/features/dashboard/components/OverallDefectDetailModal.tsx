@@ -3,6 +3,9 @@ import { Treemap, Tooltip, ResponsiveContainer } from 'recharts';
 import { companiesApi } from '../../../core/api/companies';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
 import type { OverallDefectAnalysis } from '../../../types';
+import { EndlineDefectAnalysisTableModal } from './EndlineDefectAnalysisTableModal';
+import { Ellipsis } from 'lucide-react';
+
 
 interface OverallDefectDetailModalProps {
     open: boolean;
@@ -93,6 +96,7 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
 }) => {
     const [defects, setDefects] = useState<OverallDefectAnalysis[]>([]);
     const [loading, setLoading] = useState(false);
+    const [isDataDetailTableOverallDefectOpen, setIsDataDetailTableOverallDefectOpen] = useState(false)
 
     useEffect(() => {
         if (open) {
@@ -124,6 +128,7 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
         name: d.DefectName,
         value: d.DefectQty,
     }));
+
 
     return (
         <div
@@ -228,9 +233,20 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
 
                     {/* Chart Block Container */}
                     <div className="flex flex-col gap-3">
-                        <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1">
-                            Defect Distribution Chart (Treemap)
-                        </h3>
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1">
+                                Defect Distribution Chart (Treemap)
+                            </h3>
+                            <button
+                                type='button'
+                                onClick={() => setIsDataDetailTableOverallDefectOpen(true)}
+                                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
+                                title="View defect detail data table"
+                            >
+                                <Ellipsis size={18} />
+                            </button>
+                        </div>
+
 
                         {loading ? (
                             <div className="flex h-80 items-center justify-center border border-slate-100 rounded-xl bg-slate-50/20">
@@ -282,6 +298,11 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
                         )}
                     </div>
                 </div>
+                <EndlineDefectAnalysisTableModal
+                    open={isDataDetailTableOverallDefectOpen}
+                    data={defects}
+                    onClose={() => setIsDataDetailTableOverallDefectOpen(false)}
+                />
             </div>
         </div>
     );
