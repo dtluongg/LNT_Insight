@@ -41,7 +41,7 @@ export const DashboardPage: React.FC = () => {
     SiteID: searchParams.get('siteId') || searchParams.get('SiteId') || 'Site1',
     SiteCode: '',
 
-    SectionID: searchParams.get('sectionId') || searchParams.get('SectionId') || '1',
+    SectionID: searchParams.get('sectionId') || searchParams.get('SectionId') || '0',
     SectionName: '',
 
     Date: searchParams.get('date') || searchParams.get('Date') || todayStr,
@@ -124,170 +124,170 @@ export const DashboardPage: React.FC = () => {
       ) : (
         <div className={`space-y-2 transition-opacity duration-200 ${loading ? 'opacity-70 pointer-events-none' : 'opacity-100'}`}>
 
-      {/* 4 Cards KPI ở trên cùng */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
-        <StatCard
-          title="TOTAL OUTPUT"
-          value={totalOutput.toLocaleString()}
-          subtitle="Cumulative Actual Output (PCS)"
-          icon={<Clock size={22} />}
-          iconColorClass="text-blue-600"
-          iconBgClass="bg-blue-50"
-        />
+          {/* 4 Cards KPI ở trên cùng */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
+            <StatCard
+              title="TOTAL OUTPUT"
+              value={totalOutput.toLocaleString()}
+              subtitle="Cumulative Actual Output (PCS)"
+              icon={<Clock size={22} />}
+              iconColorClass="text-blue-600"
+              iconBgClass="bg-blue-50"
+            />
 
-        <StatCard
-          title="TOTAL TARGET"
-          value={totalTarget.toLocaleString()}
-          subtitle="Overall Shift Plan (PCS)"
-          icon={<TargetIcon size={22} />}
-          iconColorClass="text-blue-600"
-          iconBgClass="bg-blue-50"
-        />
+            <StatCard
+              title="TOTAL TARGET"
+              value={totalTarget.toLocaleString()}
+              subtitle="Overall Shift Plan (PCS)"
+              icon={<TargetIcon size={22} />}
+              iconColorClass="text-blue-600"
+              iconBgClass="bg-blue-50"
+            />
 
-        <StatCard
-          title="ACHIEVEMENT RATE"
-          value={`${achievementRate.toFixed(1)}%`}
-          subtitle="Actual Output / Shift Plan"
-          icon={<TrendingUp size={22} />}
-          iconColorClass={achievementRate >= 90 ? "text-emerald-600" : "text-amber-600"}
-          iconBgClass={achievementRate >= 90 ? "bg-emerald-50" : "bg-amber-50"}
-        />
+            <StatCard
+              title="ACHIEVEMENT RATE"
+              value={`${achievementRate.toFixed(1)}%`}
+              subtitle="Actual Output / Shift Plan"
+              icon={<TrendingUp size={22} />}
+              iconColorClass={achievementRate >= 90 ? "text-emerald-600" : "text-amber-600"}
+              iconBgClass={achievementRate >= 90 ? "bg-emerald-50" : "bg-amber-50"}
+            />
 
-        <StatCard
-          title="QUALITY INSPECTED GMT"
-          value={inspection.toString()}
-          subtitle="Sewing End line Inspection"
-          icon={<Layers size={22} />}
-          iconColorClass="text-purple-600"
-          iconBgClass="bg-purple-50"
-        />
+            <StatCard
+              title="QUALITY INSPECTED GMT"
+              value={inspection.toString()}
+              subtitle="Sewing End line Inspection"
+              icon={<Layers size={22} />}
+              iconColorClass="text-purple-600"
+              iconBgClass="bg-purple-50"
+            />
 
-        <StatCard
-          title="DEFECT GMT"
-          value={defectGMT.toString()}
-          subtitle="Defect (PCS) / Defect Rate "
-          icon={<Layers size={22} />}
-          iconColorClass="text-green-600"
-          iconBgClass="bg-green-50"
-          onClick={() => setIsDefectModalOpen(true)}
-        />
-      </div>
-
-      {/* Grid bên dưới: Biểu đồ & Danh sách Section */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        {/* Biểu đồ */}
-        <div className="xl:col-span-12 flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1 flex items-center gap-2">
-              <Activity size={16} className="text-blue-600" />
-              PRODUCTION OUTPUT STATUS
-            </h2>
-            <button
-              type="button"
-              onClick={() => setIsTableModalOpen(true)}
-              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
-              title="View production data table"
-            >
-              <Ellipsis size={18} />
-            </button>
+            <StatCard
+              title="DEFECT GMT"
+              value={defectGMT.toString()}
+              subtitle="Defect (PCS) / Defect Rate "
+              icon={<Layers size={22} />}
+              iconColorClass="text-green-600"
+              iconBgClass="bg-green-50"
+              onClick={() => setIsDefectModalOpen(true)}
+            />
           </div>
-          
-          <Card className="flex flex-col justify-center h-[520px] p-6">
-            {productionData.length === 0 ? (
-              <div className="text-center text-slate-400 font-medium py-10">
-                No production data found for this company and site.
-              </div>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart
-                  data={productionData}
-                  margin={{ top: 20, right: 20, bottom: 20, left: 10 }}
-                >
-                  <defs>
-                    <linearGradient id="barDayOutput" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#F59E0B" stopOpacity={0.95} />
-                      <stop offset="100%" stopColor="#D97706" stopOpacity={0.75} />
-                    </linearGradient>
-                    <linearGradient id="barInspectedQty" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#14B8A6" stopOpacity={0.95} />
-                      <stop offset="100%" stopColor="#0F766E" stopOpacity={0.75} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                  <XAxis
-                    dataKey="TeamName"
-                    stroke="#94a3b8"
-                    fontSize={11}
-                    fontWeight={600}
-                    tickLine={false}
-                    dy={10}
-                  />
-                  <YAxis
-                    stroke="#94a3b8"
-                    fontSize={11}
-                    tickLine={false}
-                    axisLine={false}
-                    dx={-10}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      borderRadius: '12px',
-                      border: 'none',
-                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
-                      fontFamily: 'sans-serif'
-                    }}
-                    formatter={(value: any, name: string) => {
-                      if (name === "DayOutput") return [value ? value.toLocaleString() : '0', 'Day Output (Actual)'];
-                      if (name === "DayTarget") return [value ? value.toLocaleString() : '-', 'Day Target (Plan)'];
-                      return [value, name];
-                    }}
-                  />
-                  <Legend
-                    // verticalAlign="bottom"
-                    height={36}
-                    iconType="circle"
-                    wrapperStyle={{ fontSize: '13px', fontWeight: 500 }}
-                    
-                  />
-                  {/* Cột Actual Output (Màu cam gradient) */}
-                  <Bar
-                    dataKey="DayOutput"
-                    name="Day Output"
-                    fill="url(#barDayOutput)"
-                    radius={[4, 4, 0, 0]}
-                    barSize={40}
-                    label={{ position: 'top', fill: '#0F766E', fontSize: 11, fontWeight: 600 }}
-                    onClick={(data) => { setSelectedProduction(data.payload) }}
-                    cursor="pointer"
-                  />
-                  <Bar
-                    dataKey="InspectedQty"
-                    name="Inspected Qty"
-                    fill="url(#barInspectedQty)"
-                    radius={[4, 4, 0, 0]}
-                    barSize={40}
-                    label={{ position: 'top', fill: '#2a8caa', fontSize: 11, fontWeight: 600 }}
-                    onClick={(data) => { setSelectedProduction(data.payload) }}
-                    cursor="pointer"
-                  />
-                  {/* Đường Line Target (Màu xanh dương) */}
-                  <Line
-                    type="monotone"
-                    dataKey="DayTarget"
-                    name="Day Target"
-                    stroke="#3B82F6"
-                    strokeWidth={3}
-                    dot={{ r: 5, fill: "#3B82F6", stroke: "#fff", strokeWidth: 2 }}
-                    activeDot={{ r: 8 }}
-                    label={{ position: 'top', fill: '#2563EB', fontSize: 11, fontWeight: 600 }}
 
-                  />
-                </ComposedChart>
-              </ResponsiveContainer>
-            )}
-          </Card>
-        </div>
-      </div>
+          {/* Grid bên dưới: Biểu đồ & Danh sách Section */}
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+            {/* Biểu đồ */}
+            <div className="xl:col-span-12 flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1 flex items-center gap-2">
+                  <Activity size={16} className="text-blue-600" />
+                  PRODUCTION OUTPUT STATUS
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setIsTableModalOpen(true)}
+                  className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
+                  title="View production data table"
+                >
+                  <Ellipsis size={18} />
+                </button>
+              </div>
+
+              <Card className="flex flex-col justify-center h-[520px] p-6">
+                {productionData.length === 0 ? (
+                  <div className="text-center text-slate-400 font-medium py-10">
+                    No production data found for this company and site.
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ComposedChart
+                      data={productionData}
+                      margin={{ top: 20, right: 20, bottom: 20, left: 10 }}
+                    >
+                      <defs>
+                        <linearGradient id="barDayOutput" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#F59E0B" stopOpacity={0.95} />
+                          <stop offset="100%" stopColor="#D97706" stopOpacity={0.75} />
+                        </linearGradient>
+                        <linearGradient id="barInspectedQty" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#14B8A6" stopOpacity={0.95} />
+                          <stop offset="100%" stopColor="#0F766E" stopOpacity={0.75} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                      <XAxis
+                        dataKey="TeamName"
+                        stroke="#94a3b8"
+                        fontSize={11}
+                        fontWeight={600}
+                        tickLine={false}
+                        dy={10}
+                      />
+                      <YAxis
+                        stroke="#94a3b8"
+                        fontSize={11}
+                        tickLine={false}
+                        axisLine={false}
+                        dx={-10}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          borderRadius: '12px',
+                          border: 'none',
+                          boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+                          fontFamily: 'sans-serif'
+                        }}
+                        formatter={(value: any, name: string) => {
+                          if (name === "DayOutput") return [value ? value.toLocaleString() : '0', 'Day Output (Actual)'];
+                          if (name === "DayTarget") return [value ? value.toLocaleString() : '-', 'Day Target (Plan)'];
+                          return [value, name];
+                        }}
+                      />
+                      <Legend
+                        // verticalAlign="bottom"
+                        height={36}
+                        iconType="circle"
+                        wrapperStyle={{ fontSize: '13px', fontWeight: 500 }}
+
+                      />
+                      {/* Cột Actual Output (Màu cam gradient) */}
+                      <Bar
+                        dataKey="DayOutput"
+                        name="Day Output"
+                        fill="url(#barDayOutput)"
+                        radius={[4, 4, 0, 0]}
+                        barSize={40}
+                        label={{ position: 'top', fill: '#0F766E', fontSize: 11, fontWeight: 600 }}
+                        onClick={(data) => { setSelectedProduction(data.payload) }}
+                        cursor="pointer"
+                      />
+                      <Bar
+                        dataKey="InspectedQty"
+                        name="Inspected Qty"
+                        fill="url(#barInspectedQty)"
+                        radius={[4, 4, 0, 0]}
+                        barSize={40}
+                        label={{ position: 'top', fill: '#2a8caa', fontSize: 11, fontWeight: 600 }}
+                        onClick={(data) => { setSelectedProduction(data.payload) }}
+                        cursor="pointer"
+                      />
+                      {/* Đường Line Target (Màu xanh dương) */}
+                      <Line
+                        type="monotone"
+                        dataKey="DayTarget"
+                        name="Day Target"
+                        stroke="#3B82F6"
+                        strokeWidth={3}
+                        dot={{ r: 5, fill: "#3B82F6", stroke: "#fff", strokeWidth: 2 }}
+                        activeDot={{ r: 8 }}
+                        label={{ position: 'top', fill: '#2563EB', fontSize: 11, fontWeight: 600 }}
+
+                      />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                )}
+              </Card>
+            </div>
+          </div>
         </div>
       )}
 

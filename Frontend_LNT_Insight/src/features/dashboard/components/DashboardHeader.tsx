@@ -130,37 +130,33 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             try {
                 const data = await companiesApi.getSections(draftFilter.CompanyID, draftFilter.SiteID);
                 setSections(data);
+
+                // Nếu SectionID đang là '0', giữ nguyên trạng thái ô trắng
+                if (draftFilter.SectionID === '0' || !draftFilter.SectionID) {
+                    setDraftFilter(prev => ({
+                        ...prev,
+                        SectionID: '0',
+                        SectionName: ''
+                    }));
+                    return;
+                }
+
                 const currentSection = data.find(
-                    section =>
-                        String(section.SectionID) === draftFilter.SectionID
+                    section => String(section.SectionID) === draftFilter.SectionID
                 );
+
                 if (currentSection) {
                     setDraftFilter(prev => ({
                         ...prev,
                         SectionName: currentSection.SectionName
                     }));
-                    // Đồng bộ lên filter cha ở DashboardPage nếu chưa có sectionName
-                    // if (!filter.sectionName) {
-                    //     onApplyFilter({
-                    //         ...filter,
-                    //         sectionName: currentSection.sectionName
-                    //     });
-                    // }
                 } else {
-                    const firstSection = data[0];
-                    if (firstSection) {
-                        setDraftFilter(prev => ({
-                            ...prev,
-                            SectionID: String(firstSection.SectionID),
-                            SectionName: firstSection.SectionName
-                        }))
-                    } else {
-                        setDraftFilter(prev => ({
-                            ...prev,
-                            SectionID: '',
-                            SectionName: ''
-                        }))
-                    }
+                    // Nếu SectionID cũ không thuộc Site mới, reset về ô trắng (value = '0')
+                    setDraftFilter(prev => ({
+                        ...prev,
+                        SectionID: '0',
+                        SectionName: ''
+                    }));
                 }
             } catch (err) {
                 console.error('Failed to fetch sections', err);
@@ -199,7 +195,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             CompanyName: company?.CompanyName || '',
             SiteID: '',
             SiteCode: '',
-            SectionID: '',
+            SectionID: '0',
             SectionName: ''
         }))
     }
@@ -213,7 +209,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             ...prev,
             SiteID: siteID,
             SiteCode: site?.SiteCode || '',
-            SectionID: '',
+            SectionID: '0',
             SectionName: ''
         }))
     }
@@ -226,7 +222,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
         setDraftFilter(prev => ({
             ...prev,
             SectionID: sectionID,
-            SectionName: section?.SectionName || ''
+            SectionName: sectionID === '0' ? '' : (section?.SectionName || '')
         }))
     }
     // =========================================================
@@ -243,7 +239,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
 
     // Apply filter:
     const handleSearch = () => {
-        if (!draftFilter.CompanyID || !draftFilter.SiteID || !draftFilter.SectionID || !draftFilter.Date) {
+        if (!draftFilter.CompanyID || !draftFilter.SiteID || draftFilter.SectionID === '' || !draftFilter.Date) {
             return;
         }
         console.log('draftFilter before apply:', draftFilter);
@@ -275,10 +271,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
     // =========================================================
 
     // sectionOptionList:
-    const sectionOptions = sections.map(se => ({
-        value: se.SectionID,
-        label: se.SectionName
-    }));
+    const sectionOptions = [
+        { value: '0', label: '' }, // default blank
+        ...sections.map(se => ({
+            value: se.SectionID,
+            label: se.SectionName
+        }))]
+
     // =========================================================
 
     return (
