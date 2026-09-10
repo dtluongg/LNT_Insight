@@ -19,36 +19,36 @@ import { masterDataApi } from '../core/api/materData';
 import { useAuth } from '../app/providers/AuthProvider';
 import type { ModuleMasterInfo, SubModuleInfo } from '../types';
 import { getModuleRoute, getSubModuleRoute } from '../app/routesConfig';
-
+import { createPortal } from 'react-dom';
 
 // Hàm ánh xạ Icon dựa trên tên hoặc ID phân hệ
 const getModuleIcon = (ModuleName: string, id: string) => {
-  // const ModuleName = ModuleName.toLowerCase();
-  // const idLower = id.toLowerCase();
+  const nameLower = String(ModuleName).toLowerCase();
 
-  if (String(ModuleName).toLowerCase().includes('executive')) {
-    return <Activity size={20} />;
+  if (nameLower.includes('executive')) {
+    return <Activity size={18} />;
   }
-  if (String(ModuleName).toLowerCase().includes('manage') || String(ModuleName).toLowerCase().includes('vật tư') || String(ModuleName).toLowerCase().includes('kho')) {
-    return <SquareChartGantt size={20} />;
+  if (nameLower.includes('manage') || nameLower.includes('vật tư') || nameLower.includes('kho')) {
+    return <SquareChartGantt size={18} />;
   }
-  if (String(ModuleName).includes('operation') || String(ModuleName).includes('sản xuất')) {
-    return <Columns3Cog size={20} />;
+  if (nameLower.includes('operation') || nameLower.includes('sản xuất')) {
+    return <Columns3Cog size={18} />;
   }
-  if (String(ModuleName).includes('report') || String(ModuleName).includes('báo cáo')) {
-    return <FileBarChart2 size={20} />;
+  if (nameLower.includes('report') || nameLower.includes('báo cáo')) {
+    return <FileBarChart2 size={18} />;
   }
-  if (String(ModuleName).includes('analytic') || String(ModuleName).includes('bảo trì') || String(ModuleName).includes('thiết bị')) {
-    return <ChartNoAxesCombined size={20} />;
+  if (nameLower.includes('analytic') || nameLower.includes('bảo trì') || nameLower.includes('thiết bị')) {
+    return <ChartNoAxesCombined size={18} />;
   }
-  if (String(ModuleName).includes('insight') || String(ModuleName).includes('bảo trì') || String(ModuleName).includes('thiết bị')) {
-    return <Lightbulb size={20} />;
+  if (nameLower.includes('insight')) {
+    return <Lightbulb size={18} />;
   }
-  if (String(ModuleName).includes('data') || String(ModuleName).includes('danh mục') || String(ModuleName).includes('hệ thống')) {
-    return <Database size={20} />;
+  if (nameLower.includes('data') || nameLower.includes('danh mục') || nameLower.includes('hệ thống')) {
+    return <Database size={18} />;
   }
-  return <Settings size={20} />; // Mặc định
+  return <Settings size={18} />;
 };
+
 
 export const Sidebar: React.FC = () => {
   const { logout } = useAuth();
@@ -57,6 +57,7 @@ export const Sidebar: React.FC = () => {
   const [submodules, setSubmodules] = useState<{ [moduleId: string]: SubModuleInfo[] }>({});
   const [expandedModuleId, setExpandedModuleId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [openPopupLogout, setOpenPopupLogout] = useState(false);
 
   // Tải danh sách Modules chính từ API khi mount
   useEffect(() => {
@@ -76,7 +77,7 @@ export const Sidebar: React.FC = () => {
   // Gọi API tải submodules khi click vào Module chính
   const handleModuleClick = async (moduleId: string) => {
     if (isCollapsed) {
-      setIsCollapsed(false); // Tự động mở rộng sidebar nếu đang thu gọn
+      setIsCollapsed(false);
     }
 
     if (expandedModuleId === moduleId) {
@@ -86,7 +87,6 @@ export const Sidebar: React.FC = () => {
 
     setExpandedModuleId(moduleId);
 
-    // Chỉ gọi API nếu chưa tải dữ liệu submodule này
     if (!submodules[moduleId]) {
       try {
         const subData = await masterDataApi.getSubModules(moduleId);
@@ -98,122 +98,129 @@ export const Sidebar: React.FC = () => {
   };
 
   return (
-    <div
-      className={`h-screen bg-slate-950 text-slate-300 flex flex-col justify-between border-r border-slate-800 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'
+    <aside
+      style={{ backgroundColor: 'var(--color-sidebar)' }}
+      className={`h-screen text-slate-200 flex flex-col justify-between border-r border-white/10 shadow-xl transition-all duration-300 ease-in-out select-none ${isCollapsed ? 'w-20' : 'w-64'
         }`}
     >
       {/* Top Section - Brand/Logo */}
       <div>
-        <div className="h-16 flex items-center gap-3 px-5 border-b border-slate-800/80 overflow-hidden">
-          <div className="w-9 h-9 rounded-lg bg-slate-900/60 border border-slate-800/60 flex items-center justify-center shadow-lg shadow-indigo-500/10 shrink-0">
-            <div className="logo-symbol">
-              <img src="/logo_lnt_insight.png" alt="LNT Insight" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
-            </div>
+        <div className="h-16 flex items-center gap-3 px-4 border-b border-white/10 overflow-hidden">
+          <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shadow-inner shrink-0 backdrop-blur-sm">
+            <img
+              src="/logo_lnt_insight.png"
+              alt="LNT Insight"
+              className="w-6 h-6 object-contain"
+            />
           </div>
           {!isCollapsed && (
             <div className="flex flex-col min-w-0 transition-opacity duration-200">
-              <div className="flex items-center gap-1">
-                <span className="font-bold text-slate-100 tracking-wider text-sm">FXPRO</span>
-                <span className="font-extrabold bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 bg-clip-text text-transparent tracking-wider text-sm">INSIGHT</span>
+              <div className="flex items-center gap-1.5 tracking-wide leading-tight">
+                <span className="font-extrabold text-white text-sm tracking-wider">FXPRO</span>
+                <span className="font-black bg-gradient-to-r from-[var(--color-brand-cyan)] to-blue-300 bg-clip-text text-transparent text-sm">
+                  INSIGHT
+                </span>
               </div>
-              <span className="text-[9px] text-slate-500 font-bold tracking-widest uppercase">Intelligent Business</span>
+              <span className="text-[10px] text-blue-200/60 font-semibold tracking-wider uppercase mt-0.5">
+                Intelligent Business
+              </span>
             </div>
           )}
         </div>
 
         {/* Modules List */}
-        <div className="p-3 space-y-1.5 overflow-y-auto max-h-[calc(100vh-140px)]">
+        <nav className="p-3 space-y-1.5 overflow-y-auto max-h-[calc(100vh-145px)] custom-scrollbar">
           {isLoading ? (
-            <div className="text-xs text-slate-500 text-center py-4">Đang tải phân hệ...</div>
+            <div className="flex flex-col gap-2 py-3 px-1">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-10 rounded-xl bg-white/5 animate-pulse" />
+              ))}
+            </div>
           ) : (
             modules.map((module) => {
-              const isExpanded =
-                expandedModuleId === module.ModuleMasterID;
-
-              const hasSubmodules =
-                submodules[module.ModuleMasterID]?.length > 0 || true;
-
-              const moduleRoute =
-                getModuleRoute(module.ModuleMasterID);
-
-              const modulePath =
-                moduleRoute?.path ??
-                `/coming-soon`;
+              const isExpanded = expandedModuleId === module.ModuleMasterID;
+              const moduleRoute = getModuleRoute(module.ModuleMasterID);
+              const modulePath = moduleRoute?.path ?? `/coming-soon`;
 
               return (
                 <div key={module.ModuleMasterID} className="flex flex-col">
                   {/* Module Master Item */}
-                  <div className="flex items-center w-full">
-                    {/* Module navigation */}
+                  <div className="group relative flex items-center w-full rounded-xl transition-colors duration-150">
                     <NavLink
                       to={modulePath}
                       className={({ isActive }) =>
-                        `flex-1 flex items-center gap-3 py-2.5 rounded-l-lg text-sm font-medium transition-all group ${isActive
-                          ? 'bg-slate-900/90 text-slate-100 pl-2.5 border-l-2 border-cyan-400 active'
-                          : 'hover:bg-slate-900/50 hover:text-white pl-3 text-slate-400'
-                        }`
+                        `flex-1 flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-semibold tracking-wide transition-all ${isActive
+                          ? 'bg-[var(--color-brand-cyan)]/20 text-cyan-200 ring-1 ring-[var(--color-brand-cyan)]/40 shadow-sm shadow-cyan-950/20'
+                          : 'text-blue-100/75 hover:text-white hover:bg-[var(--color-sidebar-hover)]'
+                        } ${isCollapsed ? 'justify-center px-0' : ''}`
                       }
                     >
-                      <div className="text-slate-400 group-hover:text-cyan-400 group-[.active]:text-cyan-400 transition-colors">
-                        {getModuleIcon(
-                          module.ModuleMasterName,
-                          module.ModuleMasterID
-                        )}
-                      </div>
+                      {({ isActive }) => (
+                        <>
+                          <div
+                            className={`shrink-0 transition-colors ${isActive ? 'text-[var(--color-brand-cyan)]' : 'text-blue-200/70 group-hover:text-white'
+                              }`}
+                          >
+                            {getModuleIcon(module.ModuleMasterName, module.ModuleMasterID)}
+                          </div>
 
-                      {!isCollapsed && (
-                        <span className="truncate text-left">
-                          {module.ModuleMasterName}
-                        </span>
+                          {!isCollapsed && (
+                            <span className="truncate text-left leading-none flex-1">
+                              {module.ModuleMasterName}
+                            </span>
+                          )}
+
+                          {/* Tooltip khi sidebar đóng */}
+                          {isCollapsed && (
+                            <span className="absolute left-full ml-3 px-2.5 py-1.5 rounded-lg bg-[var(--color-sidebar-hover)] text-white text-xs font-medium shadow-xl border border-white/10 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
+                              {module.ModuleMasterName}
+                            </span>
+                          )}
+                        </>
                       )}
                     </NavLink>
 
-                    {/* Expand / Collapse */}
-                    {!isCollapsed && hasSubmodules && (
+                    {/* Expand/Collapse Button */}
+                    {!isCollapsed && (
                       <button
-                        onClick={() =>
-                          handleModuleClick(module.ModuleMasterID)
-                        }
-                        className="px-2.5 py-2.5 rounded-r-lg text-slate-500 hover:text-white hover:bg-slate-900/60 transition-colors"
+                        type="button"
+                        onClick={() => handleModuleClick(module.ModuleMasterID)}
+                        aria-label="Toggle submodules"
+                        className={`p-2 mr-1 rounded-lg text-blue-200/60 hover:text-white hover:bg-white/10 transition-all ${isExpanded ? 'text-[var(--color-brand-cyan)]' : ''
+                          }`}
                       >
-                        {isExpanded ? (
-                          <ChevronDown size={14} />
-                        ) : (
-                          <ChevronRight size={14} />
-                        )}
+                        {isExpanded ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
                       </button>
                     )}
                   </div>
 
-                  {/* SubModules Accordion List */}
+                  {/* SubModules Accordion */}
                   {!isCollapsed && isExpanded && submodules[module.ModuleMasterID] && (
-                    <div className="mt-1 ml-4 pl-4 border-l border-slate-800 space-y-1.5 transition-all">
-
-
+                    <div className="mt-1 ml-5 pl-3 border-l border-white/15 space-y-0.5">
                       {submodules[module.ModuleMasterID].map((sub) => {
                         const route = getSubModuleRoute(sub.ModuleMasterID, sub.ModuleMasterSubID);
-                        const path =
-                          route?.path ??
-                          `/coming-soon`;
+                        const path = route?.path ?? `/coming-soon`;
 
                         return (
                           <NavLink
                             key={`${sub.ModuleMasterID}-${sub.ModuleMasterSubID}`}
                             to={path}
                             className={({ isActive }) =>
-                              `block px-3 py-2 text-xs font-medium rounded-md transition-colors ${isActive
-                                ? 'bg-cyan-500/10 text-cyan-400 font-semibold'
-                                : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
+                              `block px-3 py-2 text-[11px] font-medium rounded-lg transition-all ${isActive
+                                ? 'text-[var(--color-brand-cyan)] bg-white/10 font-semibold'
+                                : 'text-blue-100/65 hover:text-white hover:bg-white/5'
                               }`
                             }
                           >
                             {sub.ModuleMasterName}
                           </NavLink>
-                        )
+                        );
                       })}
 
                       {submodules[module.ModuleMasterID].length === 0 && (
-                        <span className="block px-3 py-1 text-[11px] text-slate-600">Không có phân hệ con</span>
+                        <span className="block px-3 py-1.5 text-[11px] text-blue-200/40 italic">
+                          Không có phân hệ con
+                        </span>
                       )}
                     </div>
                   )}
@@ -221,27 +228,81 @@ export const Sidebar: React.FC = () => {
               );
             })
           )}
-        </div>
+        </nav>
       </div>
 
       {/* Bottom Section - Collapse Toggle & Logout */}
-      <div className="p-3 border-t border-slate-800/80 space-y-1">
+      <div className="p-3 border-t border-white/10 space-y-1">
         <button
+          type="button"
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-900 hover:text-cyan-400 transition-colors cursor-pointer"
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-900/80 hover:text-slate-200 transition-colors cursor-pointer ${isCollapsed ? 'justify-center px-0' : ''
+            }`}
+          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          {isCollapsed ? <ChevronRightSquare size={20} /> : <ChevronLeft size={20} />}
+          {isCollapsed ? <ChevronRightSquare size={18} /> : <ChevronLeft size={18} />}
           {!isCollapsed && <span>Collapse</span>}
         </button>
 
         <button
-          onClick={logout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-rose-400 hover:bg-rose-950/20 hover:text-rose-300 transition-colors cursor-pointer"
+          type="button"
+          onClick={() => setOpenPopupLogout(true)}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-rose-400 hover:bg-rose-950/30 hover:text-rose-300 transition-colors cursor-pointer ${isCollapsed ? 'justify-center px-0' : ''
+            }`}
+          title="Logout"
         >
-          <LogOut size={20} />
+          <LogOut size={18} />
           {!isCollapsed && <span>Logout</span>}
         </button>
       </div>
-    </div>
+      {/* Modal Xác nhận Đăng xuất */}
+      {/* Modal Xác nhận Đăng xuất (Portal ra toàn màn hình) */}
+      {openPopupLogout &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4"
+            onClick={() => setOpenPopupLogout(false)}
+          >
+            <div
+              className="w-full max-w-sm rounded-2xl bg-slate-900 border border-slate-800 p-5 shadow-2xl shadow-black/80 flex flex-col gap-4 text-left"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
+                  <LogOut size={20} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-100">Logout Confirm</h3>
+                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                    Are you want logout in this time?
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 mt-1">
+                <button
+                  type="button"
+                  onClick={() => setOpenPopupLogout(false)}
+                  className="px-4 py-2 text-xs font-medium text-slate-300 hover:text-slate-100 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+                >
+                  No
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenPopupLogout(false);
+                    logout();
+                  }}
+                  className="px-4 py-2 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-500 rounded-lg transition-colors shadow-md shadow-rose-950/40 cursor-pointer"
+                >
+                  Yes
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
+    </aside>
   );
 };

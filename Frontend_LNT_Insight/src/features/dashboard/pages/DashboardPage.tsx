@@ -203,16 +203,6 @@ export const DashboardPage: React.FC = () => {
                       data={productionData}
                       margin={{ top: 20, right: 20, bottom: 20, left: 10 }}
                     >
-                      <defs>
-                        <linearGradient id="barDayOutput" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#F59E0B" stopOpacity={0.95} />
-                          <stop offset="100%" stopColor="#D97706" stopOpacity={0.75} />
-                        </linearGradient>
-                        <linearGradient id="barInspectedQty" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#14B8A6" stopOpacity={0.95} />
-                          <stop offset="100%" stopColor="#0F766E" stopOpacity={0.75} />
-                        </linearGradient>
-                      </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                       <XAxis
                         dataKey="TeamName"
@@ -237,51 +227,77 @@ export const DashboardPage: React.FC = () => {
                           fontFamily: 'sans-serif'
                         }}
                         formatter={(value: any, name: string) => {
-                          if (name === "DayOutput") return [value ? value.toLocaleString() : '0', 'Day Output (Actual)'];
                           if (name === "DayTarget") return [value ? value.toLocaleString() : '-', 'Day Target (Plan)'];
+                          if (name === "DayOutput") return [value ? value.toLocaleString() : '0', 'Day Output (Actual)'];
                           return [value, name];
                         }}
                       />
+                      {/* 
+                      
+                      */}
                       <Legend
-                        // verticalAlign="bottom"
                         height={36}
                         iconType="circle"
                         wrapperStyle={{ fontSize: '13px', fontWeight: 500 }}
+                        // Tự định nghĩa giao diện Legend để ép thứ tự hiển thị chuẩn 100%
+                        content={() => (
+                          <div className="flex justify-center items-center gap-6 text-[13px] font-medium pt-2">
+                            {/* 1. Target (Màu vàng) */}
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-3 h-3 rounded-full bg-[#F59E0B]" />
+                              <span className="text-slate-600">Day Target</span>
+                            </div>
+
+                            {/* 2. Output (Màu xanh kết quả) */}
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-3 h-3 rounded-full bg-[#10B981]" />
+                              <span className="text-slate-600">Day Output</span>
+                            </div>
+
+                            {/* 3. Inspected (Màu xanh tối) */}
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-3 h-3 rounded-full bg-[#0F766E]" />
+                              <span className="text-slate-600">Inspected Qty</span>
+                            </div>
+                          </div>
+                        )}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="DayTarget"
+                        name="Day Target"
+                        stroke="#F59E0B"
+                        strokeWidth={3}
+                        dot={{ r: 5, fill: "#F59E0B", stroke: "#fff", strokeWidth: 2 }}
+                        activeDot={{ r: 8 }}
+                        label={{ position: 'top', fill: '#D97706', fontSize: 11, fontWeight: 600 }}
 
                       />
-                      {/* Cột Actual Output (Màu cam gradient) */}
+                      {/* Cột Actual Output (Màu green) */}
                       <Bar
+                        id="bar-day-output"
                         dataKey="DayOutput"
                         name="Day Output"
-                        fill="url(#barDayOutput)"
+                        fill="#10B981"
                         radius={[4, 4, 0, 0]}
-                        barSize={40}
-                        label={{ position: 'top', fill: '#0F766E', fontSize: 11, fontWeight: 600 }}
+                        barSize={30}
+                        label={{ position: 'top', fill: '#10B981', fontSize: 11, fontWeight: 600 }}
                         onClick={(data) => { setSelectedProduction(data.payload) }}
                         cursor="pointer"
                       />
                       <Bar
+                        id="bar-inspected-qty"
                         dataKey="InspectedQty"
                         name="Inspected Qty"
-                        fill="url(#barInspectedQty)"
+                        fill="#2a8caa"
                         radius={[4, 4, 0, 0]}
-                        barSize={40}
+                        barSize={30}
                         label={{ position: 'top', fill: '#2a8caa', fontSize: 11, fontWeight: 600 }}
                         onClick={(data) => { setSelectedProduction(data.payload) }}
                         cursor="pointer"
                       />
                       {/* Đường Line Target (Màu xanh dương) */}
-                      <Line
-                        type="monotone"
-                        dataKey="DayTarget"
-                        name="Day Target"
-                        stroke="#3B82F6"
-                        strokeWidth={3}
-                        dot={{ r: 5, fill: "#3B82F6", stroke: "#fff", strokeWidth: 2 }}
-                        activeDot={{ r: 8 }}
-                        label={{ position: 'top', fill: '#2563EB', fontSize: 11, fontWeight: 600 }}
 
-                      />
                     </ComposedChart>
                   </ResponsiveContainer>
                 )}

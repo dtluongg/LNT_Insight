@@ -51,30 +51,31 @@ export interface SectionInfo {
     SectionName: string;
 }
 
-export interface ProductionVsPlanInfo {
-    TeamID: number;
-    TeamNo: string;
-    TeamName: string;
-    DayOutput: number;
-    DayTarget: number | null;
-}
+// export interface ProductionVsPlanInfo {
+//     TeamID: number;
+//     TeamNo: string;
+//     TeamName: string;
+//     DayOutput: number;
+//     DayTarget: number | null;
+// }
 
 export interface SewingTeamSummay {
     DayOutput: number;
     DayTarget: number;
     InspectedQty: number;
-    DefectQty: number; 
+    DefectQty: number;
     DefectRate: number;
 }
 
 export interface SewingTeamDetail {
+    SectionID: number;
     TeamID: number;
     TeamNo: string;
     TeamName: string;
     DayOutput: number;
     DayTarget: number;
     InspectedQty: number;
-    DefectQty: number; 
+    DefectQty: number;
     DefectRate: number;
 }
 

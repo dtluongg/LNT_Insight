@@ -1,5 +1,6 @@
 [
   {
+    "SectionID": 1,
     "TeamID": 1,
     "TeamNo": "LINE-01",
     "TeamName": "S1|LINE-01",
@@ -10,6 +11,7 @@
     "DefectRate": 4.76
   },
   {
+    "SectionID": 1,
     "TeamID": 2,
     "TeamNo": "LINE-02",
     "TeamName": "S1|LINE-02",
@@ -20,6 +22,7 @@
     "DefectRate": 5.00
   },
   {
+    "SectionID": 1,
     "TeamID": 3,
     "TeamNo": "LINE-03",
     "TeamName": "S1|LINE-03",
@@ -30,6 +33,7 @@
     "DefectRate": 4.76
   },
   {
+    "SectionID": 1,
     "TeamID": 4,
     "TeamNo": "LINE-04",
     "TeamName": "S1|LINE-04",
@@ -40,70 +44,165 @@
     "DefectRate": 6.67
   },
   {
-    "TeamID": 5,
-    "TeamNo": "LINE-05",
-    "TeamName": "S1|LINE-05",
-    "DayOutput": 0,
-    "DayTarget": 0,
-    "InspectedQty": 0,
-    "DefectQty": 0,
-    "DefectRate": null
-  },
-  {
-    "TeamID": 6,
-    "TeamNo": "LINE-06",
-    "TeamName": "S1|LINE-06",
-    "DayOutput": 0,
-    "DayTarget": 0,
-    "InspectedQty": 0,
-    "DefectQty": 0,
-    "DefectRate": null
-  },
-  {
-    "TeamID": 7,
-    "TeamNo": "LINE-07",
-    "TeamName": "S1|LINE-07",
-    "DayOutput": 0,
-    "DayTarget": 0,
-    "InspectedQty": 0,
-    "DefectQty": 0,
-    "DefectRate": null
-  },
-  {
-    "TeamID": 8,
-    "TeamNo": "LINE-08",
-    "TeamName": "S1|LINE-08",
-    "DayOutput": 0,
-    "DayTarget": 0,
-    "InspectedQty": 0,
-    "DefectQty": 0,
-    "DefectRate": null
-  },
-  {
-    "TeamID": 9,
-    "TeamNo": "LINE-09",
-    "TeamName": "S1|LINE-09",
-    "DayOutput": 0,
-    "DayTarget": 0,
-    "InspectedQty": 0,
-    "DefectQty": 0,
-    "DefectRate": null
-  },
-  {
-    "TeamID": 10,
-    "TeamNo": "LINE-10",
-    "TeamName": "S1|LINE-10",
-    "DayOutput": 0,
-    "DayTarget": 0,
-    "InspectedQty": 0,
-    "DefectQty": 0,
-    "DefectRate": null
-  },
-  {
+    "SectionID": 1,
     "TeamID": 19,
     "TeamNo": "LINE-01&03",
     "TeamName": "S1|LINE-01&03",
     "DayOutput": 27,
+    "DayTarget": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 2,
+    "TeamID": 5,
+    "TeamNo": "LINE-05",
+    "TeamName": "S2|LINE-05",
+    "DayOutput": 0,
+    "DayTarget": 121,
+    "InspectedQty": 50,
+    "DefectQty": 2,
+    "DefectRate": 4.00
+  },
+  {
+    "SectionID": 2,
+    "TeamID": 6,
+    "TeamNo": "LINE-06",
+    "TeamName": "S2|LINE-06",
+    "DayOutput": 0,
+    "DayTarget": 123,
+    "InspectedQty": 93,
+    "DefectQty": 3,
+    "DefectRate": 3.23
+  },
+  {
+    "SectionID": 2,
+    "TeamID": 7,
+    "TeamNo": "LINE-07",
+    "TeamName": "S2|LINE-07",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 62,
+    "DefectQty": 5,
+    "DefectRate": 8.06
+  },
+  {
+    "SectionID": 2,
+    "TeamID": 8,
+    "TeamNo": "LINE-08",
+    "TeamName": "S2|LINE-08",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 70,
+    "DefectQty": 3,
+    "DefectRate": 4.29
+  },
+  {
+    "SectionID": 3,
+    "TeamID": 9,
+    "TeamNo": "LINE-09",
+    "TeamName": "S3|LINE-09",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 3,
+    "TeamID": 10,
+    "TeamNo": "LINE-10",
+    "TeamName": "S3|LINE-10",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 3,
+    "TeamID": 11,
+    "TeamNo": "LINE-11",
+    "TeamName": "S3|LINE-11",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 3,
+    "TeamID": 12,
+    "TeamNo": "LINE-12",
+    "TeamName": "S3|LINE-12",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 4,
+    "TeamID": 13,
+    "TeamNo": "LINE-13",
+    "TeamName": "S4|LINE-13",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 4,
+    "TeamID": 14,
+    "TeamNo": "LINE-14",
+    "TeamName": "S4|LINE-14",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 4,
+    "TeamID": 15,
+    "TeamNo": "LINE-15",
+    "TeamName": "S5|LINE-15",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 4,
+    "TeamID": 16,
+    "TeamNo": "LINE-16",
+    "TeamName": "S5|LINE-16",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 5,
+    "TeamID": 17,
+    "TeamNo": "LINE-17",
+    "TeamName": "S5|LINE-17",
+    "DayOutput": 0,
+    "DayTarget": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 5,
+    "TeamID": 18,
+    "TeamNo": "LINE-18",
+    "TeamName": "S5|LINE-18",
+    "DayOutput": 0,
     "DayTarget": 0,
     "InspectedQty": 0,
     "DefectQty": 0,

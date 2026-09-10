@@ -16,14 +16,14 @@ import {
 import { Ellipsis } from 'lucide-react';
 import { companiesApi } from '../../../core/api/companies';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
-import type { ProductionVsPlanInfo, WorkshiftInfo, SewingTeamAnalysis, OverallDefectAnalysis } from '../../../types';
+import type { SewingTeamDetail, WorkshiftInfo, SewingTeamAnalysis, OverallDefectAnalysis } from '../../../types';
 import { SewingTeamTableModal } from './SewingTeamTableModal';
 import { EndlineDefectAnalysisTableModal } from './EndlineDefectAnalysisTableModal';
 
 interface TeamProductionDetailModalProps {
     open: boolean;
     filter: DashboardFilter;
-    production: ProductionVsPlanInfo | null;
+    production: SewingTeamDetail;
     onClose: () => void;
 }
 
@@ -131,7 +131,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                         filter.CompanyID,
                         filter.SiteID,
                         dateObj,
-                        Number(filter.SectionID)
+                        Number(production.SectionID)
                     );
                     setShiftworks(shifts);
                     if (shifts.length > 0) {
@@ -155,7 +155,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                     const defects = await companiesApi.getTeamDefectAnalysis(
                         filter.CompanyID,
                         filter.SiteID,
-                        Number(filter.SectionID),
+                        Number(production.SectionID),
                         dateObj,
                         production.TeamID
                     );
@@ -249,25 +249,23 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                 <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 flex-shrink-0">
                     <div>
                         <h2 className="text-lg font-semibold text-slate-800">
-                            Production Detail (Team)
+                            Production Detail
                         </h2>
-                        <p className="mt-1 text-sm text-slate-400">
-                            Team: {production.TeamName}
-                        </p>
+                        <div className="flex items-center justify-between mt-1 gap-6" >
+                            <p className="mt-1 text-lg font-semibold text-slate-600">
+                                Team: {production.TeamName}
+                            </p>
+                            <div className="flex items-baseline">
+                                <p className="text-2xl font-semibold text-green-500">
+                                    {production.DayOutput?.toLocaleString() ?? 0}/
+                                </p>
+                                <p className="text-lg font-semibold text-amber-400">
+                                    {production.DayTarget?.toLocaleString() ?? 0}
+                                </p>
+                            </div>
+                        </div>
                     </div>
-
-                    <button
-                        onClick={onClose}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 text-xl font-bold"
-                    >
-                        ×
-                    </button>
-                </div>
-
-                {/* Content Area - Scrollable */}
-                <div className="overflow-y-auto flex-1 flex flex-col min-h-0">
-                    {/* Dashboard Filter Information */}
-                    <div className="grid grid-cols-2 gap-4 border-b border-slate-200 p-6 md:grid-cols-5 flex-shrink-0">
+                    <div className="grid grid-cols-2 gap-4 p-6 md:grid-cols-5 flex-shrink-0">
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                                 Company
@@ -327,37 +325,16 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                             )}
                         </div>
                     </div>
+                    <button
+                        onClick={onClose}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 text-xl font-bold"
+                    >
+                        ×
+                    </button>
+                </div>
 
-                    {/* Selected Chart Data Summary */}
-                    <div className="grid grid-cols-2 gap-4 p-6 md:grid-cols-3 flex-shrink-0">
-                        <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">
-                            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                                Team
-                            </p>
-                            <p className="mt-1 text-lg font-bold text-slate-800">
-                                {production.TeamName}
-                            </p>
-                        </div>
-
-                        <div className="rounded-xl border border-orange-100 bg-orange-50/50 p-4">
-                            <p className="text-xs font-bold uppercase tracking-wider text-orange-400">
-                                Day Output
-                            </p>
-                            <p className="mt-1 text-lg font-extrabold text-orange-600">
-                                {production.DayOutput?.toLocaleString() ?? 0}
-                            </p>
-                        </div>
-
-                        <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4">
-                            <p className="text-xs font-bold uppercase tracking-wider text-blue-400">
-                                Day Target
-                            </p>
-                            <p className="mt-1 text-lg font-extrabold text-blue-600">
-                                {production.DayTarget?.toLocaleString() ?? 0}
-                            </p>
-                        </div>
-                    </div>
-
+                {/* Content Area - Scrollable */}
+                <div className="overflow-y-auto flex-1 flex flex-col min-h-0">
                     {/* Tabs Selector Navigation */}
                     <div className="flex items-center justify-between">
                         <div className="flex border-b border-slate-200 px-6 flex-shrink-0">
@@ -383,10 +360,11 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                         <button
                             type="button"
                             onClick={() => setIsTableModalOpen(true)}
-                            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
+                            className="mr-5 p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition-colors cursor-pointer border border-slate-200 hover:border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
+
                             title="View production data table"
                         >
-                            <Ellipsis size={18} />
+                            <h3 className='text-sm'>Hourly Team Production Details</h3>
                         </button>
                     </div>
 
@@ -417,16 +395,6 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                 data={hourlyAnalysis}
                                                 margin={{ top: 20, right: 20, bottom: 20, left: 10 }}
                                             >
-                                                <defs>
-                                                    <linearGradient id="popupCumulativePlan" x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="0%" stopColor="#F59E0B" stopOpacity={0.95} />
-                                                        <stop offset="100%" stopColor="#D97706" stopOpacity={0.75} />
-                                                    </linearGradient>
-                                                    <linearGradient id="popupRunningOutput" x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="0%" stopColor="#2563EB" stopOpacity={0.95} />
-                                                        <stop offset="100%" stopColor="#1D4ED8" stopOpacity={0.75} />
-                                                    </linearGradient>
-                                                </defs>
                                                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                                                 <XAxis
                                                     dataKey="ShiftHourID"
@@ -455,24 +423,42 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     height={36}
                                                     iconType="circle"
                                                     wrapperStyle={{ fontSize: '12px', fontWeight: 500, paddingTop: '20px' }}
+                                                    content={() => (
+                                                        <div className="flex justify-center items-center gap-6 text-[13px] font-medium pt-2">
+                                                            {/* 1. Target (Màu vàng) */}
+                                                            <div className="flex items-center gap-1.5">
+                                                                <span className="w-3 h-3 rounded-full bg-[#10B981]" />
+                                                                <span className="text-slate-600">Running Output</span>
+                                                            </div>
+
+                                                            {/* 2. Output (Màu xanh kết quả) */}
+                                                            <div className="flex items-center gap-1.5">
+                                                                <span className="w-3 h-3 rounded-full bg-[#F59E0B]" />
+                                                                <span className="text-slate-600">Cumulative Plan</span>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
                                                 />
                                                 <Bar
+                                                    id='bar-running-output'
                                                     dataKey="RunningOutput"
                                                     name="Running Output"
-                                                    fill="url(#popupRunningOutput)"
+                                                    fill="#10B981"
                                                     radius={[4, 4, 0, 0]}
                                                     barSize={32}
-                                                    label={{ position: 'insideTop', fill: '#fff', fontSize: 20, fontWeight: 400 }}
+                                                    label={{ position: 'top', fill: '#000', fontSize: 13, fontWeight: 400 }}
                                                 >
                                                     {/* <LabelList dataKey="RunningOutput" position="insideTop" angle={0} fill="#fff" fontSize={20} fontWeight={500} /> */}
                                                 </Bar>
                                                 <Bar
+                                                    id='bar-cumulative-plan'
                                                     dataKey="CumulativePlan"
                                                     name="Cumulative Plan"
-                                                    fill="url(#popupCumulativePlan)"
+                                                    fill="#F59E0B"
                                                     radius={[4, 4, 0, 0]}
                                                     barSize={32}
-                                                    label={{ position: 'insideTop', fill: '#fff', fontSize: 20, fontWeight: 400 }}
+                                                    label={{ position: 'top', fill: '#000', fontSize: 13, fontWeight: 400 }}
                                                 />
                                                 {/* <Line
                                                     type="monotone"

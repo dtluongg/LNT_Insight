@@ -14,6 +14,15 @@ export const EndlineDefectAnalysisTableModal: React.FC<EndlineDefectAnalysisTabl
     data,
     onClose,
 }) => {
+    // sap xep lai du lieu 
+    // const dataSortASC = data
+    //     .map((item, index) => ({ index, value: item.DefectQty })) // tao 1 mang moi
+    //     .sort((a, b) => a.value - b.value)
+    //     .map(sorted => data[sorted.index]);
+
+    const dataSort = [...data].sort((a, b) => a.DefectQty - b.DefectQty);
+    // const dataSort = [...data].sort((a, b) => b.DefectQty - a.DefectQty);
+    // ==================================================================================
     if (!open) return null;
     const columnsForTable = [
         {
@@ -64,7 +73,7 @@ export const EndlineDefectAnalysisTableModal: React.FC<EndlineDefectAnalysisTabl
                     {/* Table */}
                     <Table
                         columns={columnsForTable}
-                        data={data}
+                        data={dataSort}
                         keyExtractor={(row) => row.DefectID || row.DefectName}
                     />
                 </div>

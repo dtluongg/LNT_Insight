@@ -35,6 +35,11 @@ export const SewingTeamTableModal: React.FC<SewingTeamTableModalProps> = ({
             header: 'Output Variance',
             accessor: (row: SewingTeamAnalysis) => (row.OutputVariance != null ? row.OutputVariance.toLocaleString() : '-'),
             className: 'text-right',
+        },
+        {
+            header: 'Achievement %',
+            accessor: (row: SewingTeamAnalysis) => (row.Achievement != null ? `${row.Achievement.toLocaleString()} %` : '-'),
+            className: 'text-right',
         }
     ];
     return (

@@ -49,37 +49,51 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-slate-950 font-sans">
-      {/* Background Decorative Blobs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/20 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-600/20 blur-[120px] pointer-events-none" />
+    <div
+      className="relative min-h-screen w-full flex items-center justify-center overflow-hidden font-sans"
+      style={{ backgroundColor: 'var(--color-background)' }}
+    >
+      {/* Background Decorative Gradient Blobs (tươi sáng hơn, loại bỏ nền đen) */}
+      <div className="absolute -top-[12%] -left-[10%] w-[45%] h-[45%] rounded-full bg-blue-400/15 blur-[100px] pointer-events-none" />
+      <div className="absolute -bottom-[10%] -right-[10%] w-[45%] h-[45%] rounded-full bg-cyan-400/15 blur-[100px] pointer-events-none" />
 
-      {/* Grid Pattern Background */}
-      <div 
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+      {/* Grid Pattern Background mờ nhẹ */}
+      <div
+        className="absolute inset-0 opacity-[0.04] pointer-events-none"
         style={{
-          backgroundImage: `radial-gradient(circle, #ffffff 1px, transparent 1px)`,
+          backgroundImage: `radial-gradient(circle, #0f2747 1.5px, transparent 1.5px)`,
           backgroundSize: '24px 24px'
         }}
       />
 
       {/* Login Card */}
-      <div className="w-full max-w-md px-6 py-8 md:px-8 bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl relative z-10 mx-4">
+      {/* Login Card */}
+      <div className="w-full max-w-md px-6 py-8 md:px-8 bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-2xl shadow-xl shadow-slate-200/60 relative z-10 mx-4">
         {/* Brand / Logo */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 mb-3 animate-pulse">
-            <Activity className="text-white w-6 h-6" />
+        <div className="flex flex-col items-center mb-7">
+          <div
+            className="w-12 h-12 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/20 mb-3"
+            style={{ backgroundColor: '#fff' }}
+          >
+            <img
+              src="/logo_lnt_insight.png"
+              alt="LNT Insight"
+              className="w-7 h-7 object-contain"
+            />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-white text-center">
-            LNT INSIGHT
-          </h2>
-          <p className="text-xs text-slate-400 mt-1 uppercase tracking-wider">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xl font-extrabold text-slate-800 tracking-wider">LNT</span>
+            <span className="text-xl font-black bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent tracking-wider">
+              INSIGHT
+            </span>
+          </div>
+          <p className="text-[11px] font-semibold text-slate-400 mt-1 uppercase tracking-widest text-center">
             Production Reporting & Monitoring System
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-3 rounded-lg bg-red-950/50 border border-red-500/30 text-red-200 text-xs font-medium leading-relaxed">
+          <div className="mb-5 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 text-xs font-medium leading-relaxed">
             {error}
           </div>
         )}
