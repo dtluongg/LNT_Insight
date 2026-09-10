@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Download, Calendar, RefreshCw } from 'lucide-react';
+import { Calendar, RefreshCw, ChevronDown, Building2, MapPin, Layers } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import { Select } from '../../../components/ui/Select';
-import { Button } from '../../../components/ui/Button';
 import { companiesApi } from '../../../core/api/companies';
 import type { CompanyInfo, SiteInfo, SectionInfo } from '../../../types';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
@@ -216,15 +214,15 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
     // =========================================================
 
     // Handle for Section Change:
-    const handleSectionChange = (e: React.ChangeEvent<HTMLSelectElement>) => { // chưa hiểu hàm này cho lắm
+    const handleSectionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const sectionID = e.target.value;
-        const section = sections.find(item => item.SectionID === sectionID);
+        const section = sections.find(item => String(item.SectionID) === sectionID);
         setDraftFilter(prev => ({
             ...prev,
             SectionID: sectionID,
-            SectionName: sectionID === '0' ? '' : (section?.SectionName || '')
-        }))
-    }
+            SectionName: sectionID === '0' ? 'All' : (section?.SectionName || '')
+        }));
+    };
     // =========================================================
 
     // Date change
@@ -236,7 +234,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
     };
     // =========================================================
 
-
     // Apply filter:
     const handleSearch = () => {
         if (!draftFilter.CompanyID || !draftFilter.SiteID || draftFilter.SectionID === '' || !draftFilter.Date) {
@@ -244,15 +241,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
         }
         console.log('draftFilter before apply:', draftFilter);
         onApplyFilter({
-            ...draftFilter // không hiểu lắm
+            ...draftFilter
         });
         setLatestUpdate(
             new Date().toLocaleString('vi-VN', { hour12: false })
         );
-    }
+    };
     // =========================================================
-
-
 
     // Options for combobox:
 
@@ -272,89 +267,143 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
 
     // sectionOptionList:
     const sectionOptions = [
-        { value: '0', label: '' }, // default blank
+        { value: '0', label: 'All' },
         ...sections.map(se => ({
             value: se.SectionID,
             label: se.SectionName
-        }))]
-
+        }))
+    ];
     // =========================================================
 
     return (
-        <header className="bg-white border-b border-slate-100 px-8 py-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between shrink-0">
-            {/* Title info */}
-            <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                    <h1 className="text-xl font-bold text-slate-800 tracking-tight">
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-xs px-6 py-4 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 shrink-0">
+            {/* Title info with Sewing Machine Icon */}
+            <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-sky-100/70 border border-sky-200/50 flex items-center justify-center shrink-0 shadow-xs">
+                    <svg
+                        className="w-6 h-6 text-sky-600"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        {/* Bàn máy may */}
+                        <path d="M2 19h20" />
+                        <path d="M4 19v-2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2" />
+                        {/* Thân & cần máy */}
+                        <path d="M18 16V8a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v8" />
+                        <path d="M4 11h9a2 2 0 0 1 2 2v3" />
+                        {/* Ống chỉ */}
+                        <circle cx="16" cy="5" r="1.2" fill="currentColor" />
+                        {/* Kim may */}
+                        <line x1="7" y1="11" x2="7" y2="15" />
+                        <circle cx="7" cy="15.5" r="0.5" fill="currentColor" />
+                    </svg>
+                </div>
+                <div className="flex flex-col">
+                    <h1 className="text-xl lg:text-2xl font-black text-slate-800 tracking-tight leading-tight">
                         Sewing Team Performance
                     </h1>
-                    <div className="w-5 h-5 rounded-full border border-slate-300 text-slate-400 text-xs flex items-center justify-center font-semibold cursor-help select-none">
-                        i
-                    </div>
+                    <span className="text-xs text-slate-400 font-medium mt-0.5">
+                        Latest Update: {latestUpdate}
+                    </span>
                 </div>
-                <span className="text-xs text-slate-400 mt-1">Latest Update: {latestUpdate}</span>
             </div>
 
-            {/* Filters & Actions */}
-            <div className="flex items-end gap-3">
-                {/* Date Input */}
+            {/* Filters & Actions Form */}
+            <div className="flex flex-wrap items-end gap-3">
+                {/* 1. Date Input */}
                 <div className="flex flex-col gap-1.5">
-                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Day</span>
+                    <div className="flex items-center gap-1.5 text-slate-700">
+                        <Calendar size={13} className="text-slate-600" />
+                        <span className="text-[11px] font-bold tracking-wider uppercase">DAY</span>
+                    </div>
                     <div className="relative flex items-center">
-                        <Calendar size={15} className="absolute left-3 text-slate-400 pointer-events-none" />
                         <input
                             type="date"
                             value={draftFilter.Date}
                             max={todayStr}
                             onChange={handleDateChange}
-                            className="h-10 rounded-lg border border-slate-200 pl-10 pr-3 text-sm font-medium text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary cursor-pointer shadow-xs"
+                            className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer"
                         />
                     </div>
                 </div>
 
-                {/* Company Select */}
-                <Select
-                    label="Company"
-                    options={companyOptions}
-                    value={draftFilter.CompanyID}
-                    onChange={handleCompanyChange}
-                />
-
-                {/* Site Select */}
-                <Select
-                    label="Site"
-                    options={siteOptions}
-                    value={draftFilter.SiteID}
-                    onChange={handleSiteChange}
-                    disabled={siteOptions.length === 0}
-                />
-
-                {/* Section Select */}
-                <Select
-                    label="Section"
-                    options={sectionOptions}
-                    value={draftFilter.SectionID}
-                    onChange={handleSectionChange}
-                    disabled={sectionOptions.length === 0}
-                />
-
-                {/* Action Buttons */}
-                <div className="flex gap-2">
-                    <Button
-                        onClick={handleSearch}
-                        disabled={isLoading}
-                        title="Refresh data"
-                        className="h-10 px-4 flex items-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 shadow-xs text-white disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
-                    >
-                        <RefreshCw size={20} className={isLoading ? 'animate-spin' : ''} />
-                    </Button>
-
-                    {/* <Button variant="secondary" className="h-10 px-4 flex items-center gap-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold shadow-xs">
-                        <Download size={16} />
-                        Export file
-                    </Button> */}
+                {/* 2. Company Select */}
+                <div className="flex flex-col gap-1.5 min-w-[140px]">
+                    <div className="flex items-center gap-1.5 text-slate-700">
+                        <Building2 size={13} className="text-slate-600" />
+                        <span className="text-[11px] font-bold tracking-wider uppercase">COMPANY</span>
+                    </div>
+                    <div className="relative">
+                        <select
+                            value={draftFilter.CompanyID}
+                            onChange={handleCompanyChange}
+                            className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-3 pr-8 text-xs font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer appearance-none"
+                        >
+                            {companyOptions.map(co => (
+                                <option key={co.value} value={co.value}>{co.label}</option>
+                            ))}
+                        </select>
+                        <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    </div>
                 </div>
+
+                {/* 3. Site Select */}
+                <div className="flex flex-col gap-1.5 min-w-[130px]">
+                    <div className="flex items-center gap-1.5 text-slate-700">
+                        <MapPin size={13} className="text-slate-600" />
+                        <span className="text-[11px] font-bold tracking-wider uppercase">SITE</span>
+                    </div>
+                    <div className="relative">
+                        <select
+                            value={draftFilter.SiteID}
+                            onChange={handleSiteChange}
+                            disabled={siteOptions.length === 0}
+                            className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-3 pr-8 text-xs font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer appearance-none disabled:bg-slate-50 disabled:opacity-60"
+                        >
+                            {siteOptions.map(si => (
+                                <option key={si.value} value={si.value}>{si.label}</option>
+                            ))}
+                        </select>
+                        <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    </div>
+                </div>
+
+                {/* 4. Section Select */}
+                <div className="flex flex-col gap-1.5 min-w-[110px]">
+                    <div className="flex items-center gap-1.5 text-slate-700">
+                        <Layers size={13} className="text-slate-600" />
+                        <span className="text-[11px] font-bold tracking-wider uppercase">SECTION</span>
+                    </div>
+                    <div className="relative">
+                        <select
+                            value={draftFilter.SectionID}
+                            onChange={handleSectionChange}
+                            disabled={sectionOptions.length === 0}
+                            className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-3 pr-8 text-xs font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer appearance-none disabled:bg-slate-50 disabled:opacity-60"
+                        >
+                            {sectionOptions.map(se => (
+                                <option key={se.value} value={se.value}>{se.label}</option>
+                            ))}
+                        </select>
+                        <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    </div>
+                </div>
+
+                {/* 5. Action Button: Refresh */}
+                <button
+                    type="button"
+                    onClick={handleSearch}
+                    disabled={isLoading}
+                    title="Refresh data"
+                    className="h-10 w-10 rounded-xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white flex items-center justify-center shadow-md shadow-blue-500/30 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed shrink-0"
+                >
+                    <RefreshCw size={18} className={isLoading ? 'animate-spin' : ''} />
+                </button>
             </div>
-        </header>
+        </div>
     );
 };

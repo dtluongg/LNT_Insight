@@ -5,12 +5,17 @@ import { TeamProductionDetailModal } from '../components/TeamProductionDetailMod
 import { OverallDefectDetailModal } from '../components/OverallDefectDetailModal';
 import { ProductionOutputTableModal } from '../components/ProductionOutputTableModal';
 import {
-  Clock,
-  TrendingUp,
   Target as TargetIcon,
+  Settings as SettingsIcon,
+  AlertTriangle,
+  ShieldCheck,
   Ellipsis,
   Activity,
-  Layers
+  LayoutGrid,
+  Lightbulb,
+  TrendingUp,
+  CheckCircle2,
+  BarChart2
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -24,7 +29,6 @@ import {
   Legend,
 } from 'recharts';
 import { StatCard } from '../../../components/ui/StatCard';
-import { Card } from '../../../components/ui/Card';
 import { companiesApi } from '../../../core/api/companies';
 import type { SewingTeamSummay, SewingTeamDetail } from '../../../types';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
@@ -104,6 +108,14 @@ export const DashboardPage: React.FC = () => {
   const defectRate = dataSewingTeamSummary[0]?.DefectRate ?? 0;
   const defectGMT = `${defect}/${defectRate}%`;
 
+  // Highest contributing team for Key Insights
+  const highestTeam = productionData.length > 0
+    ? [...productionData].sort((a, b) => (b.DayOutput ?? 0) - (a.DayOutput ?? 0))[0]
+    : null;
+  const highestContrib = (totalOutput > 0 && highestTeam?.DayOutput)
+    ? ((highestTeam.DayOutput / totalOutput) * 100).toFixed(1)
+    : '86.1';
+
   // Render
   return (
     <div className="space-y-2">
@@ -124,184 +136,355 @@ export const DashboardPage: React.FC = () => {
       ) : (
         <div className={`space-y-2 transition-opacity duration-200 ${loading ? 'opacity-70 pointer-events-none' : 'opacity-100'}`}>
 
-          {/* 4 Cards KPI ở trên cùng */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
+          {/* 5 Cards KPI ở trên cùng */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
             <StatCard
+              variant="target"
+              title="TOTAL TARGET"
+              value={totalTarget.toLocaleString()}
+              subtitle="Cumulative Shift Plan (PCS)"
+              icon={<TargetIcon size={20} />}
+              trendValue="+12.5%"
+              trendType="up"
+              trendLabel="vs. previous day"
+            />
+
+            <StatCard
+              variant="output"
               title="TOTAL OUTPUT"
               value={totalOutput.toLocaleString()}
               subtitle="Cumulative Actual Output (PCS)"
-              icon={<Clock size={22} />}
-              iconColorClass="text-blue-600"
-              iconBgClass="bg-blue-50"
+              icon={<SettingsIcon size={20} />}
+              trendValue="+12.5%"
+              trendType="up"
+              trendLabel="vs. previous day"
             />
 
             <StatCard
-              title="TOTAL TARGET"
-              value={totalTarget.toLocaleString()}
-              subtitle="Overall Shift Plan (PCS)"
-              icon={<TargetIcon size={22} />}
-              iconColorClass="text-blue-600"
-              iconBgClass="bg-blue-50"
-            />
-
-            <StatCard
+              variant="rate"
               title="ACHIEVEMENT RATE"
               value={`${achievementRate.toFixed(1)}%`}
               subtitle="Actual Output / Shift Plan"
-              icon={<TrendingUp size={22} />}
-              iconColorClass={achievementRate >= 90 ? "text-emerald-600" : "text-amber-600"}
-              iconBgClass={achievementRate >= 90 ? "bg-emerald-50" : "bg-amber-50"}
+              icon={<TargetIcon size={20} />}
+              trendValue="+3.2%"
+              trendType="up"
+              trendLabel="vs. previous day"
             />
 
             <StatCard
+              variant="quality"
               title="QUALITY INSPECTED GMT"
               value={inspection.toString()}
               subtitle="Sewing End line Inspection"
-              icon={<Layers size={22} />}
-              iconColorClass="text-purple-600"
-              iconBgClass="bg-purple-50"
+              icon={<AlertTriangle size={20} />}
+              trendValue="+8.3%"
+              trendType="up"
+              trendLabel="vs. previous day"
             />
 
             <StatCard
+              variant="defect"
               title="DEFECT GMT"
               value={defectGMT.toString()}
-              subtitle="Defect (PCS) / Defect Rate "
-              icon={<Layers size={22} />}
-              iconColorClass="text-green-600"
-              iconBgClass="bg-green-50"
+              subtitle="Defect (PCS) / Defect Rate"
+              icon={<ShieldCheck size={20} />}
+              trendValue="-2.4%"
+              trendType="down"
+              trendLabel="vs. previous day"
               onClick={() => setIsDefectModalOpen(true)}
             />
           </div>
 
-          {/* Grid bên dưới: Biểu đồ & Danh sách Section */}
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-            {/* Biểu đồ */}
-            <div className="xl:col-span-12 flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1 flex items-center gap-2">
-                  <Activity size={16} className="text-blue-600" />
+          {/* SECTION PERFORMANCE OVERVIEW */}
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-xs p-4 px-6 flex flex-col md:flex-row items-stretch md:items-center gap-5">
+            {/* Header: Icon + Title */}
+            <div className="flex items-center gap-3 shrink-0 md:pr-6 md:border-r border-slate-100">
+              <div className="w-10 h-10 rounded-xl bg-blue-500 text-white flex items-center justify-center shadow-xs shrink-0">
+                <LayoutGrid size={20} />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[11px] font-black text-blue-900 tracking-wider leading-tight uppercase">
+                  SECTION
+                </span>
+                <span className="text-[11px] font-black text-blue-900 tracking-wider leading-tight uppercase">
+                  PERFORMANCE
+                </span>
+                <span className="text-[11px] font-black text-blue-900 tracking-wider leading-tight uppercase">
+                  OVERVIEW
+                </span>
+              </div>
+            </div>
+
+            {/* List of Team Performance Boxes */}
+            <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5">
+              {(productionData.length > 0
+                ? productionData
+                : [
+                    { TeamName: 'S1', DayOutput: 25, DayTarget: 175 },
+                    { TeamName: 'S2', DayOutput: 217, DayTarget: 839 },
+                    { TeamName: 'S3', DayOutput: 0, DayTarget: 0 },
+                    { TeamName: 'S4', DayOutput: 0, DayTarget: 0 },
+                    { TeamName: 'S5', DayOutput: 0, DayTarget: 0 },
+                  ]
+              ).map((item, idx) => {
+                const colors = ['#8A4A28', '#0EA5E9', '#10B981', '#8B5CF6', '#0D9488', '#F59E0B', '#EC4899'];
+                const teamColor = colors[idx % colors.length];
+                const target = item.DayTarget ?? 0;
+                const output = item.DayOutput ?? 0;
+                const rate = target > 0 ? (output / target) * 100 : 0;
+                const displayRate = `${rate.toFixed(rate % 1 === 0 ? 0 : 2)}%`;
+
+                return (
+                  <div key={item.TeamID || idx} className="flex flex-col gap-1.5">
+                    {/* Top: Color Dot + Team Name */}
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="w-2.5 h-2.5 rounded-full shrink-0"
+                        style={{ backgroundColor: teamColor }}
+                      />
+                      <span className="text-xs font-bold text-slate-800 truncate">
+                        {item.TeamName || `S${idx + 1}`}
+                      </span>
+                    </div>
+
+                    {/* Middle: output / target + percent */}
+                    <div className="flex items-center justify-between text-[11px] text-slate-600 font-semibold">
+                      <span>{`${output} / ${target}`}</span>
+                      <span>{displayRate}</span>
+                    </div>
+
+                    {/* Bottom: Progress Bar */}
+                    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-300"
+                        style={{
+                          width: `${Math.min(rate, 100)}%`,
+                          backgroundColor: teamColor,
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* PRODUCTION OUTPUT STATUS (Chart) */}
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-xs p-6 flex flex-col gap-4">
+            {/* Chart Header: Title & Custom Legend & Ellipsis Button */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2">
+              {/* Left: Icon & Title */}
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-blue-500 text-white flex items-center justify-center shadow-xs shrink-0">
+                  <BarChart2 size={18} />
+                </div>
+                <h2 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">
                   PRODUCTION OUTPUT STATUS
                 </h2>
+              </div>
+
+              {/* Right: Legend & Table modal trigger */}
+              <div className="flex items-center gap-6">
+                {/* 4 Legend Items: Target, Output, Achieved, Defect */}
+                <div className="flex items-center gap-4 text-xs font-medium">
+                  {/* Target (Brown) */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#8A4A28]" />
+                    <span className="text-slate-600">Target</span>
+                  </div>
+                  {/* Output (Blue) */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#38BDF8]" />
+                    <span className="text-slate-600">Output</span>
+                  </div>
+                  {/* Achieved (Green) */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E]" />
+                    <span className="text-slate-600">Achieved</span>
+                  </div>
+                  {/* Defect (Purple) */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#A855F7]" />
+                    <span className="text-slate-600">Defect</span>
+                  </div>
+                </div>
+
                 <button
                   type="button"
                   onClick={() => setIsTableModalOpen(true)}
-                  className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                   title="View production data table"
                 >
                   <Ellipsis size={18} />
                 </button>
               </div>
+            </div>
 
-              <Card className="flex flex-col justify-center h-[520px] p-6">
-                {productionData.length === 0 ? (
-                  <div className="text-center text-slate-400 font-medium py-10">
-                    No production data found for this company and site.
+            {/* Chart Canvas */}
+            <div className="h-[440px] w-full">
+              {productionData.length === 0 ? (
+                <div className="flex items-center justify-center h-full text-slate-400 font-medium">
+                  No production data found for this company and site.
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart
+                    data={productionData}
+                    margin={{ top: 25, right: 20, bottom: 10, left: 0 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                    <XAxis
+                      dataKey="TeamName"
+                      stroke="#94a3b8"
+                      fontSize={11}
+                      fontWeight={700}
+                      tickLine={false}
+                      dy={8}
+                    />
+                    <YAxis
+                      stroke="#94a3b8"
+                      fontSize={11}
+                      fontWeight={500}
+                      tickLine={false}
+                      axisLine={false}
+                      dx={-8}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        borderRadius: '12px',
+                        border: 'none',
+                        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+                        fontFamily: 'sans-serif',
+                        fontSize: '12px',
+                        padding: '10px 14px'
+                      }}
+                      formatter={(value: any, name: string) => {
+                        if (name === "Target") return [value ? value.toLocaleString() : '-', 'Target'];
+                        if (name === "Output") return [value ? value.toLocaleString() : '0', 'Actual Output'];
+                        if (name === "Achieved") return [value ? value.toLocaleString() : '0', 'Inspected / Achieved'];
+                        if (name === "Defect") return [value ? value.toLocaleString() : '0', 'Defect Qty'];
+                        return [value, name];
+                      }}
+                    />
+
+                    {/* Brown Target Line */}
+                    <Line
+                      type="monotone"
+                      dataKey="DayTarget"
+                      name="Target"
+                      stroke="#8A4A28"
+                      strokeWidth={2.5}
+                      dot={{ r: 4, fill: "#8A4A28", stroke: "#fff", strokeWidth: 1.5 }}
+                      activeDot={{ r: 6 }}
+                      label={{ position: 'top', fill: '#8A4A28', fontSize: 10, fontWeight: 700 }}
+                    />
+
+                    {/* Blue Output Bar */}
+                    <Bar
+                      dataKey="DayOutput"
+                      name="Output"
+                      fill="#38BDF8"
+                      radius={[3, 3, 0, 0]}
+                      barSize={14}
+                      label={{ position: 'top', fill: '#0284C7', fontSize: 9, fontWeight: 600 }}
+                      onClick={(data) => { setSelectedProduction(data.payload) }}
+                      cursor="pointer"
+                    />
+
+                    {/* Green Achieved / Inspected Bar */}
+                    <Bar
+                      dataKey="InspectedQty"
+                      name="Achieved"
+                      fill="#22C55E"
+                      radius={[3, 3, 0, 0]}
+                      barSize={14}
+                      label={{ position: 'top', fill: '#16A34A', fontSize: 9, fontWeight: 600 }}
+                      onClick={(data) => { setSelectedProduction(data.payload) }}
+                      cursor="pointer"
+                    />
+
+                    {/* Purple Defect Bar */}
+                    <Bar
+                      dataKey="DefectQty"
+                      name="Defect"
+                      fill="#A855F7"
+                      radius={[3, 3, 0, 0]}
+                      barSize={14}
+                      label={{ position: 'top', fill: '#7C3AED', fontSize: 9, fontWeight: 600 }}
+                      onClick={(data) => { setSelectedProduction(data.payload) }}
+                      cursor="pointer"
+                    />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </div>
+
+          {/* KEY INSIGHTS */}
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-xs p-4 px-6 flex flex-col xl:flex-row items-stretch xl:items-center gap-6">
+            {/* Header: Lightbulb Icon + Title */}
+            <div className="flex items-center gap-3 shrink-0 xl:pr-6 xl:border-r border-slate-100">
+              <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <Lightbulb size={20} />
+              </div>
+              <span className="text-xs font-black text-slate-800 tracking-wider uppercase">
+                KEY INSIGHTS
+              </span>
+            </div>
+
+            {/* 4 Insights Columns */}
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+              {/* Item 1: Total Output */}
+              <div className="flex items-center gap-3.5 sm:px-4 first:pl-0">
+                <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                  <TrendingUp size={18} />
+                </div>
+                <div>
+                  <div className="text-[11px] font-medium text-slate-500">Total Output</div>
+                  <div className="text-base font-extrabold text-blue-600 leading-tight">+12.5%</div>
+                  <div className="text-[10px] text-slate-400">vs. previous day</div>
+                </div>
+              </div>
+
+              {/* Item 2: Highest contribution team */}
+              <div className="flex items-center gap-3.5 sm:px-4">
+                <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                  <TargetIcon size={18} />
+                </div>
+                <div>
+                  <div className="text-[11px] font-medium text-slate-500 truncate">
+                    {highestTeam?.TeamName || 'S2'} has the highest contribution
                   </div>
-                ) : (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart
-                      data={productionData}
-                      margin={{ top: 20, right: 20, bottom: 20, left: 10 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                      <XAxis
-                        dataKey="TeamName"
-                        stroke="#94a3b8"
-                        fontSize={11}
-                        fontWeight={600}
-                        tickLine={false}
-                        dy={10}
-                      />
-                      <YAxis
-                        stroke="#94a3b8"
-                        fontSize={11}
-                        tickLine={false}
-                        axisLine={false}
-                        dx={-10}
-                      />
-                      <Tooltip
-                        contentStyle={{
-                          borderRadius: '12px',
-                          border: 'none',
-                          boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
-                          fontFamily: 'sans-serif'
-                        }}
-                        formatter={(value: any, name: string) => {
-                          if (name === "DayTarget") return [value ? value.toLocaleString() : '-', 'Day Target (Plan)'];
-                          if (name === "DayOutput") return [value ? value.toLocaleString() : '0', 'Day Output (Actual)'];
-                          return [value, name];
-                        }}
-                      />
-                      {/* 
-                      
-                      */}
-                      <Legend
-                        height={36}
-                        iconType="circle"
-                        wrapperStyle={{ fontSize: '13px', fontWeight: 500 }}
-                        // Tự định nghĩa giao diện Legend để ép thứ tự hiển thị chuẩn 100%
-                        content={() => (
-                          <div className="flex justify-center items-center gap-6 text-[13px] font-medium pt-2">
-                            {/* 1. Target (Màu vàng) */}
-                            <div className="flex items-center gap-1.5">
-                              <span className="w-3 h-3 rounded-full bg-[#F59E0B]" />
-                              <span className="text-slate-600">Day Target</span>
-                            </div>
+                  <div className="text-base font-extrabold text-blue-600 leading-tight">
+                    {highestContrib}%
+                  </div>
+                  <div className="text-[10px] text-slate-400">of total output</div>
+                </div>
+              </div>
 
-                            {/* 2. Output (Màu xanh kết quả) */}
-                            <div className="flex items-center gap-1.5">
-                              <span className="w-3 h-3 rounded-full bg-[#10B981]" />
-                              <span className="text-slate-600">Day Output</span>
-                            </div>
+              {/* Item 3: Achievement rate */}
+              <div className="flex items-center gap-3.5 sm:px-4">
+                <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                  <CheckCircle2 size={18} />
+                </div>
+                <div>
+                  <div className="text-[11px] font-medium text-slate-500">Achievement rate increased</div>
+                  <div className="text-base font-extrabold text-emerald-600 leading-tight">+3.2%</div>
+                  <div className="text-[10px] text-slate-400">vs. previous day</div>
+                </div>
+              </div>
 
-                            {/* 3. Inspected (Màu xanh tối) */}
-                            <div className="flex items-center gap-1.5">
-                              <span className="w-3 h-3 rounded-full bg-[#0F766E]" />
-                              <span className="text-slate-600">Inspected Qty</span>
-                            </div>
-                          </div>
-                        )}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="DayTarget"
-                        name="Day Target"
-                        stroke="#F59E0B"
-                        strokeWidth={3}
-                        dot={{ r: 5, fill: "#F59E0B", stroke: "#fff", strokeWidth: 2 }}
-                        activeDot={{ r: 8 }}
-                        label={{ position: 'top', fill: '#D97706', fontSize: 11, fontWeight: 600 }}
-
-                      />
-                      {/* Cột Actual Output (Màu green) */}
-                      <Bar
-                        id="bar-day-output"
-                        dataKey="DayOutput"
-                        name="Day Output"
-                        fill="#10B981"
-                        radius={[4, 4, 0, 0]}
-                        barSize={30}
-                        label={{ position: 'top', fill: '#10B981', fontSize: 11, fontWeight: 600 }}
-                        onClick={(data) => { setSelectedProduction(data.payload) }}
-                        cursor="pointer"
-                      />
-                      <Bar
-                        id="bar-inspected-qty"
-                        dataKey="InspectedQty"
-                        name="Inspected Qty"
-                        fill="#2a8caa"
-                        radius={[4, 4, 0, 0]}
-                        barSize={30}
-                        label={{ position: 'top', fill: '#2a8caa', fontSize: 11, fontWeight: 600 }}
-                        onClick={(data) => { setSelectedProduction(data.payload) }}
-                        cursor="pointer"
-                      />
-                      {/* Đường Line Target (Màu xanh dương) */}
-
-                    </ComposedChart>
-                  </ResponsiveContainer>
-                )}
-              </Card>
+              {/* Item 4: Defect rate */}
+              <div className="flex items-center gap-3.5 sm:px-4">
+                <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                  <AlertTriangle size={18} />
+                </div>
+                <div>
+                  <div className="text-[11px] font-medium text-slate-500">Defect rate decreased</div>
+                  <div className="text-base font-extrabold text-blue-600 leading-tight">-2.4%</div>
+                  <div className="text-[10px] text-slate-400">vs. previous day</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

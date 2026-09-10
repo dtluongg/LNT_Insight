@@ -100,7 +100,7 @@ export const Sidebar: React.FC = () => {
   return (
     <aside
       style={{ backgroundColor: 'var(--color-sidebar)' }}
-      className={`h-screen text-slate-200 flex flex-col justify-between border-r border-white/10 shadow-xl transition-all duration-300 ease-in-out select-none ${isCollapsed ? 'w-20' : 'w-64'
+      className={`h-screen overflow-x-hidden text-slate-200 flex flex-col justify-between border-r border-white/10 shadow-xl transition-all duration-300 ease-in-out select-none ${isCollapsed ? 'w-20' : 'w-64'
         }`}
     >
       {/* Top Section - Brand/Logo */}
@@ -129,7 +129,7 @@ export const Sidebar: React.FC = () => {
         </div>
 
         {/* Modules List */}
-        <nav className="p-3 space-y-1.5 overflow-y-auto max-h-[calc(100vh-145px)] custom-scrollbar">
+        <nav className="p-3 space-y-1.5 overflow-y-auto overflow-x-hidden max-h-[calc(100vh-145px)] custom-scrollbar">
           {isLoading ? (
             <div className="flex flex-col gap-2 py-3 px-1">
               {[1, 2, 3, 4].map((i) => (
@@ -148,6 +148,7 @@ export const Sidebar: React.FC = () => {
                   <div className="group relative flex items-center w-full rounded-xl transition-colors duration-150">
                     <NavLink
                       to={modulePath}
+                      title={isCollapsed ? module.ModuleMasterName : undefined}
                       className={({ isActive }) =>
                         `flex-1 flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-semibold tracking-wide transition-all ${isActive
                           ? 'bg-[var(--color-brand-cyan)]/20 text-cyan-200 ring-1 ring-[var(--color-brand-cyan)]/40 shadow-sm shadow-cyan-950/20'
@@ -166,13 +167,6 @@ export const Sidebar: React.FC = () => {
 
                           {!isCollapsed && (
                             <span className="truncate text-left leading-none flex-1">
-                              {module.ModuleMasterName}
-                            </span>
-                          )}
-
-                          {/* Tooltip khi sidebar đóng */}
-                          {isCollapsed && (
-                            <span className="absolute left-full ml-3 px-2.5 py-1.5 rounded-lg bg-[var(--color-sidebar-hover)] text-white text-xs font-medium shadow-xl border border-white/10 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
                               {module.ModuleMasterName}
                             </span>
                           )}
