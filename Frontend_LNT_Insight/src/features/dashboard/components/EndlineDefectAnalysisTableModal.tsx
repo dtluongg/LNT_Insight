@@ -20,8 +20,8 @@ export const EndlineDefectAnalysisTableModal: React.FC<EndlineDefectAnalysisTabl
     //     .sort((a, b) => a.value - b.value)
     //     .map(sorted => data[sorted.index]);
 
-    const dataSort = [...data].sort((a, b) => a.DefectQty - b.DefectQty);
-    // const dataSort = [...data].sort((a, b) => b.DefectQty - a.DefectQty);
+    // const dataSort = [...data].sort((a, b) => a.DefectQty - b.DefectQty);
+    const dataSort = [...data].sort((a, b) => b.DefectQty - a.DefectQty);
     // ==================================================================================
     if (!open) return null;
     const columnsForTable = [
