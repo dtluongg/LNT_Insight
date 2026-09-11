@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { data, useSearchParams } from 'react-router-dom';
 import { DashboardHeader } from '../components/DashboardHeader';
 import { TeamProductionDetailModal } from '../components/TeamProductionDetailModal';
 import { OverallDefectDetailModal } from '../components/OverallDefectDetailModal';
@@ -52,6 +52,7 @@ export const DashboardPage: React.FC = () => {
   });
 
   const [productionData, setProductionData] = useState<SewingTeamDetail[]>([]);
+  const [filterProductionData, setFilterProductionData] = useState<any[]>([]);
   const [dataSewingTeamSummary, setDataSewingTeamSummary] = useState<SewingTeamSummay[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -73,6 +74,35 @@ export const DashboardPage: React.FC = () => {
         ]);
         setProductionData(prodResult);
         setDataSewingTeamSummary(summaryResult);
+
+        // filter for get sumary:
+        const datafilter = prodResult.reduce((acc, cur) => {
+          const dataGroup = cur.SectionID;
+          // neu như object chua co bien nao thuoc sectionID thi tao bien moi voi value mac dinh
+          if (!acc[dataGroup]) {
+            acc[dataGroup] = {
+              DayTargetTotal: 0,
+              DayOutputTotal: 0,
+              DayPercent: 0
+            }
+          }
+          // neu như object co bien thuoc sectionID thi tiep tuc cong don:
+          acc[dataGroup].DayTargetTotal += cur.DayTarget;
+          acc[dataGroup].DayOutputTotal += cur.DayOutput;
+          acc[dataGroup].DayPercent = (acc[dataGroup].DayTargetTotal) / (acc[dataGroup].DayOutputTotal);
+          return acc;
+        }, {} as Record<number, any>);
+        // maping dataFilter to array:
+        const mapDataFilter = Object.keys(datafilter).map(keyObj => {
+          return {
+            SectionID: keyObj,
+            ...datafilter[Number(keyObj)]
+          }
+        })
+        // set data
+        setFilterProductionData(mapDataFilter);
+        console.log("data filter: ", mapDataFilter);
+
       } catch (err) {
         console.error('Failed to fetch dashboard data', err);
         setProductionData([]);
@@ -217,25 +247,25 @@ export const DashboardPage: React.FC = () => {
 
             {/* List of Team Performance Boxes */}
             <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5">
-              {(productionData.length > 0
-                ? productionData
+              {(filterProductionData.length > 0
+                ? filterProductionData
                 : [
-                    { TeamName: 'S1', DayOutput: 25, DayTarget: 175 },
-                    { TeamName: 'S2', DayOutput: 217, DayTarget: 839 },
-                    { TeamName: 'S3', DayOutput: 0, DayTarget: 0 },
-                    { TeamName: 'S4', DayOutput: 0, DayTarget: 0 },
-                    { TeamName: 'S5', DayOutput: 0, DayTarget: 0 },
-                  ]
+                  // { TeamName: 'S1', DayOutput: 25, DayTarget: 175 },
+                  // { TeamName: 'S2', DayOutput: 217, DayTarget: 839 },
+                  // { TeamName: 'S3', DayOutput: 0, DayTarget: 0 },
+                  // { TeamName: 'S4', DayOutput: 0, DayTarget: 0 },
+                  // { TeamName: 'S5', DayOutput: 0, DayTarget: 0 },
+                ]
               ).map((item, idx) => {
                 const colors = ['#8A4A28', '#0EA5E9', '#10B981', '#8B5CF6', '#0D9488', '#F59E0B', '#EC4899'];
                 const teamColor = colors[idx % colors.length];
-                const target = item.DayTarget ?? 0;
-                const output = item.DayOutput ?? 0;
-                const rate = target > 0 ? (output / target) * 100 : 0;
+                const target = item.DayTargetTotal ?? 0;
+                const output = item.DayOutputTotal ?? 0;
+                const rate = (item.DayPercent ?? 0);
                 const displayRate = `${rate.toFixed(rate % 1 === 0 ? 0 : 2)}%`;
 
                 return (
-                  <div key={item.TeamID || idx} className="flex flex-col gap-1.5">
+                  <div key={item.SectionID} className="flex flex-col gap-1.5">
                     {/* Top: Color Dot + Team Name */}
                     <div className="flex items-center gap-2">
                       <span
@@ -243,7 +273,7 @@ export const DashboardPage: React.FC = () => {
                         style={{ backgroundColor: teamColor }}
                       />
                       <span className="text-xs font-bold text-slate-800 truncate">
-                        {item.TeamName || `S${idx + 1}`}
+                        S{item.SectionID}
                       </span>
                     </div>
 

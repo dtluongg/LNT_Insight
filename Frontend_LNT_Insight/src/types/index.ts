@@ -100,6 +100,7 @@ export interface SewingTeamAnalysis {
     HourlyPlan: number;
     Achievement: number | null;
     RunningOutput: number;
-    OutputVariance: number | null;
+    CumulativeVariance: number | null;
     CumulativePlan: number;
+    OutputVariance: number | null;
 }

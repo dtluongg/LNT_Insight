@@ -159,6 +159,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                         dateObj,
                         production.TeamID
                     );
+                    console.log(production.SectionID)
                     setTeamDefects(defects);
                 } catch (error) {
                     console.error('Failed to fetch team defect analysis', error);
@@ -225,16 +226,16 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
     }));
 
 
-    const varianceChartData = hourlyAnalysis.map((item) => {
-        const variance = item.OutputVariance ?? 0;
-        return {
-            ...item,
-            // if variance > 0 then not change 
-            PositiveVariance: variance > 0 ? variance : 0,
-            // if variance < 0 then set variance to 0
-            NegativeVariance: variance < 0 ? variance : 0
-        }
-    })
+    // const varianceChartData = hourlyAnalysis.map((item) => {
+    //     const variance = item.OutputVariance ?? 0;
+    //     return {
+    //         ...item,
+    //         // if variance > 0 then not change 
+    //         PositiveVariance: variance > 0 ? variance : 0,
+    //         // if variance < 0 then set variance to 0
+    //         NegativeVariance: variance < 0 ? variance : 0
+    //     }
+    // })
 
     return (
         <div
@@ -498,7 +499,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                     <div className="bg-slate-50/30 p-4 rounded-xl border border-slate-100/80 flex-1 flex flex-col">
                                         <ResponsiveContainer width="100%" height={360}>
                                             <ComposedChart
-                                                data={varianceChartData}
+                                                data={hourlyAnalysis}
                                                 stackOffset='sign'
                                                 margin={{ top: 20, right: 20, bottom: 20, left: 10 }}
                                             >
@@ -547,41 +548,22 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                 />
                                                 <Bar
                                                     dataKey="RunningOutput"
-                                                    name="Base Output"
+                                                    name="Running Output"
                                                     stackId="varianceStack"
                                                     fill="url(#popupRunningOutput)"
                                                     barSize={32}
                                                     label={{ position: 'center', fill: '#fff', fontSize: 20, fontWeight: 400 }}
                                                 />
                                                 <Bar
-                                                    dataKey="PositiveVariance"
-                                                    name="Over Target"
+                                                    dataKey="CumulativeVariance"
+                                                    name="Cumulative Variance"
                                                     stackId="varianceStack"
                                                     fill="#10B981"
                                                     barSize={32}
                                                     radius={[4, 4, 0, 0]}
                                                 >
-                                                    <LabelList
-                                                        dataKey="PositiveVariance"
-                                                        position="top"
-                                                        fill="#000"
-                                                        fontSize={20}
-                                                        fontWeight={400}
-                                                        formatter={(value: any) => {
-                                                            const num = Number(value);
-                                                            return num > 0 ? `+${num.toLocaleString()}` : '';
-                                                        }}
-                                                    />
                                                 </Bar>
-                                                <Bar
-                                                    dataKey="NegativeVariance"
-                                                    name="Under Target"
-                                                    stackId="varianceStack"
-                                                    fill="#EF4444"
-                                                    barSize={32}
-                                                    radius={[0, 0, 4, 4]}
-                                                    label={{ position: 'top', fill: '#000', fontSize: 20, fontWeight: 400 }}
-                                                />
+
                                             </ComposedChart>
                                         </ResponsiveContainer>
                                     </div>

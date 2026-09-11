@@ -4,89 +4,98 @@
     "ShiftHourWithTime": "1WH (07:15 - 08:15)",
     "OutputQty": null,
     "HourlyPlan": 33,
-    "Achievement": null,
+    "Achievement": 0.0000,
     "RunningOutput": 0,
-    "OutputVariance": null,
-    "CumulativePlan": 33
+    "CumulativeVariance": null,
+    "CumulativePlan": 33,
+    "OutputVariance": 33
   },
   {
     "ShiftHourID": "2WH",
     "ShiftHourWithTime": "2WH (08:15 - 09:15)",
     "OutputQty": null,
     "HourlyPlan": 33,
-    "Achievement": null,
+    "Achievement": 0.0000,
     "RunningOutput": 0,
-    "OutputVariance": null,
-    "CumulativePlan": 66
+    "CumulativeVariance": null,
+    "CumulativePlan": 66,
+    "OutputVariance": 66
   },
   {
     "ShiftHourID": "3WH",
     "ShiftHourWithTime": "3WH (09:15 - 10:15)",
     "OutputQty": 31,
     "HourlyPlan": 33,
-    "Achievement": 93.9400,
+    "Achievement": 31.3100,
     "RunningOutput": 31,
-    "OutputVariance": 2,
-    "CumulativePlan": 99
+    "CumulativeVariance": 2,
+    "CumulativePlan": 99,
+    "OutputVariance": 68
   },
   {
     "ShiftHourID": "4WH",
     "ShiftHourWithTime": "4WH (10:15 - 11:30)",
     "OutputQty": 40,
     "HourlyPlan": 33,
-    "Achievement": 121.2100,
+    "Achievement": 53.7900,
     "RunningOutput": 71,
-    "OutputVariance": -7,
-    "CumulativePlan": 132
+    "CumulativeVariance": -7,
+    "CumulativePlan": 132,
+    "OutputVariance": 61
   },
   {
     "ShiftHourID": "5WH",
     "ShiftHourWithTime": "5WH (12:30 - 13:30)",
     "OutputQty": 14,
     "HourlyPlan": 33,
-    "Achievement": 42.4200,
+    "Achievement": 51.5200,
     "RunningOutput": 85,
-    "OutputVariance": 19,
-    "CumulativePlan": 165
+    "CumulativeVariance": 19,
+    "CumulativePlan": 165,
+    "OutputVariance": 80
   },
   {
     "ShiftHourID": "6WH",
     "ShiftHourWithTime": "6WH (13:30 - 14:30)",
     "OutputQty": null,
     "HourlyPlan": 33,
-    "Achievement": null,
+    "Achievement": 42.9300,
     "RunningOutput": 85,
-    "OutputVariance": null,
-    "CumulativePlan": 198
+    "CumulativeVariance": null,
+    "CumulativePlan": 198,
+    "OutputVariance": 113
   },
   {
     "ShiftHourID": "7WH",
     "ShiftHourWithTime": "7WH (14:30 - 15:30)",
     "OutputQty": null,
     "HourlyPlan": 33,
-    "Achievement": null,
+    "Achievement": 36.8000,
     "RunningOutput": 85,
-    "OutputVariance": null,
-    "CumulativePlan": 231
+    "CumulativeVariance": null,
+    "CumulativePlan": 231,
+    "OutputVariance": 146
   },
   {
     "ShiftHourID": "8WH",
     "ShiftHourWithTime": "8WH (15:30 - 16:15)",
     "OutputQty": null,
     "HourlyPlan": 33,
-    "Achievement": null,
+    "Achievement": 32.2000,
     "RunningOutput": 85,
-    "OutputVariance": null,
-    "CumulativePlan": 264
+    "CumulativeVariance": null,
+    "CumulativePlan": 264,
+    "OutputVariance": 179
   },
   {
     "ShiftHourID": "AFH",
     "ShiftHourWithTime": "AFH",
     "OutputQty": null,
     "HourlyPlan": 0,
-    "Achievement": null,
+    "Achievement": 32.2000,
     "RunningOutput": 85,
-    "OutputVariance": null,
-    "CumulativePlan": 264
+    "CumulativeVariance": null,
+    "CumulativePlan": 264,
+    "OutputVariance": 179
   }
 ]
