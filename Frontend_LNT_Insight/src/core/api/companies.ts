@@ -1,7 +1,15 @@
 import { apiFetch } from './httpClient';
 import type { CompanyInfo, SiteInfo, SectionInfo, ProductionVsPlanInfo, SewingTeamSummay, SewingTeamDetail, OverallDefectAnalysis, WorkshiftInfo, SewingTeamAnalysis } from '../../types';
+import { getPreviousWorkingDayClient } from '../../utils/dateUtils';
 
 export const companiesApi = {
+    getPreviousWorkingDay: async (_companyID: string, _siteID: string, dateDayStr: string): Promise<string> => {
+        // Architecture abstraction: Currently uses client-side calculation.
+        // In the future, this can be switched to fetch from backend API endpoint:
+        // const workingDays = await apiFetch<string[]>(`/companies/${_companyID}/sites/${_siteID}/working-days`);
+        // return findPreviousWorkingDay(workingDays, dateDayStr);
+        return getPreviousWorkingDayClient(dateDayStr);
+    },
     getCompanies: async (): Promise<CompanyInfo[]> => {
         const raw = await apiFetch<any[]>('/companies');
         return raw;

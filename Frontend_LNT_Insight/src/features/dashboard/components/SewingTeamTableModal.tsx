@@ -32,8 +32,8 @@ export const SewingTeamTableModal: React.FC<SewingTeamTableModalProps> = ({
             className: 'text-right',
         },
         {
-            header: 'Output Variance',
-            accessor: (row: SewingTeamAnalysis) => (row.OutputVariance != null ? row.OutputVariance.toLocaleString() : '-'),
+            header: 'Cumulative Variance',
+            accessor: (row: SewingTeamAnalysis) => (row.CumulativeVariance != null ? row.CumulativeVariance.toLocaleString() : '-'),
             className: 'text-right',
         },
         {

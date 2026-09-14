@@ -30,6 +30,7 @@ import {
 } from 'recharts';
 import { StatCard } from '../../../components/ui/StatCard';
 import { companiesApi } from '../../../core/api/companies';
+import { calculateTrend } from '../../../utils/dateUtils';
 import type { SewingTeamSummay, SewingTeamDetail } from '../../../types';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
 
@@ -54,6 +55,7 @@ export const DashboardPage: React.FC = () => {
   const [productionData, setProductionData] = useState<SewingTeamDetail[]>([]);
   const [filterProductionData, setFilterProductionData] = useState<any[]>([]);
   const [dataSewingTeamSummary, setDataSewingTeamSummary] = useState<SewingTeamSummay[]>([]);
+  const [prevDataSewingTeamSummary, setPrevDataSewingTeamSummary] = useState<SewingTeamSummay[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -68,12 +70,17 @@ export const DashboardPage: React.FC = () => {
       setLoading(true);
       try {
         const dateObj = new Date(filter.Date);
-        const [prodResult, summaryResult] = await Promise.all([
+        const prevDateStr = await companiesApi.getPreviousWorkingDay(filter.CompanyID, filter.SiteID, filter.Date);
+        const prevDateObj = new Date(prevDateStr);
+
+        const [prodResult, summaryResult, prevSummaryResult] = await Promise.all([
           companiesApi.getTeamSewingDetail(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj),
-          companiesApi.getTeamSewingSummary(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj)
+          companiesApi.getTeamSewingSummary(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj),
+          companiesApi.getTeamSewingSummary(filter.CompanyID, filter.SiteID, Number(filter.SectionID), prevDateObj)
         ]);
         setProductionData(prodResult);
         setDataSewingTeamSummary(summaryResult);
+        setPrevDataSewingTeamSummary(prevSummaryResult);
 
         // filter for get sumary:
         const datafilter = prodResult.reduce((acc, cur) => {
@@ -107,6 +114,7 @@ export const DashboardPage: React.FC = () => {
         console.error('Failed to fetch dashboard data', err);
         setProductionData([]);
         setDataSewingTeamSummary([]);
+        setPrevDataSewingTeamSummary([]);
       } finally {
         setLoading(false);
       }
@@ -129,7 +137,7 @@ export const DashboardPage: React.FC = () => {
     });
   };
 
-  // Calculate dynamic stats
+  // Calculate dynamic stats for active day
   const totalOutput = dataSewingTeamSummary[0]?.DayOutput ?? 0;
   const totalTarget = dataSewingTeamSummary[0]?.DayTarget ?? 0;
   const achievementRate = totalTarget > 0 ? (totalOutput / totalTarget) * 100 : 0;
@@ -137,6 +145,20 @@ export const DashboardPage: React.FC = () => {
   const defect = dataSewingTeamSummary[0]?.DefectQty ?? 0;
   const defectRate = dataSewingTeamSummary[0]?.DefectRate ?? 0;
   const defectGMT = `${defect}/${defectRate}%`;
+
+  // Stats for previous working day
+  const prevOutput = prevDataSewingTeamSummary[0]?.DayOutput ?? 0;
+  const prevTarget = prevDataSewingTeamSummary[0]?.DayTarget ?? 0;
+  const prevAchievementRate = prevTarget > 0 ? (prevOutput / prevTarget) * 100 : 0;
+  const prevInspection = prevDataSewingTeamSummary[0]?.InspectedQty ?? 0;
+  const prevDefectRate = prevDataSewingTeamSummary[0]?.DefectRate ?? 0;
+
+  // Dynamic comparison trends vs previous day
+  const targetTrend = calculateTrend(totalTarget, prevTarget);
+  const outputTrend = calculateTrend(totalOutput, prevOutput);
+  const rateTrend = calculateTrend(achievementRate, prevAchievementRate, true);
+  const qualityTrend = calculateTrend(inspection, prevInspection);
+  const defectTrend = calculateTrend(defectRate, prevDefectRate, true);
 
   // Highest contributing team for Key Insights
   const highestTeam = productionData.length > 0
@@ -174,8 +196,8 @@ export const DashboardPage: React.FC = () => {
               value={totalTarget.toLocaleString()}
               subtitle="Cumulative Shift Plan (PCS)"
               icon={<TargetIcon size={20} />}
-              trendValue="+12.5%"
-              trendType="up"
+              trendValue={targetTrend.trendValue}
+              trendType={targetTrend.trendType}
               trendLabel="vs. previous day"
             />
 
@@ -185,8 +207,8 @@ export const DashboardPage: React.FC = () => {
               value={totalOutput.toLocaleString()}
               subtitle="Cumulative Actual Output (PCS)"
               icon={<SettingsIcon size={20} />}
-              trendValue="+12.5%"
-              trendType="up"
+              trendValue={outputTrend.trendValue}
+              trendType={outputTrend.trendType}
               trendLabel="vs. previous day"
             />
 
@@ -196,20 +218,19 @@ export const DashboardPage: React.FC = () => {
               value={`${achievementRate.toFixed(1)}%`}
               subtitle="Actual Output / Shift Plan"
               icon={<TargetIcon size={20} />}
-              trendValue="+3.2%"
-              trendType="up"
+              trendValue={rateTrend.trendValue}
+              trendType={rateTrend.trendType}
               trendLabel="vs. previous day"
             />
 
             <StatCard
               variant="quality"
               title="QUALITY INSPECTED GMT"
-              // titleColorClass='text-amber-300'
               value={inspection.toString()}
               subtitle="Sewing End line Inspection"
               icon={<AlertTriangle size={20} />}
-              trendValue="+8.3%"
-              trendType="up"
+              trendValue={qualityTrend.trendValue}
+              trendType={qualityTrend.trendType}
               trendLabel="vs. previous day"
             />
 
@@ -219,8 +240,8 @@ export const DashboardPage: React.FC = () => {
               value={defectGMT.toString()}
               subtitle="Defect (PCS) / Defect Rate"
               icon={<ShieldCheck size={20} />}
-              trendValue="-2.4%"
-              trendType="down"
+              trendValue={defectTrend.trendValue}
+              trendType={defectTrend.trendType}
               trendLabel="vs. previous day"
               titleColorClass="text-[#0D9488]"
               onClick={() => setIsDefectModalOpen(true)}
@@ -474,7 +495,9 @@ export const DashboardPage: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-[13px] font-medium text-slate-500">Total Output</div>
-                  <div className="text-[19px] font-bold text-blue-600 leading-tight">+12.5%</div>
+                  <div className={`text-[19px] font-bold leading-tight ${outputTrend.diff >= 0 ? 'text-blue-600' : 'text-amber-600'}`}>
+                    {outputTrend.trendValue}
+                  </div>
                   <div className="text-[12px] text-slate-400">vs. previous day</div>
                 </div>
               </div>
@@ -486,7 +509,7 @@ export const DashboardPage: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-[13px] font-medium text-slate-500 truncate">
-                    {highestTeam?.TeamName || 'S2'} has the highest contribution
+                    {highestTeam?.TeamName || 'N/A'} has highest contribution
                   </div>
                   <div className="text-[19px] font-bold text-blue-600 leading-tight">
                     {highestContrib}%
@@ -501,8 +524,12 @@ export const DashboardPage: React.FC = () => {
                   <CheckCircle2 size={18} />
                 </div>
                 <div>
-                  <div className="text-[13px] font-medium text-slate-500">Achievement rate increased</div>
-                  <div className="text-[19px] font-bold text-emerald-600 leading-tight">+3.2%</div>
+                  <div className="text-[13px] font-medium text-slate-500">
+                    Achievement rate {rateTrend.diff >= 0 ? 'increased' : 'decreased'}
+                  </div>
+                  <div className={`text-[19px] font-bold leading-tight ${rateTrend.diff >= 0 ? 'text-emerald-600' : 'text-amber-600'}`}>
+                    {rateTrend.trendValue}
+                  </div>
                   <div className="text-[12px] text-slate-400">vs. previous day</div>
                 </div>
               </div>
@@ -513,8 +540,12 @@ export const DashboardPage: React.FC = () => {
                   <AlertTriangle size={18} />
                 </div>
                 <div>
-                  <div className="text-[13px] font-medium text-slate-500">Defect rate decreased</div>
-                  <div className="text-[19px] font-bold text-blue-600 leading-tight">-2.4%</div>
+                  <div className="text-[13px] font-medium text-slate-500">
+                    Defect rate {defectTrend.diff <= 0 ? 'decreased' : 'increased'}
+                  </div>
+                  <div className={`text-[19px] font-bold leading-tight ${defectTrend.diff <= 0 ? 'text-blue-600' : 'text-rose-600'}`}>
+                    {defectTrend.trendValue}
+                  </div>
                   <div className="text-[12px] text-slate-400">vs. previous day</div>
                 </div>
               </div>

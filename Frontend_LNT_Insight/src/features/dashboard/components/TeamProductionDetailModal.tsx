@@ -561,8 +561,31 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     fill="#10B981"
                                                     barSize={32}
                                                     radius={[4, 4, 0, 0]}
-                                                    label={{ position: 'center', fill: '#fff', fontSize: 20, fontWeight: 400 }}
                                                 >
+                                                    <LabelList
+                                                        content={(props: any) => {
+                                                            const { x, y, width, index } = props;
+
+                                                            // Lấy trực tiếp từ mảng dữ liệu gốc thông qua index
+                                                            const originalItem = hourlyAnalysis[index];
+                                                            const val = Number(originalItem?.CumulativeVariance) || 0;
+
+                                                            if (val === 0) return null;
+
+                                                            return (
+                                                                <text
+                                                                    x={x + width / 2}
+                                                                    y={y + 20} // Vị trí hiển thị bên trong cột xanh lá
+                                                                    fill="#ffffff"
+                                                                    textAnchor="middle"
+                                                                    fontSize={20}
+                                                                    fontWeight={400}
+                                                                >
+                                                                    {val.toLocaleString()} {/* Chắc chắn 100% là 179 */}
+                                                                </text>
+                                                            );
+                                                        }}
+                                                    />
                                                 </Bar>
 
                                             </ComposedChart>
