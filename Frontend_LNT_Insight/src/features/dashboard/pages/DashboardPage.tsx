@@ -204,6 +204,7 @@ export const DashboardPage: React.FC = () => {
             <StatCard
               variant="quality"
               title="QUALITY INSPECTED GMT"
+              // titleColorClass='text-amber-300'
               value={inspection.toString()}
               subtitle="Sewing End line Inspection"
               icon={<AlertTriangle size={20} />}
@@ -221,12 +222,13 @@ export const DashboardPage: React.FC = () => {
               trendValue="-2.4%"
               trendType="down"
               trendLabel="vs. previous day"
+              titleColorClass="text-[#0D9488]"
               onClick={() => setIsDefectModalOpen(true)}
             />
           </div>
 
           {/* SECTION PERFORMANCE OVERVIEW */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-xs p-4 px-6 flex flex-col md:flex-row items-stretch md:items-center gap-5">
+          <div className="bg-background rounded-2xl border-6 border-white shadow-xs p-1 px-1 flex flex-col md:flex-row items-stretch md:items-center gap-5">
             {/* Header: Icon + Title */}
             <div className="flex items-center gap-3 shrink-0 md:pr-6 md:border-r border-slate-100">
               <div className="w-10 h-10 rounded-xl bg-blue-500 text-white flex items-center justify-center shadow-xs shrink-0">
@@ -257,7 +259,7 @@ export const DashboardPage: React.FC = () => {
                   // { TeamName: 'S5', DayOutput: 0, DayTarget: 0 },
                 ]
               ).map((item, idx) => {
-                const colors = ['#8A4A28', '#0EA5E9', '#10B981', '#8B5CF6', '#0D9488', '#F59E0B', '#EC4899'];
+                const colors = ['#276ebe'];
                 const teamColor = colors[idx % colors.length];
                 const target = item.DayTargetTotal ?? 0;
                 const output = item.DayOutputTotal ?? 0;
@@ -265,20 +267,20 @@ export const DashboardPage: React.FC = () => {
                 const displayRate = `${rate.toFixed(rate % 1 === 0 ? 0 : 2)}%`;
 
                 return (
-                  <div key={item.SectionID} className="flex flex-col gap-1.5">
+                  <div key={item.SectionID} className="flex flex-col gap-1.5 bg-white p-4 rounded-xl">
                     {/* Top: Color Dot + Team Name */}
                     <div className="flex items-center gap-2">
                       <span
                         className="w-2.5 h-2.5 rounded-full shrink-0"
                         style={{ backgroundColor: teamColor }}
                       />
-                      <span className="text-xs font-bold text-slate-800 truncate">
+                      <span className="text-[14px] font-bold text-slate-800 truncate">
                         S{item.SectionID}
                       </span>
                     </div>
 
                     {/* Middle: output / target + percent */}
-                    <div className="flex items-center justify-between text-[11px] text-slate-600 font-semibold">
+                    <div className="flex items-center justify-between text-[13px] text-slate-600 font-semibold">
                       <span>{`${output} / ${target}`}</span>
                       <span>{displayRate}</span>
                     </div>
@@ -300,7 +302,7 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           {/* PRODUCTION OUTPUT STATUS (Chart) */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-xs p-6 flex flex-col gap-4">
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-xs p-4 flex flex-col gap-4">
             {/* Chart Header: Title & Custom Legend & Ellipsis Button */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2">
               {/* Left: Icon & Title */}
@@ -319,7 +321,7 @@ export const DashboardPage: React.FC = () => {
                 <div className="flex items-center gap-4 text-xs font-medium">
                   {/* Target (Brown) */}
                   <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#8A4A28]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#d6951b]" />
                     <span className="text-slate-600">Target</span>
                   </div>
                   {/* Output (Blue) */}
@@ -330,13 +332,14 @@ export const DashboardPage: React.FC = () => {
                   {/* Achieved (Green) */}
                   <div className="flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E]" />
+                    {/* <span className="w-2.5 h-2.5 rounded-full bg-[#276ebe]" /> */}
                     <span className="text-slate-600">Achieved</span>
                   </div>
                   {/* Defect (Purple) */}
-                  <div className="flex items-center gap-1.5">
+                  {/* <div className="flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#A855F7]" />
                     <span className="text-slate-600">Defect</span>
-                  </div>
+                  </div> */}
                 </div>
 
                 <button
@@ -351,7 +354,7 @@ export const DashboardPage: React.FC = () => {
             </div>
 
             {/* Chart Canvas */}
-            <div className="h-[440px] w-full">
+            <div className="h-[300px] w-full">
               {productionData.length === 0 ? (
                 <div className="flex items-center justify-center h-full text-slate-400 font-medium">
                   No production data found for this company and site.
@@ -402,11 +405,11 @@ export const DashboardPage: React.FC = () => {
                       type="monotone"
                       dataKey="DayTarget"
                       name="Target"
-                      stroke="#8A4A28"
+                      stroke="#d6951b"
                       strokeWidth={2.5}
-                      dot={{ r: 4, fill: "#8A4A28", stroke: "#fff", strokeWidth: 1.5 }}
+                      dot={{ r: 4, fill: "#d6951b", stroke: "#fff", strokeWidth: 1.5 }}
                       activeDot={{ r: 6 }}
-                      label={{ position: 'top', fill: '#8A4A28', fontSize: 10, fontWeight: 700 }}
+                      label={{ position: 'top', fill: '#d6951b', fontSize: 13, fontWeight: 700 }}
                     />
 
                     {/* Blue Output Bar */}
@@ -415,8 +418,8 @@ export const DashboardPage: React.FC = () => {
                       name="Output"
                       fill="#38BDF8"
                       radius={[3, 3, 0, 0]}
-                      barSize={14}
-                      label={{ position: 'top', fill: '#0284C7', fontSize: 9, fontWeight: 600 }}
+                      barSize={22}
+                      label={{ position: 'top', fill: '#0284C7', fontSize: 13, fontWeight: 600 }}
                       onClick={(data) => { setSelectedProduction(data.payload) }}
                       cursor="pointer"
                     />
@@ -427,23 +430,23 @@ export const DashboardPage: React.FC = () => {
                       name="Achieved"
                       fill="#22C55E"
                       radius={[3, 3, 0, 0]}
-                      barSize={14}
-                      label={{ position: 'top', fill: '#16A34A', fontSize: 9, fontWeight: 600 }}
+                      barSize={22}
+                      label={{ position: 'top', fill: '#16A34A', fontSize: 13, fontWeight: 600 }}
                       onClick={(data) => { setSelectedProduction(data.payload) }}
                       cursor="pointer"
                     />
 
                     {/* Purple Defect Bar */}
-                    <Bar
-                      dataKey="DefectQty"
-                      name="Defect"
-                      fill="#A855F7"
-                      radius={[3, 3, 0, 0]}
-                      barSize={14}
-                      label={{ position: 'top', fill: '#7C3AED', fontSize: 9, fontWeight: 600 }}
-                      onClick={(data) => { setSelectedProduction(data.payload) }}
-                      cursor="pointer"
-                    />
+                    {/* <Bar
+                        dataKey="DefectQty"
+                        name="Defect"
+                        fill="#A855F7"
+                        radius={[3, 3, 0, 0]}
+                        barSize={22}
+                        label={{ position: 'top', fill: '#7C3AED', fontSize: 13, fontWeight: 600 }}
+                        onClick={(data) => { setSelectedProduction(data.payload) }}
+                        cursor="pointer"
+                      /> */}
                   </ComposedChart>
                 </ResponsiveContainer>
               )}
@@ -451,7 +454,7 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           {/* KEY INSIGHTS */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-xs p-4 px-6 flex flex-col xl:flex-row items-stretch xl:items-center gap-6">
+          <div className="bg-background rounded-2xl border-white border-6 shadow-xs p-2 flex flex-col xl:flex-row items-stretch xl:items-center gap-6">
             {/* Header: Lightbulb Icon + Title */}
             <div className="flex items-center gap-3 shrink-0 xl:pr-6 xl:border-r border-slate-100">
               <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center shrink-0 shadow-xs">
@@ -465,42 +468,42 @@ export const DashboardPage: React.FC = () => {
             {/* 4 Insights Columns */}
             <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
               {/* Item 1: Total Output */}
-              <div className="flex items-center gap-3.5 sm:px-4 first:pl-0">
+              <div className="flex items-center gap-3.5 sm:px-4 first:pl-0 border-r-1 border-zinc-300">
                 <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                   <TrendingUp size={18} />
                 </div>
                 <div>
-                  <div className="text-[11px] font-medium text-slate-500">Total Output</div>
-                  <div className="text-base font-extrabold text-blue-600 leading-tight">+12.5%</div>
-                  <div className="text-[10px] text-slate-400">vs. previous day</div>
+                  <div className="text-[13px] font-medium text-slate-500">Total Output</div>
+                  <div className="text-[19px] font-bold text-blue-600 leading-tight">+12.5%</div>
+                  <div className="text-[12px] text-slate-400">vs. previous day</div>
                 </div>
               </div>
 
               {/* Item 2: Highest contribution team */}
-              <div className="flex items-center gap-3.5 sm:px-4">
+              <div className="flex items-center gap-3.5 sm:px-4 border-r-1 border-zinc-300">
                 <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                   <TargetIcon size={18} />
                 </div>
                 <div>
-                  <div className="text-[11px] font-medium text-slate-500 truncate">
+                  <div className="text-[13px] font-medium text-slate-500 truncate">
                     {highestTeam?.TeamName || 'S2'} has the highest contribution
                   </div>
-                  <div className="text-base font-extrabold text-blue-600 leading-tight">
+                  <div className="text-[19px] font-bold text-blue-600 leading-tight">
                     {highestContrib}%
                   </div>
-                  <div className="text-[10px] text-slate-400">of total output</div>
+                  <div className="text-[12px] text-slate-400">of total output</div>
                 </div>
               </div>
 
               {/* Item 3: Achievement rate */}
-              <div className="flex items-center gap-3.5 sm:px-4">
+              <div className="flex items-center gap-3.5 sm:px-4 border-r-1 border-zinc-300">
                 <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
                   <CheckCircle2 size={18} />
                 </div>
                 <div>
-                  <div className="text-[11px] font-medium text-slate-500">Achievement rate increased</div>
-                  <div className="text-base font-extrabold text-emerald-600 leading-tight">+3.2%</div>
-                  <div className="text-[10px] text-slate-400">vs. previous day</div>
+                  <div className="text-[13px] font-medium text-slate-500">Achievement rate increased</div>
+                  <div className="text-[19px] font-bold text-emerald-600 leading-tight">+3.2%</div>
+                  <div className="text-[12px] text-slate-400">vs. previous day</div>
                 </div>
               </div>
 
@@ -510,9 +513,9 @@ export const DashboardPage: React.FC = () => {
                   <AlertTriangle size={18} />
                 </div>
                 <div>
-                  <div className="text-[11px] font-medium text-slate-500">Defect rate decreased</div>
-                  <div className="text-base font-extrabold text-blue-600 leading-tight">-2.4%</div>
-                  <div className="text-[10px] text-slate-400">vs. previous day</div>
+                  <div className="text-[13px] font-medium text-slate-500">Defect rate decreased</div>
+                  <div className="text-[19px] font-bold text-blue-600 leading-tight">-2.4%</div>
+                  <div className="text-[12px] text-slate-400">vs. previous day</div>
                 </div>
               </div>
             </div>

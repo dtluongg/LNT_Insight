@@ -479,7 +479,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                         ) : (
                             <div className="h-full flex flex-col gap-4">
                                 <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1">
-                                    Production Output vs. Target Variance
+                                    Running Output vs. Cumulative Variance
                                 </h3>
 
                                 {loadingAnalysis ? (
@@ -561,6 +561,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     fill="#10B981"
                                                     barSize={32}
                                                     radius={[4, 4, 0, 0]}
+                                                    label={{ position: 'center', fill: '#fff', fontSize: 20, fontWeight: 400 }}
                                                 >
                                                 </Bar>
 

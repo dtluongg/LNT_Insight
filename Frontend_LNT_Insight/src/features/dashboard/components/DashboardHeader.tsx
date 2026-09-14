@@ -276,7 +276,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
     // =========================================================
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-xs px-6 py-4 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 shrink-0">
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-xs px-4 py-2 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 shrink-0">
             {/* Title info with Sewing Machine Icon */}
             <div className="flex items-center gap-3.5">
                 <div className="w-12 h-12 rounded-2xl bg-sky-100/70 border border-sky-200/50 flex items-center justify-center shrink-0 shadow-xs">
@@ -303,7 +303,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                     </svg>
                 </div>
                 <div className="flex flex-col">
-                    <h1 className="text-xl lg:text-2xl font-black text-slate-800 tracking-tight leading-tight">
+                    <h1 className="text-xl lg:text-2xl font-bold text-slate-800 tracking-tight leading-tight">
                         Sewing Team Performance
                     </h1>
                     <span className="text-xs text-slate-400 font-medium mt-0.5">
@@ -318,7 +318,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                 <div className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-1.5 text-slate-700">
                         <Calendar size={13} className="text-slate-600" />
-                        <span className="text-[11px] font-bold tracking-wider uppercase">DAY</span>
+                        <span className="text-[12px] font-bold tracking-wider uppercase">DAY</span>
                     </div>
                     <div className="relative flex items-center">
                         <input
@@ -326,7 +326,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                             value={draftFilter.Date}
                             max={todayStr}
                             onChange={handleDateChange}
-                            className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer"
+                            className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-[14px] font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer"
                         />
                     </div>
                 </div>
@@ -335,13 +335,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                 <div className="flex flex-col gap-1.5 min-w-[140px]">
                     <div className="flex items-center gap-1.5 text-slate-700">
                         <Building2 size={13} className="text-slate-600" />
-                        <span className="text-[11px] font-bold tracking-wider uppercase">COMPANY</span>
+                        <span className="text-[12px] font-bold tracking-wider uppercase">COMPANY</span>
                     </div>
                     <div className="relative">
                         <select
                             value={draftFilter.CompanyID}
                             onChange={handleCompanyChange}
-                            className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-3 pr-8 text-xs font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer appearance-none"
+                            className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-3 pr-8 text-[14px] font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer appearance-none"
                         >
                             {companyOptions.map(co => (
                                 <option key={co.value} value={co.value}>{co.label}</option>
@@ -355,14 +355,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                 <div className="flex flex-col gap-1.5 min-w-[130px]">
                     <div className="flex items-center gap-1.5 text-slate-700">
                         <MapPin size={13} className="text-slate-600" />
-                        <span className="text-[11px] font-bold tracking-wider uppercase">SITE</span>
+                        <span className="text-[12px] font-bold tracking-wider uppercase">SITE</span>
                     </div>
                     <div className="relative">
                         <select
                             value={draftFilter.SiteID}
                             onChange={handleSiteChange}
                             disabled={siteOptions.length === 0}
-                            className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-3 pr-8 text-xs font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer appearance-none disabled:bg-slate-50 disabled:opacity-60"
+                            className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-3 pr-8 text-[14px] font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer appearance-none disabled:bg-slate-50 disabled:opacity-60"
                         >
                             {siteOptions.map(si => (
                                 <option key={si.value} value={si.value}>{si.label}</option>
@@ -376,14 +376,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                 <div className="flex flex-col gap-1.5 min-w-[110px]">
                     <div className="flex items-center gap-1.5 text-slate-700">
                         <Layers size={13} className="text-slate-600" />
-                        <span className="text-[11px] font-bold tracking-wider uppercase">SECTION</span>
+                        <span className="text-[12px] font-bold tracking-wider uppercase">SECTION</span>
                     </div>
                     <div className="relative">
                         <select
                             value={draftFilter.SectionID}
                             onChange={handleSectionChange}
                             disabled={sectionOptions.length === 0}
-                            className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-3 pr-8 text-xs font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer appearance-none disabled:bg-slate-50 disabled:opacity-60"
+                            className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-3 pr-8 text-[14px] font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer appearance-none disabled:bg-slate-50 disabled:opacity-60"
                         >
                             {sectionOptions.map(se => (
                                 <option key={se.value} value={se.value}>{se.label}</option>

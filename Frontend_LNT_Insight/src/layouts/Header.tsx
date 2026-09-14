@@ -55,7 +55,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
   }, [isDropdownOpen]);
 
   return (
-    <header className="h-14 px-6 flex items-center justify-between shrink-0 bg-[#f5f7fb] border-b border-slate-200/50 select-none">
+    <header className="h-14 px-6 flex items-center justify-between shrink-0 bg-background border-b border-slate-200/50 select-none">
       {/* Bên trái: Tiêu đề hoặc để trống */}
       <div className="flex items-center gap-2">
         {title && (
@@ -109,9 +109,8 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
             {/* Mũi tên thu gọn / mở rộng */}
             <ChevronDown
               size={16}
-              className={`text-slate-400 group-hover:text-slate-600 transition-transform duration-200 ${
-                isDropdownOpen ? 'rotate-180 text-blue-600' : ''
-              }`}
+              className={`text-slate-400 group-hover:text-slate-600 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180 text-blue-600' : ''
+                }`}
             />
           </button>
 
