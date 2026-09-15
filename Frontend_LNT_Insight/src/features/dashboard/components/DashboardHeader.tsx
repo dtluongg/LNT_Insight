@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Calendar, RefreshCw, ChevronDown, Building2, MapPin, Layers, ChevronLeft } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
 import { companiesApi } from '../../../core/api/companies';
 import { getPreviousWorkingDayClient } from '../../../utils/dateUtils';
 import type { CompanyInfo, SiteInfo, SectionInfo } from '../../../types';
@@ -12,87 +11,63 @@ interface DashboardHeaderProps {
     isLoading?: boolean;
 }
 
-export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onApplyFilter, isLoading = false }) => {
-
-    const todayStr = new Date().toLocaleDateString('sv-SE');
+export const DashboardHeader: React.FC<DashboardHeaderProps> = React.memo(({ filter, onApplyFilter, isLoading = false }) => {
+    const todayStr = useMemo(() => new Date().toLocaleDateString('sv-SE'), []);
 
     // Master data
     const [companies, setCompanies] = useState<CompanyInfo[]>([]);
     const [sites, setSites] = useState<SiteInfo[]>([]);
     const [sections, setSections] = useState<SectionInfo[]>([]);
-    const [searchParams, setSearchParams] = useSearchParams();
-    // =========================================================
 
-    // Draft filter
-    // Người dùng đang chọn gì trên Header
-    // Chỉ Apply khi bấm Refresh
-    const [draftFilter, setDraftFilter] =
-        useState<DashboardFilter>(filter);
-    // =========================================================
-
-    // const [date, setDate] = useState(searchParams.get('date') || todayStr); // set lại không cho chọn quá ngày hôm nay.
+    // Draft filter state
+    const [draftFilter, setDraftFilter] = useState<DashboardFilter>(filter);
     const [latestUpdate, setLatestUpdate] = useState<string>(
-        new Date().toLocaleString('vi-VN', { hour12: false })
+        () => new Date().toLocaleString('vi-VN', { hour12: false })
     );
 
-    // Sync draft khi Dashboard filter thay đổi từ bên ngoài
+    // Sync draft when Dashboard filter changes externally
     useEffect(() => {
         setDraftFilter(filter);
     }, [filter]);
-    // =========================================================
 
-    // Load Companies
+    // Load Companies on mount
     useEffect(() => {
+        let isMounted = true;
         const fetchCompanies = async () => {
             try {
                 const data = await companiesApi.getCompanies();
+                if (!isMounted) return;
                 setCompanies(data);
-                // Tìm company name tương ứng với ID hiện tại
                 const currentCompany = data.find(c => c.CompanyID === draftFilter.CompanyID);
                 if (currentCompany) {
                     setDraftFilter(prev => ({
                         ...prev,
                         CompanyName: currentCompany.CompanyName
                     }));
-                    // // Đồng bộ lên filter cha ở DashboardPage nếu chưa có tên
-                    // if (!filter.companyName) {
-                    //     onApplyFilter({
-                    //         ...filter,
-                    //         companyName: currentCompany.companyName
-                    //     });
-                    // }
                 }
             } catch (err) {
                 console.error('Failed to fetch companies', err);
             }
         };
         fetchCompanies();
+        return () => { isMounted = false; };
     }, []);
-
 
     // Fetch sites when selected company changes
     useEffect(() => {
         if (!draftFilter.CompanyID) return;
+        let isMounted = true;
         const fetchSites = async () => {
             try {
                 const data = await companiesApi.getSites(draftFilter.CompanyID);
+                if (!isMounted) return;
                 setSites(data);
-                const currentSite = data.find(
-                    site =>
-                        site.SiteID === draftFilter.SiteID
-                );
+                const currentSite = data.find(site => site.SiteID === draftFilter.SiteID);
                 if (currentSite) {
                     setDraftFilter(prev => ({
                         ...prev,
                         SiteCode: currentSite.SiteCode
                     }));
-                    // Đồng bộ lên filter cha ở DashboardPage nếu chưa có siteCode
-                    // if (!filter.siteCode) {
-                    //     onApplyFilter({
-                    //         ...filter,
-                    //         siteCode: currentSite.siteCode
-                    //     });
-                    // }
                 } else {
                     const firstSite = data[0];
                     if (firstSite) {
@@ -100,7 +75,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                             ...prev,
                             SiteID: firstSite.SiteID,
                             SiteCode: firstSite.SiteCode,
-                            SectionID: '',
+                            SectionID: '0',
                             SectionName: ''
                         }));
                     } else {
@@ -108,34 +83,35 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                             ...prev,
                             SiteID: '',
                             SiteCode: '',
-                            SectionID: '',
+                            SectionID: '0',
                             SectionName: ''
                         }));
                     }
                 }
             } catch (err) {
                 console.error('Failed to fetch sites', err);
-                setSites([]);
+                if (isMounted) setSites([]);
             }
         };
         fetchSites();
+        return () => { isMounted = false; };
     }, [draftFilter.CompanyID]);
-    // =========================================================
 
     // Fetch sections when selected company or site changes
     useEffect(() => {
         if (!draftFilter.CompanyID || !draftFilter.SiteID) return;
+        let isMounted = true;
         const fetchSections = async () => {
             try {
                 const data = await companiesApi.getSections(draftFilter.CompanyID, draftFilter.SiteID);
+                if (!isMounted) return;
                 setSections(data);
 
-                // Nếu SectionID đang là '0', giữ nguyên trạng thái ô trắng
                 if (draftFilter.SectionID === '0' || !draftFilter.SectionID) {
                     setDraftFilter(prev => ({
                         ...prev,
                         SectionID: '0',
-                        SectionName: ''
+                        SectionName: 'All'
                     }));
                     return;
                 }
@@ -150,42 +126,23 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                         SectionName: currentSection.SectionName
                     }));
                 } else {
-                    // Nếu SectionID cũ không thuộc Site mới, reset về ô trắng (value = '0')
                     setDraftFilter(prev => ({
                         ...prev,
                         SectionID: '0',
-                        SectionName: ''
+                        SectionName: 'All'
                     }));
                 }
             } catch (err) {
                 console.error('Failed to fetch sections', err);
-                setSections([]);
+                if (isMounted) setSections([]);
             }
         };
         fetchSections();
+        return () => { isMounted = false; };
     }, [draftFilter.CompanyID, draftFilter.SiteID]);
-    // =========================================================
-    // Đồng bộ đầy đủ companyName, siteCode, sectionName lên filter cha khi tất cả master data đã sẵn sàng
-    useEffect(() => {
-        if (companies.length > 0 && sites.length > 0 && sections.length > 0) {
-            const currentCompany = companies.find(c => c.CompanyID === filter.CompanyID);
-            const currentSite = sites.find(s => s.SiteID === filter.SiteID);
-            const currentSection = sections.find(s => String(s.SectionID) === filter.SectionID);
-            if (currentCompany && currentSite && currentSection) {
-                // Chỉ đồng bộ khi filter cha còn thiếu ít nhất một trường tên
-                if (!filter.CompanyName || !filter.SiteCode || !filter.SectionName) {
-                    onApplyFilter({
-                        ...filter,
-                        CompanyName: currentCompany.CompanyName,
-                        SiteCode: currentSite.SiteCode,
-                        SectionName: currentSection.SectionName
-                    });
-                }
-            }
-        }
-    }, [companies, sites, sections, filter.CompanyID, filter.SiteID, filter.SectionID]);
-    // Handle for Company Change:
-    const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => { // chưa hiểu hàm này cho lắm
+
+    // Handlers
+    const handleCompanyChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
         const companyID = e.target.value;
         const company = companies.find(item => item.CompanyID === companyID);
         setDraftFilter(prev => ({
@@ -196,12 +153,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             SiteCode: '',
             SectionID: '0',
             SectionName: ''
-        }))
-    }
-    // =========================================================
+        }));
+    }, [companies]);
 
-    // Handle for Site Change:
-    const handleSiteChange = (e: React.ChangeEvent<HTMLSelectElement>) => { // chưa hiểu hàm này cho lắm
+    const handleSiteChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
         const siteID = e.target.value;
         const site = sites.find(item => item.SiteID === siteID);
         setDraftFilter(prev => ({
@@ -210,12 +165,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             SiteCode: site?.SiteCode || '',
             SectionID: '0',
             SectionName: ''
-        }))
-    }
-    // =========================================================
+        }));
+    }, [sites]);
 
-    // Handle for Section Change:
-    const handleSectionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleSectionChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
         const sectionID = e.target.value;
         const section = sections.find(item => String(item.SectionID) === sectionID);
         setDraftFilter(prev => ({
@@ -223,12 +176,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             SectionID: sectionID,
             SectionName: sectionID === '0' ? 'All' : (section?.SectionName || '')
         }));
-    };
-    // =========================================================
+    }, [sections]);
 
-    const prevWorkingDay = getPreviousWorkingDayClient(draftFilter.Date);
+    const prevWorkingDay = useMemo(
+        () => getPreviousWorkingDayClient(draftFilter.Date),
+        [draftFilter.Date]
+    );
 
-    const handleJumpToPreviousDay = () => {
+    const handleJumpToPreviousDay = useCallback(() => {
         const prevDate = getPreviousWorkingDayClient(draftFilter.Date);
         if (!prevDate) return;
         const newFilter = {
@@ -237,60 +192,42 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
         };
         setDraftFilter(newFilter);
         onApplyFilter(newFilter);
-        setLatestUpdate(
-            new Date().toLocaleString('vi-VN', { hour12: false })
-        );
-    };
+        setLatestUpdate(new Date().toLocaleString('vi-VN', { hour12: false }));
+    }, [draftFilter, onApplyFilter]);
 
-    // Date change
-    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setDraftFilter(prev => ({
             ...prev,
             Date: e.target.value
         }));
-    };
-    // =========================================================
+    }, []);
 
-    // Apply filter:
-    const handleSearch = () => {
+    const handleSearch = useCallback(() => {
         if (!draftFilter.CompanyID || !draftFilter.SiteID || draftFilter.SectionID === '' || !draftFilter.Date) {
             return;
         }
-        console.log('draftFilter before apply:', draftFilter);
-        onApplyFilter({
-            ...draftFilter
-        });
-        setLatestUpdate(
-            new Date().toLocaleString('vi-VN', { hour12: false })
-        );
-    };
-    // =========================================================
+        onApplyFilter({ ...draftFilter });
+        setLatestUpdate(new Date().toLocaleString('vi-VN', { hour12: false }));
+    }, [draftFilter, onApplyFilter]);
 
-    // Options for combobox:
-
-    // companyOptionList:
-    const companyOptions = companies.map(co => ({
+    // Memoized Select Options
+    const companyOptions = useMemo(() => companies.map(co => ({
         value: co.CompanyID,
         label: co.CompanyName
-    }));
-    // =========================================================
+    })), [companies]);
 
-    // siteOptionList:
-    const siteOptions = sites.map(si => ({
+    const siteOptions = useMemo(() => sites.map(si => ({
         value: si.SiteID,
         label: si.SiteCode
-    }));
-    // =========================================================
+    })), [sites]);
 
-    // sectionOptionList:
-    const sectionOptions = [
+    const sectionOptions = useMemo(() => [
         { value: '0', label: 'All' },
         ...sections.map(se => ({
             value: se.SectionID,
             label: se.SectionName
         }))
-    ];
-    // =========================================================
+    ], [sections]);
 
     return (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-xs px-4 py-2 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 shrink-0">
@@ -306,15 +243,11 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     >
-                        {/* Bàn máy may */}
                         <path d="M2 19h20" />
                         <path d="M4 19v-2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2" />
-                        {/* Thân & cần máy */}
                         <path d="M18 16V8a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v8" />
                         <path d="M4 11h9a2 2 0 0 1 2 2v3" />
-                        {/* Ống chỉ */}
                         <circle cx="16" cy="5" r="1.2" fill="currentColor" />
-                        {/* Kim may */}
                         <line x1="7" y1="11" x2="7" y2="15" />
                         <circle cx="7" cy="15.5" r="0.5" fill="currentColor" />
                     </svg>
@@ -439,4 +372,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             </div>
         </div>
     );
-};
+});
+
+DashboardHeader.displayName = 'DashboardHeader';

@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
     ResponsiveContainer,
     ComposedChart,
     Bar,
-    Line,
     XAxis,
     YAxis,
     CartesianGrid,
@@ -28,19 +27,9 @@ interface TeamProductionDetailModalProps {
 }
 
 const COLORS = [
-    '#3B82F6', // Blue
-    '#10B981', // Emerald
-    '#F59E0B', // Amber
-    '#EF4444', // Red
-    '#8B5CF6', // Purple
-    '#EC4899', // Pink
-    '#06B6D4', // Cyan
-    '#14B8A6', // Teal
-    '#6366F1', // Indigo
-    '#84CC16', // Lime
-    '#EAB308', // Yellow
-    '#D946EF', // Fuchsia
-    '#F97316', // Orange
+    '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+    '#EC4899', '#06B6D4', '#14B8A6', '#6366F1', '#84CC16',
+    '#EAB308', '#D946EF', '#F97316',
 ];
 
 const CustomizedContent = (props: any) => {
@@ -97,7 +86,29 @@ const CustomizedContent = (props: any) => {
     );
 };
 
-export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps> = ({
+// Stable Custom Label renderer for Recharts Cumulative Variance Bar
+const renderCumulativeVarianceLabel = (hourlyAnalysisData: SewingTeamAnalysis[]) => (props: any) => {
+    const { x, y, width, index } = props;
+    const originalItem = hourlyAnalysisData[index];
+    const val = Number(originalItem?.CumulativeVariance) || 0;
+
+    if (val === 0) return null;
+
+    return (
+        <text
+            x={x + width / 2}
+            y={y + 20}
+            fill="#ffffff"
+            textAnchor="middle"
+            fontSize={20}
+            fontWeight={400}
+        >
+            {val.toLocaleString()}
+        </text>
+    );
+};
+
+export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps> = React.memo(({
     open,
     filter,
     production,
@@ -114,16 +125,16 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
     const [loadingAnalysis, setLoadingAnalysis] = useState(false);
     const [loadingDefects, setLoadingDefects] = useState(false);
 
-    // Modal:
+    // Modal state
     const [isTableModalOpen, setIsTableModalOpen] = useState(false);
     const [isTableModalOpen2, setIsTableModalOpen2] = useState(false);
 
     // Fetch Shiftwork List & Team Defects on Modal Open
     useEffect(() => {
         if (open && production) {
+            let isMounted = true;
             const dateObj = new Date(filter.Date);
 
-            // 1. Fetch workshifts
             const fetchWorkshifts = async () => {
                 setLoadingShiftworks(true);
                 try {
@@ -133,22 +144,20 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                         dateObj,
                         Number(production.SectionID)
                     );
+                    if (!isMounted) return;
                     setShiftworks(shifts);
-                    if (shifts.length > 0) {
-                        setSelectedShiftworkID(shifts[0].ShiftWorkID);
-                    } else {
-                        setSelectedShiftworkID(null);
-                    }
+                    setSelectedShiftworkID(shifts.length > 0 ? shifts[0].ShiftWorkID : null);
                 } catch (error) {
                     console.error('Failed to fetch workshift list', error);
-                    setShiftworks([]);
-                    setSelectedShiftworkID(null);
+                    if (isMounted) {
+                        setShiftworks([]);
+                        setSelectedShiftworkID(null);
+                    }
                 } finally {
-                    setLoadingShiftworks(false);
+                    if (isMounted) setLoadingShiftworks(false);
                 }
             };
 
-            // 2. Fetch team-specific defects
             const fetchTeamDefects = async () => {
                 setLoadingDefects(true);
                 try {
@@ -159,25 +168,26 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                         dateObj,
                         production.TeamID
                     );
-                    console.log(production.SectionID)
-                    setTeamDefects(defects);
+                    if (isMounted) setTeamDefects(defects);
                 } catch (error) {
                     console.error('Failed to fetch team defect analysis', error);
-                    setTeamDefects([]);
+                    if (isMounted) setTeamDefects([]);
                 } finally {
-                    setLoadingDefects(false);
+                    if (isMounted) setLoadingDefects(false);
                 }
             };
 
             fetchWorkshifts();
             fetchTeamDefects();
-            setActiveTab('hourly_cumulative_output'); // Reset to default tab
+            setActiveTab('hourly_cumulative_output');
+            return () => { isMounted = false; };
         }
     }, [open, production, filter.CompanyID, filter.SiteID, filter.Date, filter.SectionID]);
 
     // Fetch Hourly Analysis whenever selectedShiftworkID changes
     useEffect(() => {
         if (open && production && selectedShiftworkID !== null) {
+            let isMounted = true;
             const fetchHourlyAnalysis = async () => {
                 setLoadingAnalysis(true);
                 try {
@@ -189,53 +199,27 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                         production.TeamID,
                         selectedShiftworkID
                     );
-                    setHourlyAnalysis(analysis);
-                    // if (analysis) {
-                    //     let sumOutputQty = 0;
-                    //     let sumHourlyPlan = 0;
-                    //     const newAnalysis = analysis.map(item => {
-                    //         sumOutputQty += item.OutputQty;
-                    //         sumHourlyPlan += item.HourlyPlan;
-                    //         return {
-                    //             ...item,
-                    //             OutputQty: sumOutputQty,
-                    //             HourlyPlan: sumHourlyPlan
-                    //         };
-                    //     });
-                    //     setHourlyAnalysis(newAnalysis);
-                    // }
-
+                    if (isMounted) setHourlyAnalysis(analysis);
                 } catch (error) {
                     console.error('Failed to fetch hourly team analysis', error);
-                    setHourlyAnalysis([]);
+                    if (isMounted) setHourlyAnalysis([]);
                 } finally {
-                    setLoadingAnalysis(false);
+                    if (isMounted) setLoadingAnalysis(false);
                 }
             };
             fetchHourlyAnalysis();
+            return () => { isMounted = false; };
         } else {
             setHourlyAnalysis([]);
         }
     }, [open, production, selectedShiftworkID, filter.CompanyID, filter.SiteID, filter.Date]);
 
-    if (!open || !production) return null;
-
-    const defectChartData = teamDefects.map((d) => ({
+    const defectChartData = useMemo(() => teamDefects.map((d) => ({
         name: d.DefectName,
         value: d.DefectQty,
-    }));
+    })), [teamDefects]);
 
-
-    // const varianceChartData = hourlyAnalysis.map((item) => {
-    //     const variance = item.OutputVariance ?? 0;
-    //     return {
-    //         ...item,
-    //         // if variance > 0 then not change 
-    //         PositiveVariance: variance > 0 ? variance : 0,
-    //         // if variance < 0 then set variance to 0
-    //         NegativeVariance: variance < 0 ? variance : 0
-    //     }
-    // })
+    if (!open || !production) return null;
 
     return (
         <div
@@ -362,7 +346,6 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                             type="button"
                             onClick={() => setIsTableModalOpen(true)}
                             className="mr-5 p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition-colors cursor-pointer border border-slate-200 hover:border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
-
                             title="View production data table"
                         >
                             <h3 className='text-sm'>Hourly Team Production Details</h3>
@@ -426,20 +409,16 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     wrapperStyle={{ fontSize: '12px', fontWeight: 500, paddingTop: '20px' }}
                                                     content={() => (
                                                         <div className="flex justify-center items-center gap-6 text-[13px] font-medium pt-2">
-                                                            {/* 1. Target (Màu vàng) */}
                                                             <div className="flex items-center gap-1.5">
                                                                 <span className="w-3 h-3 rounded-full bg-[#10B981]" />
                                                                 <span className="text-slate-600">Running Output</span>
                                                             </div>
-
-                                                            {/* 2. Output (Màu xanh kết quả) */}
                                                             <div className="flex items-center gap-1.5">
                                                                 <span className="w-3 h-3 rounded-full bg-[#F59E0B]" />
                                                                 <span className="text-slate-600">Cumulative Plan</span>
                                                             </div>
                                                         </div>
                                                     )}
-
                                                 />
                                                 <Bar
                                                     id='bar-running-output'
@@ -449,9 +428,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     radius={[4, 4, 0, 0]}
                                                     barSize={32}
                                                     label={{ position: 'top', fill: '#000', fontSize: 13, fontWeight: 400 }}
-                                                >
-                                                    {/* <LabelList dataKey="RunningOutput" position="insideTop" angle={0} fill="#fff" fontSize={20} fontWeight={500} /> */}
-                                                </Bar>
+                                                />
                                                 <Bar
                                                     id='bar-cumulative-plan'
                                                     dataKey="CumulativePlan"
@@ -461,16 +438,6 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     barSize={32}
                                                     label={{ position: 'top', fill: '#000', fontSize: 13, fontWeight: 400 }}
                                                 />
-                                                {/* <Line
-                                                    type="monotone"
-                                                    dataKey="HourlyPlan"
-                                                    name="HourlyPlan"
-                                                    stroke="#3B82F6"
-                                                    strokeWidth={3}
-                                                    dot={{ r: 4, fill: "#3B82F6", stroke: "#fff", strokeWidth: 2 }}
-                                                    activeDot={{ r: 6 }}
-                                                    label={{ position: 'top', fill: '#2563EB', fontSize: 10, fontWeight: 600 }}
-                                                /> */}
                                             </ComposedChart>
                                         </ResponsiveContainer>
                                     </div>
@@ -528,10 +495,10 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     tickLine={false}
                                                     axisLine={false}
                                                     dx={-10}
-                                                    domain={['auto', 'auto']}  // cho phép mở trục dải số âm bên dưới nếu có.
+                                                    domain={['auto', 'auto']}
                                                 />
 
-                                                <ReferenceLine y={0} stroke="#64748b" strokeWidth={1.5} /> // vẽ kẻ trục 0 phân định trên dưới
+                                                <ReferenceLine y={0} stroke="#64748b" strokeWidth={1.5} />
 
                                                 <Tooltip
                                                     formatter={(val: any, name: string) => {
@@ -563,31 +530,9 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     radius={[4, 4, 0, 0]}
                                                 >
                                                     <LabelList
-                                                        content={(props: any) => {
-                                                            const { x, y, width, index } = props;
-
-                                                            // Lấy trực tiếp từ mảng dữ liệu gốc thông qua index
-                                                            const originalItem = hourlyAnalysis[index];
-                                                            const val = Number(originalItem?.CumulativeVariance) || 0;
-
-                                                            if (val === 0) return null;
-
-                                                            return (
-                                                                <text
-                                                                    x={x + width / 2}
-                                                                    y={y + 20} // Vị trí hiển thị bên trong cột xanh lá
-                                                                    fill="#ffffff"
-                                                                    textAnchor="middle"
-                                                                    fontSize={20}
-                                                                    fontWeight={400}
-                                                                >
-                                                                    {val.toLocaleString()} {/* Chắc chắn 100% là 179 */}
-                                                                </text>
-                                                            );
-                                                        }}
+                                                        content={renderCumulativeVarianceLabel(hourlyAnalysis)}
                                                     />
                                                 </Bar>
-
                                             </ComposedChart>
                                         </ResponsiveContainer>
                                     </div>
@@ -595,9 +540,6 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                             </div>
                         )}
                         <div className="h-full flex flex-col gap-4 mt-6">
-                            {/* <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1">
-                                Team End-Line Defect Analysis
-                            </h3> */}
                             <div className="flex items-center justify-between">
                                 <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1">
                                     Team End-Line Defect Analysis
@@ -675,4 +617,6 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
             </div>
         </div>
     );
-};
+});
+
+TeamProductionDetailModal.displayName = 'TeamProductionDetailModal';

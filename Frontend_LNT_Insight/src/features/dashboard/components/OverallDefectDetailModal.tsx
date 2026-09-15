@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Treemap, Tooltip, ResponsiveContainer } from 'recharts';
 import { companiesApi } from '../../../core/api/companies';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
 import type { OverallDefectAnalysis } from '../../../types';
 import { EndlineDefectAnalysisTableModal } from './EndlineDefectAnalysisTableModal';
 import { Ellipsis } from 'lucide-react';
-
 
 interface OverallDefectDetailModalProps {
     open: boolean;
@@ -17,19 +16,9 @@ interface OverallDefectDetailModalProps {
 }
 
 const COLORS = [
-    '#3B82F6', // Blue
-    '#10B981', // Emerald
-    '#F59E0B', // Amber
-    '#EF4444', // Red
-    '#8B5CF6', // Purple
-    '#EC4899', // Pink
-    '#06B6D4', // Cyan
-    '#14B8A6', // Teal
-    '#6366F1', // Indigo
-    '#84CC16', // Lime
-    '#EAB308', // Yellow
-    '#D946EF', // Fuchsia
-    '#F97316', // Orange
+    '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+    '#EC4899', '#06B6D4', '#14B8A6', '#6366F1', '#84CC16',
+    '#EAB308', '#D946EF', '#F97316',
 ];
 
 const CustomizedContent = (props: any) => {
@@ -86,7 +75,7 @@ const CustomizedContent = (props: any) => {
     );
 };
 
-export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> = ({
+export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> = React.memo(({
     open,
     filter,
     onClose,
@@ -96,10 +85,11 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
 }) => {
     const [defects, setDefects] = useState<OverallDefectAnalysis[]>([]);
     const [loading, setLoading] = useState(false);
-    const [isDataDetailTableOverallDefectOpen, setIsDataDetailTableOverallDefectOpen] = useState(false)
+    const [isDataDetailTableOverallDefectOpen, setIsDataDetailTableOverallDefectOpen] = useState(false);
 
     useEffect(() => {
         if (open) {
+            let isMounted = true;
             const fetchDefects = async () => {
                 setLoading(true);
                 try {
@@ -110,25 +100,25 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
                         Number(filter.SectionID),
                         dateObj
                     );
-                    setDefects(data);
+                    if (isMounted) setDefects(data);
                 } catch (error) {
                     console.error('Failed to fetch defect analysis data', error);
-                    setDefects([]);
+                    if (isMounted) setDefects([]);
                 } finally {
-                    setLoading(false);
+                    if (isMounted) setLoading(false);
                 }
             };
             fetchDefects();
+            return () => { isMounted = false; };
         }
     }, [open, filter.CompanyID, filter.SiteID, filter.Date]);
 
-    if (!open) return null;
-
-    const chartData = defects.map((d) => ({
+    const chartData = useMemo(() => defects.map((d) => ({
         name: d.DefectName,
         value: d.DefectQty,
-    }));
+    })), [defects]);
 
+    if (!open) return null;
 
     return (
         <div
@@ -157,9 +147,9 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
                     </button>
                 </div>
 
-                {/* Content - Scrollable if content overflows */}
+                {/* Content */}
                 <div className="overflow-y-auto p-6 space-y-6 flex-1">
-                    {/* Dashboard Filter Information */}
+                    {/* Filter Information */}
                     <div className="grid grid-cols-2 gap-4 border border-slate-100 rounded-xl bg-slate-50/50 p-4 md:grid-cols-4">
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
@@ -247,7 +237,6 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
                             </button>
                         </div>
 
-
                         {loading ? (
                             <div className="flex h-80 items-center justify-center border border-slate-100 rounded-xl bg-slate-50/20">
                                 <div className="flex flex-col items-center gap-3">
@@ -306,4 +295,6 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
             </div>
         </div>
     );
-};
+});
+
+OverallDefectDetailModal.displayName = 'OverallDefectDetailModal';
