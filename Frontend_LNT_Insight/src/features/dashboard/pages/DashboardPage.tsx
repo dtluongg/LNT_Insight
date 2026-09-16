@@ -166,7 +166,7 @@ export const DashboardPage: React.FC = () => {
     : null;
   const highestContrib = (totalOutput > 0 && highestTeam?.DayOutput)
     ? ((highestTeam.DayOutput / totalOutput) * 100).toFixed(1)
-    : '86.1';
+    : '';
 
   // Render
   return (
@@ -350,11 +350,11 @@ export const DashboardPage: React.FC = () => {
                     <span className="w-2.5 h-2.5 rounded-full bg-[#38BDF8]" />
                     <span className="text-slate-600">Output</span>
                   </div>
-                  {/* Achieved (Green) */}
+                  {/* Inspected Qty  (Green) */}
                   <div className="flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E]" />
                     {/* <span className="w-2.5 h-2.5 rounded-full bg-[#276ebe]" /> */}
-                    <span className="text-slate-600">Achieved</span>
+                    <span className="text-slate-600">Inspected Qty </span>
                   </div>
                   {/* Defect (Purple) */}
                   {/* <div className="flex items-center gap-1.5">
@@ -415,8 +415,8 @@ export const DashboardPage: React.FC = () => {
                       formatter={(value: any, name: string) => {
                         if (name === "Target") return [value ? value.toLocaleString() : '-', 'Target'];
                         if (name === "Output") return [value ? value.toLocaleString() : '0', 'Actual Output'];
-                        if (name === "Achieved") return [value ? value.toLocaleString() : '0', 'Inspected / Achieved'];
-                        if (name === "Defect") return [value ? value.toLocaleString() : '0', 'Defect Qty'];
+                        if (name === "Inspected") return [value ? value.toLocaleString() : '0', 'Inspected'];
+                        // if (name === "Defect") return [value ? value.toLocaleString() : '0', 'Defect Qty'];
                         return [value, name];
                       }}
                     />
@@ -445,10 +445,10 @@ export const DashboardPage: React.FC = () => {
                       cursor="pointer"
                     />
 
-                    {/* Green Achieved / Inspected Bar */}
+                    {/* Green Inspected Bar */}
                     <Bar
                       dataKey="InspectedQty"
-                      name="Achieved"
+                      name="Inspected"
                       fill="#22C55E"
                       radius={[3, 3, 0, 0]}
                       barSize={22}
@@ -525,7 +525,7 @@ export const DashboardPage: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-[13px] font-medium text-slate-500">
-                    Achievement rate {rateTrend.diff >= 0 ? 'increased' : 'decreased'}
+                    Inspected rate {rateTrend.diff >= 0 ? 'increased' : 'decreased'}
                   </div>
                   <div className={`text-[19px] font-bold leading-tight ${rateTrend.diff >= 0 ? 'text-emerald-600' : 'text-amber-600'}`}>
                     {rateTrend.trendValue}

@@ -504,10 +504,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                 margin={{ top: 20, right: 20, bottom: 20, left: 10 }}
                                             >
                                                 <defs>
-                                                    <linearGradient id="popupCumulativePlan" x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="0%" stopColor="#F59E0B" stopOpacity={0.95} />
-                                                        <stop offset="100%" stopColor="#D97706" stopOpacity={0.75} />
-                                                    </linearGradient>
+
                                                     <linearGradient id="popupRunningOutput" x1="0" y1="0" x2="0" y2="1">
                                                         <stop offset="0%" stopColor="#2563EB" stopOpacity={0.95} />
                                                         <stop offset="100%" stopColor="#1D4ED8" stopOpacity={0.75} />
@@ -535,9 +532,8 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
 
                                                 <Tooltip
                                                     formatter={(val: any, name: string) => {
-                                                        if (name === 'Base Output') return [val?.toLocaleString(), 'Sản lượng thực tế'];
-                                                        if (name === 'Over Target') return [`+${val?.toLocaleString()}`, 'Vượt kế hoạch'];
-                                                        if (name === 'Under Target') return [`${val?.toLocaleString()}`, 'Hụt kế hoạch'];
+                                                        if (name === 'Running Output') return [val?.toLocaleString(), name];
+                                                        if (name === 'Cumulative Variance') return [`${val?.toLocaleString()}`, name];
                                                         return [val, name];
                                                     }}
                                                 />
@@ -550,7 +546,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     dataKey="RunningOutput"
                                                     name="Running Output"
                                                     stackId="varianceStack"
-                                                    fill="url(#popupRunningOutput)"
+                                                    fill="#10B981"
                                                     barSize={32}
                                                     label={{ position: 'center', fill: '#fff', fontSize: 20, fontWeight: 400 }}
                                                 />
@@ -558,13 +554,13 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     dataKey="CumulativeVariance"
                                                     name="Cumulative Variance"
                                                     stackId="varianceStack"
-                                                    fill="#10B981"
+                                                    fill="#1D4ED8"
                                                     barSize={32}
                                                     radius={[4, 4, 0, 0]}
                                                 >
                                                     <LabelList
                                                         content={(props: any) => {
-                                                            const { x, y, width, index } = props;
+                                                            const { x, y, width, height, index } = props;
 
                                                             // Lấy trực tiếp từ mảng dữ liệu gốc thông qua index
                                                             const originalItem = hourlyAnalysis[index];
@@ -575,13 +571,14 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                             return (
                                                                 <text
                                                                     x={x + width / 2}
-                                                                    y={y + 20} // Vị trí hiển thị bên trong cột xanh lá
+                                                                    y={y + height / 2}
                                                                     fill="#ffffff"
                                                                     textAnchor="middle"
+                                                                    dominantBaseline="central"
                                                                     fontSize={20}
                                                                     fontWeight={400}
                                                                 >
-                                                                    {val.toLocaleString()} {/* Chắc chắn 100% là 179 */}
+                                                                    {val.toLocaleString()} {/* get default value */}
                                                                 </text>
                                                             );
                                                         }}

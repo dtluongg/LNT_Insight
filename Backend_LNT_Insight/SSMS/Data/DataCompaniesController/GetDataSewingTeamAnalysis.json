@@ -39,7 +39,7 @@
     "HourlyPlan": 33,
     "Achievement": 53.7900,
     "RunningOutput": 71,
-    "CumulativeVariance": 61,
+    "CumulativeVariance": -61,
     "CumulativePlan": 132,
     "OutputVariance": -7
   },
