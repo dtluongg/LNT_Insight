@@ -10,7 +10,7 @@ export interface TrendResult {
  * @param isPercent (boolean) If true, calculates absolute point difference (e.g. rate % minus rate %). Otherwise calculates percentage change %.
  * @returns TrendResult
  */
-export const comparisionTrendResult = (preValue: number, curValue: number, isPercent: boolean = false): TrendResult => {
+export const comparisonTrendResult = (preValue: number, curValue: number, isPercent: boolean = false): TrendResult => {
     if (isPercent) { // if value has flag isPercent, just get data current minus prev to show data.
         const diff = curValue - preValue;
         const absDiff = Math.abs(diff).toFixed(1);
