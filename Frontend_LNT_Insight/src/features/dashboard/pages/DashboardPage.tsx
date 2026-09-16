@@ -285,7 +285,7 @@ export const DashboardPage: React.FC = () => {
                 const target = item.DayTargetTotal ?? 0;
                 const output = item.DayOutputTotal ?? 0;
                 const rate = (item.DayPercent ?? 0);
-                const displayRate = `${rate.toFixed(rate % 1 === 0 ? 0 : 2)}%`;
+                const displayRate = `${((output / target) * 100).toFixed(1)}%`;
 
                 return (
                   <div key={item.SectionID} className="flex flex-col gap-1.5 bg-white p-4 rounded-xl">
