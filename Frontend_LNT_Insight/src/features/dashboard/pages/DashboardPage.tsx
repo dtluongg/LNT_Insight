@@ -30,7 +30,7 @@ import {
 } from 'recharts';
 import { StatCard } from '../../../components/ui/StatCard';
 import { companiesApi } from '../../../core/api/companies';
-import { calculateTrend } from '../../../utils/dateUtils';
+import { comparisionTrendResult } from '../utils/compareUtils';
 import type { SewingTeamSummay, SewingTeamDetail } from '../../../types';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
 
@@ -154,11 +154,11 @@ export const DashboardPage: React.FC = () => {
   const prevDefectRate = prevDataSewingTeamSummary[0]?.DefectRate ?? 0;
 
   // Dynamic comparison trends vs previous day
-  const targetTrend = calculateTrend(totalTarget, prevTarget);
-  const outputTrend = calculateTrend(totalOutput, prevOutput);
-  const rateTrend = calculateTrend(achievementRate, prevAchievementRate, true);
-  const qualityTrend = calculateTrend(inspection, prevInspection);
-  const defectTrend = calculateTrend(defectRate, prevDefectRate, true);
+  const targetTrend = comparisionTrendResult(totalTarget, prevTarget);
+  const outputTrend = comparisionTrendResult(totalOutput, prevOutput);
+  const rateTrend = comparisionTrendResult(achievementRate, prevAchievementRate, true);
+  const qualityTrend = comparisionTrendResult(inspection, prevInspection);
+  const defectTrend = comparisionTrendResult(defectRate, prevDefectRate, true);
 
   // Highest contributing team for Key Insights
   const highestTeam = productionData.length > 0

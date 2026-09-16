@@ -36,7 +36,7 @@ const variantStyles: Record<
     iconBg: 'bg-[#d6951b]',
     sparkline: '#d6951b',
     textPreviewColor: 'text-[#d6951b]',
-    bgPreviewColor: 'bg-[#d6951b]/[0.07]'
+    bgPreviewColor: 'bg-[#d6951b]/[0.19]'
   },
   output: {
     border: 'border-[#0EA5E9]',
@@ -44,7 +44,7 @@ const variantStyles: Record<
     iconBg: 'bg-[#0EA5E9]',
     sparkline: '#0EA5E9',
     textPreviewColor: 'text-[#0EA5E9]',
-    bgPreviewColor: 'bg-[#0EA5E9]/[0.07]'
+    bgPreviewColor: 'bg-[#0EA5E9]/[0.19]'
   },
   rate: {
     border: 'border-[#10B981]',
@@ -52,7 +52,7 @@ const variantStyles: Record<
     iconBg: 'bg-[#10B981]',
     sparkline: '#10B981',
     textPreviewColor: 'text-[#10B981]',
-    bgPreviewColor: 'bg-[#10B981]/[0.07]'
+    bgPreviewColor: 'bg-[#10B981]/[0.19]'
   },
   quality: {
     border: 'border-[#A855F7]',
@@ -60,7 +60,7 @@ const variantStyles: Record<
     iconBg: 'bg-[#A855F7]',
     sparkline: '#A855F7',
     textPreviewColor: 'text-[#A855F7]',
-    bgPreviewColor: 'bg-[#A855F7]/[0.07]'
+    bgPreviewColor: 'bg-[#A855F7]/[0.19]'
   },
   defect: {
     border: 'border-[#0D9488]',
@@ -68,7 +68,7 @@ const variantStyles: Record<
     iconBg: 'bg-[#0D9488]',
     sparkline: '#0D9488',
     textPreviewColor: 'text-[#0D9488]',
-    bgPreviewColor: 'bg-[#0D9488]/[0.07]'
+    bgPreviewColor: 'bg-[#0D9488]/[0.19]'
   },
 };
 

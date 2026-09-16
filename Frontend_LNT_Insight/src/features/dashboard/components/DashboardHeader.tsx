@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, RefreshCw, ChevronDown, Building2, MapPin, Layers, ChevronLeft } from 'lucide-react';
+import { Calendar, RefreshCw, ChevronDown, Building2, MapPin, Layers, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { companiesApi } from '../../../core/api/companies';
-import { getPreviousWorkingDayClient } from '../../../utils/dateUtils';
+// import { getPreviousWorkingDayClient } from '../../../utils/dateUtils';
+import { getNextWorkingDay, getPreviousWorkingDay } from '../utils/dateUtils';
 import type { CompanyInfo, SiteInfo, SectionInfo } from '../../../types';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
 
@@ -226,10 +227,27 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
     };
     // =========================================================
 
-    const prevWorkingDay = getPreviousWorkingDayClient(draftFilter.Date);
+    const prevWorkingDay = getPreviousWorkingDay(draftFilter.Date);
 
     const handleJumpToPreviousDay = () => {
-        const prevDate = getPreviousWorkingDayClient(draftFilter.Date);
+        const prevDate = getPreviousWorkingDay(draftFilter.Date);
+        if (!prevDate) return;
+        const newFilter = {
+            ...draftFilter,
+            Date: prevDate
+        };
+        setDraftFilter(newFilter);
+        onApplyFilter(newFilter);
+        setLatestUpdate(
+            new Date().toLocaleString('vi-VN', { hour12: false })
+        );
+    };
+
+    // get next Day:
+    const nextWorkingDay = getNextWorkingDay(draftFilter.Date);
+
+    const handleJumpToNextDay = () => {
+        const prevDate = getNextWorkingDay(draftFilter.Date);
         if (!prevDate) return;
         const newFilter = {
             ...draftFilter,
@@ -338,19 +356,12 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             {/* Filters & Actions Form */}
             <div className="flex flex-wrap items-end gap-3">
                 {/* 1. Date Input */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1.5 items-center">
                     <div className="flex items-center gap-1.5 text-slate-700">
                         <Calendar size={13} className="text-slate-600" />
                         <span className="text-[12px] font-bold tracking-wider uppercase">DAY</span>
                     </div>
                     <div className="relative flex items-center gap-1.5">
-                        <input
-                            type="date"
-                            value={draftFilter.Date}
-                            max={todayStr}
-                            onChange={handleDateChange}
-                            className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-[14px] font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer"
-                        />
                         <button
                             type="button"
                             onClick={handleJumpToPreviousDay}
@@ -359,8 +370,24 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                             className="h-10 px-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-700 flex items-center gap-1 text-[13px] font-bold shadow-xs transition-all cursor-pointer disabled:opacity-60 shrink-0"
                         >
                             <ChevronLeft size={16} className="text-slate-600" />
-                            <span className="hidden sm:inline">Prev Day</span>
+                            {/* <span className="hidden sm:inline">Prev Day</span> */}
                         </button>
+                        <input
+                            type="date"
+                            value={draftFilter.Date}
+                            max={todayStr}
+                            onChange={handleDateChange}
+                            className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-[14px] font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer"
+                        />
+                        {/* <button
+                            type="button"
+                            onClick={handleJumpToNextDay}
+                            disabled={isLoading}
+                            title={`Load Previous Working Day (${nextWorkingDay})`}
+                            className="h-10 px-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-700 flex items-center gap-1 text-[13px] font-bold shadow-xs transition-all cursor-pointer disabled:opacity-60 shrink-0"
+                        >
+                            <ChevronRight size={16} className="text-slate-600" />
+                        </button> */}
                     </div>
                 </div>
 
