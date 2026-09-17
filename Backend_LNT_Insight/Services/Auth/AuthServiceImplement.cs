@@ -34,32 +34,57 @@ namespace Backend_LNT_Insight.Services.Auth
         {
             using IDbConnection db = new SqlConnection(_connectionString);
             // 1. tìm user trong database:
-            var userFind = await db.QueryFirstOrDefaultAsync<UserInfo>(
-                    "USP_Auth_GetUserByUsername",
-                    new { loginRequest.Username },
+            var userFind = await db.QueryFirstOrDefaultAsync<UserInfoFindDto>(
+                    "USP_FXPRO_Insight_CheckUser",
+                    new { UserID = loginRequest.Username },
                     commandType: CommandType.StoredProcedure
                 );
-            if (userFind == null) return null;
+            if (userFind == null)
+            {
+                return new LoginResponse
+                {
+                    IsSuccess = false,
+                    Message = "User Not Authorized"
+                };
+            }
 
             // xác thực mật khẩu:
             if (string.IsNullOrEmpty(userFind.Password) || !PWHelperHash.VerifyPassword(loginRequest.Password, userFind.Password))
             {
-                return null;
+                return new LoginResponse
+                {
+                    IsSuccess = false,
+                    Message = "Incorrect Password"
+                };
             }
 
+            var userInfo = await db.QueryFirstOrDefaultAsync<UserInfoNew>(
+                    "USP_FXPRO_Insight_GetInfoUser",
+                    new { userFind.UserID },
+                    commandType: CommandType.StoredProcedure
+                );
+            if (userInfo == null) return null;
+
             // Kiểm tra Authorized flag:
-            if (userFind.Authorized == false) return null;
+            //if (userInfo.Authorized == false) return null;
+
+            // Get list company follow user:
+            var userCompanies = (await db.QueryAsync<CompanyDto>(
+                    "select * from [dbo].[tblMastUserCompany] where UserID = @UserID",
+                    new {userFind.UserID}
+                )).ToList();
+
 
             // Tạo JWT (Access Token và Refresh Token):
-            var accessToken = _jwtHelper.GenerateJwtAccessToken(userFind);
-            var refreshToken = _jwtHelper.GenerateJwtRefreshToken(userFind);
+            var accessToken = _jwtHelper.GenerateJwtAccessToken(userInfo);
+            var refreshToken = _jwtHelper.GenerateJwtRefreshToken(userInfo);
 
             // Cập nhật refreshToken 
             await db.ExecuteAsync(
-                "USP_Auth_UpdateRefreshToken",
+                "USP_FXPRO_Insight_SaveRefreshToken",
                 new
                 {
-                    loginRequest.Username,
+                    UserID = loginRequest.Username,
                     RefreshToken = refreshToken,
                     RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(1).ToString()
                 },
@@ -73,12 +98,13 @@ namespace Backend_LNT_Insight.Services.Auth
                 RefreshToken = refreshToken,
                 User = new UserInfoDto
                 {
-                    Username = userFind.Username,
-                    FullName = userFind.FullName,
-                    Email = userFind.Email,
-                    IsAdmin = userFind.Admin ?? false,
-                    DefaultCompanyID = userFind.DefaultCompanyID,
-                }
+                    Username = userInfo.UserID,
+                    FullName = userInfo.FullName,
+                    Email = userInfo.Email,
+                    IsAdmin = userInfo.Admin ?? false,
+                    DefaultCompanyID = userInfo.DefaultCompanyID,
+                },
+                AuthorizedCompanies = userCompanies,
             };
         }
 
@@ -93,20 +119,19 @@ namespace Backend_LNT_Insight.Services.Auth
             
             // Check if user exists first to verify the target username is valid
             var userExists = await db.ExecuteScalarAsync<int>(
-                "SELECT COUNT(1) FROM tblMastUser WHERE Username = @Username",
-                new { resetPasswordRequest.Username }
+                "SELECT COUNT(1) FROM tblMastUser WHERE UserID = @UserID",
+                new { UserID = resetPasswordRequest.Username }
             );
             if (userExists == 0) return false;
 
             var hashPassword = PWHelperHash.HashPassword(resetPasswordRequest.NewPassword);
             await db.ExecuteAsync(
-                "USP_Auth_ResetPassword",
+                "UPDATE tblMastUser SET Password = @Password WHERE UserID = @UserID",
                 new
                 {
-                    resetPasswordRequest.Username,
+                    UserID = resetPasswordRequest.Username,
                     Password = hashPassword
-                },
-                commandType: CommandType.StoredProcedure
+                }
             );
             return true;
         }

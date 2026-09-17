@@ -16,7 +16,7 @@ namespace Backend_LNT_Insight.Helpers
         {
             _jwtSettings = jwtOptions.Value;
         }
-        public string GenerateJwtAccessToken(UserInfo user)
+        public string GenerateJwtAccessToken(UserInfoNew user)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
             var issuer = _jwtSettings.Issuer;
@@ -26,7 +26,7 @@ namespace Backend_LNT_Insight.Helpers
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Name, user.UserID),
                 new Claim(ClaimTypes.Role, user.Admin == true ? "Admin" : "User")
             };
 
@@ -44,7 +44,7 @@ namespace Backend_LNT_Insight.Helpers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public string GenerateJwtRefreshToken(UserInfo user)
+        public string GenerateJwtRefreshToken(UserInfoNew user)
         {
             var randomNumber = new byte[64];
             using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();

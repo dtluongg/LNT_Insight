@@ -29,7 +29,7 @@ namespace Backend_LNT_Insight.Controllers
         }
 
         [HttpPost("reset-password")]
-        [Authorize(Roles = "Admin")] // Require authorization, Admin only
+        //[Authorize(Roles = "Admin")] // Require authorization, Admin only
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest resetPasswordRequest)
         {
             var result = await _authService.ResetPasswordAsync(resetPasswordRequest);
