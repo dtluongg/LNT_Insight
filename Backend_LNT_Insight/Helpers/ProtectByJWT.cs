@@ -1,5 +1,6 @@
-﻿using Backend_LNT_Insight.DataConfig;
+using Backend_LNT_Insight.DataConfig;
 using Backend_LNT_Insight.Dtos;
+using Backend_LNT_Insight.Dtos.AuthDto;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

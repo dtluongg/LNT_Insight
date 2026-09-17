@@ -161,9 +161,12 @@ export const DashboardPage: React.FC = () => {
   const defectTrend = comparisonTrendResult(prevDefectRate, defectRate, true);
 
   // Highest contributing team for Key Insights
-  const highestTeam = productionData.length > 0
+
+  const getHighestTeam = productionData.length > 0
     ? [...productionData].sort((a, b) => (b.DayOutput ?? 0) - (a.DayOutput ?? 0))[0]
     : null;
+  const highestTeam = (getHighestTeam?.DayOutput ?? 0) > 0 ? getHighestTeam : null;
+
   const highestContrib = (totalOutput > 0 && highestTeam?.DayOutput)
     ? ((highestTeam.DayOutput / totalOutput) * 100).toFixed(1)
     : '';
@@ -525,7 +528,7 @@ export const DashboardPage: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-[13px] font-medium text-slate-500">
-                    Inspected rate {rateTrend.diff >= 0 ? 'increased' : 'decreased'}
+                    Achievement rate {rateTrend.diff >= 0 ? 'increased' : 'decreased'}
                   </div>
                   <div className={`text-[19px] font-bold leading-tight ${rateTrend.diff >= 0 ? 'text-emerald-600' : 'text-amber-600'}`}>
                     {rateTrend.trendValue}
