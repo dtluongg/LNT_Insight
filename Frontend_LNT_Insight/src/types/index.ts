@@ -6,11 +6,17 @@ export interface User {
     isAdmin: boolean;
     defaultCompanyID: string | null;
 }
+export interface AuthorizedCompanyDto {
+    companyID: string;
+}
 // Cấu trúc phản hồi từ API Đăng nhập thành công
 export interface LoginResponse {
+    isSuccess: boolean;
+    message?: string;
     token: string;
     refreshToken?: string;
     user: User;
+    authorizedCompanies: AuthorizedCompanyDto[];
 }
 export interface MastUserInfo {
     username: string;

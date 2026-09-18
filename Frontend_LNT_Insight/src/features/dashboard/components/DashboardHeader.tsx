@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, RefreshCw, ChevronDown, Building2, MapPin, Layers, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, RefreshCw, ChevronDown, MapPin, Layers, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
+import { useAuth } from '../../../app/providers/AuthProvider';
 import { companiesApi } from '../../../core/api/companies';
 // import { getPreviousWorkingDayClient } from '../../../utils/dateUtils';
 import { getNextWorkingDay, getPreviousWorkingDay } from '../utils/dateUtils';
-import type { CompanyInfo, SiteInfo, SectionInfo } from '../../../types';
+import type { SiteInfo, SectionInfo } from '../../../types';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
 
 interface DashboardHeaderProps {
@@ -16,9 +17,9 @@ interface DashboardHeaderProps {
 export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onApplyFilter, isLoading = false }) => {
 
     const todayStr = new Date().toLocaleDateString('sv-SE');
+    const { selectedCompanyID } = useAuth();
 
     // Master data
-    const [companies, setCompanies] = useState<CompanyInfo[]>([]);
     const [sites, setSites] = useState<SiteInfo[]>([]);
     const [sections, setSections] = useState<SectionInfo[]>([]);
     const [searchParams, setSearchParams] = useSearchParams();
@@ -27,73 +28,51 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
     // Draft filter
     // Người dùng đang chọn gì trên Header
     // Chỉ Apply khi bấm Refresh
-    const [draftFilter, setDraftFilter] =
-        useState<DashboardFilter>(filter);
+    const [draftFilter, setDraftFilter] = useState<DashboardFilter>({
+        ...filter,
+        CompanyID: selectedCompanyID || filter.CompanyID
+    });
     // =========================================================
 
-    // const [date, setDate] = useState(searchParams.get('date') || todayStr); // set lại không cho chọn quá ngày hôm nay.
     const [latestUpdate, setLatestUpdate] = useState<string>(
         new Date().toLocaleString('vi-VN', { hour12: false })
     );
 
     // Sync draft khi Dashboard filter thay đổi từ bên ngoài
     useEffect(() => {
-        setDraftFilter(filter);
-    }, [filter]);
-    // =========================================================
+        setDraftFilter(prev => ({
+            ...filter,
+            CompanyID: selectedCompanyID || filter.CompanyID
+        }));
+    }, [filter, selectedCompanyID]);
 
-    // Load Companies
+    // Đồng bộ draftFilter.CompanyID khi selectedCompanyID trên Header tổng thay đổi
     useEffect(() => {
-        const fetchCompanies = async () => {
-            try {
-                const data = await companiesApi.getCompanies();
-                setCompanies(data);
-                // Tìm company name tương ứng với ID hiện tại
-                const currentCompany = data.find(c => c.CompanyID === draftFilter.CompanyID);
-                if (currentCompany) {
-                    setDraftFilter(prev => ({
-                        ...prev,
-                        CompanyName: currentCompany.CompanyName
-                    }));
-                    // // Đồng bộ lên filter cha ở DashboardPage nếu chưa có tên
-                    // if (!filter.companyName) {
-                    //     onApplyFilter({
-                    //         ...filter,
-                    //         companyName: currentCompany.companyName
-                    //     });
-                    // }
-                }
-            } catch (err) {
-                console.error('Failed to fetch companies', err);
-            }
-        };
-        fetchCompanies();
-    }, []);
-
+        if (selectedCompanyID && selectedCompanyID !== draftFilter.CompanyID) {
+            setDraftFilter(prev => ({
+                ...prev,
+                CompanyID: selectedCompanyID
+            }));
+        }
+    }, [selectedCompanyID]);
+    // =========================================================
 
     // Fetch sites when selected company changes
     useEffect(() => {
-        if (!draftFilter.CompanyID) return;
+        const companyID = draftFilter.CompanyID || selectedCompanyID;
+        if (!companyID) return;
         const fetchSites = async () => {
             try {
-                const data = await companiesApi.getSites(draftFilter.CompanyID);
+                const data = await companiesApi.getSites(companyID);
                 setSites(data);
                 const currentSite = data.find(
-                    site =>
-                        site.SiteID === draftFilter.SiteID
+                    site => site.SiteID === draftFilter.SiteID
                 );
                 if (currentSite) {
                     setDraftFilter(prev => ({
                         ...prev,
                         SiteCode: currentSite.SiteCode
                     }));
-                    // Đồng bộ lên filter cha ở DashboardPage nếu chưa có siteCode
-                    // if (!filter.siteCode) {
-                    //     onApplyFilter({
-                    //         ...filter,
-                    //         siteCode: currentSite.siteCode
-                    //     });
-                    // }
                 } else {
                     const firstSite = data[0];
                     if (firstSite) {
@@ -101,7 +80,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                             ...prev,
                             SiteID: firstSite.SiteID,
                             SiteCode: firstSite.SiteCode,
-                            SectionID: '',
+                            SectionID: '0',
                             SectionName: ''
                         }));
                     } else {
@@ -109,7 +88,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                             ...prev,
                             SiteID: '',
                             SiteCode: '',
-                            SectionID: '',
+                            SectionID: '0',
                             SectionName: ''
                         }));
                     }
@@ -120,15 +99,16 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             }
         };
         fetchSites();
-    }, [draftFilter.CompanyID]);
+    }, [draftFilter.CompanyID, selectedCompanyID]);
     // =========================================================
 
     // Fetch sections when selected company or site changes
     useEffect(() => {
-        if (!draftFilter.CompanyID || !draftFilter.SiteID) return;
+        const companyID = draftFilter.CompanyID || selectedCompanyID;
+        if (!companyID || !draftFilter.SiteID) return;
         const fetchSections = async () => {
             try {
-                const data = await companiesApi.getSections(draftFilter.CompanyID, draftFilter.SiteID);
+                const data = await companiesApi.getSections(companyID, draftFilter.SiteID);
                 setSections(data);
 
                 // Nếu SectionID đang là '0', giữ nguyên trạng thái ô trắng
@@ -164,45 +144,11 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             }
         };
         fetchSections();
-    }, [draftFilter.CompanyID, draftFilter.SiteID]);
-    // =========================================================
-    // Đồng bộ đầy đủ companyName, siteCode, sectionName lên filter cha khi tất cả master data đã sẵn sàng
-    useEffect(() => {
-        if (companies.length > 0 && sites.length > 0 && sections.length > 0) {
-            const currentCompany = companies.find(c => c.CompanyID === filter.CompanyID);
-            const currentSite = sites.find(s => s.SiteID === filter.SiteID);
-            const currentSection = sections.find(s => String(s.SectionID) === filter.SectionID);
-            if (currentCompany && currentSite && currentSection) {
-                // Chỉ đồng bộ khi filter cha còn thiếu ít nhất một trường tên
-                if (!filter.CompanyName || !filter.SiteCode || !filter.SectionName) {
-                    onApplyFilter({
-                        ...filter,
-                        CompanyName: currentCompany.CompanyName,
-                        SiteCode: currentSite.SiteCode,
-                        SectionName: currentSection.SectionName
-                    });
-                }
-            }
-        }
-    }, [companies, sites, sections, filter.CompanyID, filter.SiteID, filter.SectionID]);
-    // Handle for Company Change:
-    const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => { // chưa hiểu hàm này cho lắm
-        const companyID = e.target.value;
-        const company = companies.find(item => item.CompanyID === companyID);
-        setDraftFilter(prev => ({
-            ...prev,
-            CompanyID: companyID,
-            CompanyName: company?.CompanyName || '',
-            SiteID: '',
-            SiteCode: '',
-            SectionID: '0',
-            SectionName: ''
-        }))
-    }
+    }, [draftFilter.CompanyID, draftFilter.SiteID, selectedCompanyID]);
     // =========================================================
 
     // Handle for Site Change:
-    const handleSiteChange = (e: React.ChangeEvent<HTMLSelectElement>) => { // chưa hiểu hàm này cho lắm
+    const handleSiteChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const siteID = e.target.value;
         const site = sites.find(item => item.SiteID === siteID);
         setDraftFilter(prev => ({
@@ -211,8 +157,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             SiteCode: site?.SiteCode || '',
             SectionID: '0',
             SectionName: ''
-        }))
-    }
+        }));
+    };
     // =========================================================
 
     // Handle for Section Change:
@@ -243,23 +189,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
         );
     };
 
-    // get next Day:
-    const nextWorkingDay = getNextWorkingDay(draftFilter.Date);
-
-    const handleJumpToNextDay = () => {
-        const prevDate = getNextWorkingDay(draftFilter.Date);
-        if (!prevDate) return;
-        const newFilter = {
-            ...draftFilter,
-            Date: prevDate
-        };
-        setDraftFilter(newFilter);
-        onApplyFilter(newFilter);
-        setLatestUpdate(
-            new Date().toLocaleString('vi-VN', { hour12: false })
-        );
-    };
-
     // Date change
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setDraftFilter(prev => ({
@@ -274,7 +203,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
         if (!draftFilter.CompanyID || !draftFilter.SiteID || draftFilter.SectionID === '' || !draftFilter.Date) {
             return;
         }
-        console.log('draftFilter before apply:', draftFilter);
         onApplyFilter({
             ...draftFilter
         });
@@ -282,15 +210,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             new Date().toLocaleString('vi-VN', { hour12: false })
         );
     };
-    // =========================================================
-
-    // Options for combobox:
-
-    // companyOptionList:
-    const companyOptions = companies.map(co => ({
-        value: co.CompanyID,
-        label: co.CompanyName
-    }));
     // =========================================================
 
     // siteOptionList:
@@ -370,7 +289,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                             className="h-10 px-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-700 flex items-center gap-1 text-[13px] font-bold shadow-xs transition-all cursor-pointer disabled:opacity-60 shrink-0"
                         >
                             <ChevronLeft size={16} className="text-slate-600" />
-                            {/* <span className="hidden sm:inline">Prev Day</span> */}
                         </button>
                         <input
                             type="date"
@@ -379,39 +297,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                             onChange={handleDateChange}
                             className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-[14px] font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer"
                         />
-                        {/* <button
-                            type="button"
-                            onClick={handleJumpToNextDay}
-                            disabled={isLoading}
-                            title={`Load Previous Working Day (${nextWorkingDay})`}
-                            className="h-10 px-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-700 flex items-center gap-1 text-[13px] font-bold shadow-xs transition-all cursor-pointer disabled:opacity-60 shrink-0"
-                        >
-                            <ChevronRight size={16} className="text-slate-600" />
-                        </button> */}
                     </div>
                 </div>
 
-                {/* 2. Company Select */}
-                <div className="flex flex-col gap-1.5 min-w-[140px]">
-                    <div className="flex items-center gap-1.5 text-slate-700">
-                        <Building2 size={13} className="text-slate-600" />
-                        <span className="text-[12px] font-bold tracking-wider uppercase">COMPANY</span>
-                    </div>
-                    <div className="relative">
-                        <select
-                            value={draftFilter.CompanyID}
-                            onChange={handleCompanyChange}
-                            className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-3 pr-8 text-[14px] font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer appearance-none"
-                        >
-                            {companyOptions.map(co => (
-                                <option key={co.value} value={co.value}>{co.label}</option>
-                            ))}
-                        </select>
-                        <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                    </div>
-                </div>
-
-                {/* 3. Site Select */}
+                {/* 2. Site Select */}
                 <div className="flex flex-col gap-1.5 min-w-[130px]">
                     <div className="flex items-center gap-1.5 text-slate-700">
                         <MapPin size={13} className="text-slate-600" />
@@ -432,7 +321,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                     </div>
                 </div>
 
-                {/* 4. Section Select */}
+                {/* 3. Section Select */}
                 <div className="flex flex-col gap-1.5 min-w-[110px]">
                     <div className="flex items-center gap-1.5 text-slate-700">
                         <Layers size={13} className="text-slate-600" />
@@ -453,7 +342,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                     </div>
                 </div>
 
-                {/* 5. Action Button: Refresh */}
+                {/* 4. Action Button: Refresh */}
                 <button
                     type="button"
                     onClick={handleSearch}

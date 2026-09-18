@@ -238,7 +238,7 @@ export const Sidebar: React.FC = () => {
           {!isCollapsed && <span>Collapse</span>}
         </button>
 
-        <button
+        {/* <button
           type="button"
           onClick={() => setOpenPopupLogout(true)}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-rose-400 hover:bg-rose-950/30 hover:text-rose-300 transition-colors cursor-pointer ${isCollapsed ? 'justify-center px-0' : ''
@@ -247,7 +247,7 @@ export const Sidebar: React.FC = () => {
         >
           <LogOut size={18} />
           {!isCollapsed && <span>Logout</span>}
-        </button>
+        </button> */}
       </div>
       {/* Modal Xác nhận Đăng xuất */}
       {/* Modal Xác nhận Đăng xuất (Portal ra toàn màn hình) */}

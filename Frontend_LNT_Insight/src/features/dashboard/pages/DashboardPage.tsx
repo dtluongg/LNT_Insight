@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { data, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../../../app/providers/AuthProvider';
 import { DashboardHeader } from '../components/DashboardHeader';
 import { TeamProductionDetailModal } from '../components/TeamProductionDetailModal';
 import { OverallDefectDetailModal } from '../components/OverallDefectDetailModal';
@@ -36,11 +37,12 @@ import type { DashboardFilter } from '../types/TeamSewingFilters';
 
 export const DashboardPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { selectedCompanyID } = useAuth();
   const todayStr = new Date().toLocaleDateString('sv-SE');
 
   // Dashboard Filter
   const [filter, setFilter] = useState<DashboardFilter>({
-    CompanyID: searchParams.get('companyId') || searchParams.get('CompanyId') || 'COM01',
+    CompanyID: selectedCompanyID || searchParams.get('companyId') || searchParams.get('CompanyId') || 'COM01',
     CompanyName: '',
 
     SiteID: searchParams.get('siteId') || searchParams.get('SiteId') || 'Site1',
@@ -51,6 +53,20 @@ export const DashboardPage: React.FC = () => {
 
     Date: searchParams.get('date') || searchParams.get('Date') || todayStr,
   });
+
+  // Đồng bộ filter.CompanyID khi selectedCompanyID ở Main Header thay đổi
+  useEffect(() => {
+    if (selectedCompanyID && selectedCompanyID !== filter.CompanyID) {
+      setFilter(prev => ({
+        ...prev,
+        CompanyID: selectedCompanyID
+      }));
+      setSearchParams(prev => {
+        prev.set('companyId', selectedCompanyID);
+        return prev;
+      });
+    }
+  }, [selectedCompanyID]);
 
   const [productionData, setProductionData] = useState<SewingTeamDetail[]>([]);
   const [filterProductionData, setFilterProductionData] = useState<any[]>([]);
