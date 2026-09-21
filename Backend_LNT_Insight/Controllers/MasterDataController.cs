@@ -26,7 +26,7 @@ namespace Backend_LNT_Insight.Controllers
         public async Task<IActionResult> GetModules()
         {
             using var db = CreateConnection();
-            var result = (await db.QueryAsync<dynamic>("USP_MD_GetModules", commandType: CommandType.StoredProcedure)).ToList();
+            var result = (await db.QueryAsync<dynamic>("USP_FXPRO_Insight_GetModules", commandType: CommandType.StoredProcedure)).ToList();
             return Ok(result);
         }
 
@@ -34,24 +34,24 @@ namespace Backend_LNT_Insight.Controllers
         public async Task<IActionResult> GetSubModules(string moduleMasterID)
         {
             using var db = CreateConnection();
-            var result = (await db.QueryAsync<dynamic>("USP_MD_GetSubModule", new { ModuleMasterID = moduleMasterID}, commandType: CommandType.StoredProcedure)).ToList();
+            var result = (await db.QueryAsync<dynamic>("USP_FXPRO_Insight_GetSubModules", new { ModuleMasterID = moduleMasterID}, commandType: CommandType.StoredProcedure)).ToList();
             return Ok(result);
         }
 
-        [HttpGet("users")]
-        public async Task<IActionResult> GetUsers()
-        {
-            using var db = CreateConnection();
-            var result = (await db.QueryAsync<dynamic>("USP_MD_GetUsers", commandType: CommandType.StoredProcedure)).ToList();
-            return Ok(result);
-        }
+        // [HttpGet("users")]
+        // public async Task<IActionResult> GetUsers()
+        // {
+        //     using var db = CreateConnection();
+        //     var result = (await db.QueryAsync<dynamic>("USP_MD_GetUsers", commandType: CommandType.StoredProcedure)).ToList();
+        //     return Ok(result);
+        // }
 
-        [HttpGet("company/{companyID}site/{siteID}")]
-        public async Task<IActionResult> GetProductionVsPlan(string companyID, string siteID)
-        {
-            using var db = CreateConnection();
-            var result = (await db.QueryAsync<dynamic>("USP_ProductionVsPlan", new { CompanyID = companyID, SiteID = siteID}, commandType: CommandType.StoredProcedure)).ToList();
-            return Ok(result);
-        }
+        // [HttpGet("company/{companyID}site/{siteID}")]
+        // public async Task<IActionResult> GetProductionVsPlan(string companyID, string siteID)
+        // {
+        //     using var db = CreateConnection();
+        //     var result = (await db.QueryAsync<dynamic>("USP_ProductionVsPlan", new { CompanyID = companyID, SiteID = siteID}, commandType: CommandType.StoredProcedure)).ToList();
+        //     return Ok(result);
+        // }
     }
 }

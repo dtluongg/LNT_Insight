@@ -27,12 +27,12 @@ export const ProductionOutputTableModal: React.FC<ProductionOutputTableModalProp
     },
     {
       header: 'Day Output',
-      accessor: (row: SewingTeamDetail) => (row.DayOutput != null ? row.DayOutput.toLocaleString() : '-'),
+      accessor: (row: SewingTeamDetail) => (row.OutputQty != null ? row.OutputQty.toLocaleString() : '-'),
       className: 'text-right',
     },
     {
       header: 'Day Target',
-      accessor: (row: SewingTeamDetail) => (row.DayTarget != null ? row.DayTarget.toLocaleString() : '-'),
+      accessor: (row: SewingTeamDetail) => (row.MOPlanQty != null ? row.MOPlanQty.toLocaleString() : '-'),
       className: 'text-right',
     },
     {

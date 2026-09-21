@@ -70,8 +70,10 @@ namespace Backend_LNT_Insight.Services.Auth
 
             // Get list company follow user:
             var userCompanies = (await db.QueryAsync<CompanyDto>(
-                    "select * from [dbo].[tblMastUserCompany] where UserID = @UserID",
-                    new { userFind.UserID }
+                    // "select * from [lntdev-db01].[FXPRO].[dbo].[tblMastUserCompany] where UserID = @UserID",
+                    "USP_FXPRO_Insight_GetMastUserCompany",
+                    new { userFind.UserID },
+                    commandType: CommandType.StoredProcedure
                 )).ToList();
 
 

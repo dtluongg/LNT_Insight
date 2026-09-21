@@ -110,8 +110,8 @@ export const DashboardPage: React.FC = () => {
             }
           }
           // neu như object co bien thuoc sectionID thi tiep tuc cong don:
-          acc[dataGroup].DayTargetTotal += cur.DayTarget;
-          acc[dataGroup].DayOutputTotal += cur.DayOutput;
+          acc[dataGroup].DayTargetTotal += cur.MOPlanQty;
+          acc[dataGroup].DayOutputTotal += cur.OutputQty;
           acc[dataGroup].DayPercent = (acc[dataGroup].DayTargetTotal) / (acc[dataGroup].DayOutputTotal);
           return acc;
         }, {} as Record<number, any>);
@@ -154,8 +154,8 @@ export const DashboardPage: React.FC = () => {
   };
 
   // Calculate dynamic stats for active day
-  const totalOutput = dataSewingTeamSummary[0]?.DayOutput ?? 0;
-  const totalTarget = dataSewingTeamSummary[0]?.DayTarget ?? 0;
+  const totalOutput = dataSewingTeamSummary[0]?.OutputQty ?? 0;
+  const totalTarget = dataSewingTeamSummary[0]?.MOPlanQty ?? 0;
   const achievementRate = totalTarget > 0 ? (totalOutput / totalTarget) * 100 : 0;
   const inspection = dataSewingTeamSummary[0]?.InspectedQty ?? 0;
   const defect = dataSewingTeamSummary[0]?.DefectQty ?? 0;
@@ -163,8 +163,8 @@ export const DashboardPage: React.FC = () => {
   const defectGMT = `${defect}/${defectRate}%`;
 
   // Stats for previous working day
-  const prevOutput = prevDataSewingTeamSummary[0]?.DayOutput ?? 0;
-  const prevTarget = prevDataSewingTeamSummary[0]?.DayTarget ?? 0;
+  const prevOutput = prevDataSewingTeamSummary[0]?.OutputQty ?? 0;
+  const prevTarget = prevDataSewingTeamSummary[0]?.MOPlanQty ?? 0;
   const prevAchievementRate = prevTarget > 0 ? (prevOutput / prevTarget) * 100 : 0;
   const prevInspection = prevDataSewingTeamSummary[0]?.InspectedQty ?? 0;
   const prevDefectRate = prevDataSewingTeamSummary[0]?.DefectRate ?? 0;
@@ -179,12 +179,12 @@ export const DashboardPage: React.FC = () => {
   // Highest contributing team for Key Insights
 
   const getHighestTeam = productionData.length > 0
-    ? [...productionData].sort((a, b) => (b.DayOutput ?? 0) - (a.DayOutput ?? 0))[0]
+    ? [...productionData].sort((a, b) => (b.OutputQty ?? 0) - (a.OutputQty ?? 0))[0]
     : null;
-  const highestTeam = (getHighestTeam?.DayOutput ?? 0) > 0 ? getHighestTeam : null;
+  const highestTeam = (getHighestTeam?.OutputQty ?? 0) > 0 ? getHighestTeam : null;
 
-  const highestContrib = (totalOutput > 0 && highestTeam?.DayOutput)
-    ? ((highestTeam.DayOutput / totalOutput) * 100).toFixed(1)
+  const highestContrib = (totalOutput > 0 && highestTeam?.OutputQty)
+    ? ((highestTeam.OutputQty / totalOutput) * 100).toFixed(1)
     : '';
 
   // Render
@@ -443,7 +443,7 @@ export const DashboardPage: React.FC = () => {
                     {/* Brown Target Line */}
                     <Line
                       type="monotone"
-                      dataKey="DayTarget"
+                      dataKey="MOPlanQty"
                       name="Target"
                       stroke="#d6951b"
                       strokeWidth={2.5}
@@ -454,7 +454,7 @@ export const DashboardPage: React.FC = () => {
 
                     {/* Blue Output Bar */}
                     <Bar
-                      dataKey="DayOutput"
+                      dataKey="OutputQty"
                       name="Output"
                       fill="#38BDF8"
                       radius={[3, 3, 0, 0]}

@@ -66,8 +66,8 @@ export interface SectionInfo {
 // }
 
 export interface SewingTeamSummay {
-    DayOutput: number;
-    DayTarget: number;
+    OutputQty: number;  // DayOutPut
+    MOPlanQty: number;  // DayTarget
     InspectedQty: number;
     DefectQty: number;
     DefectRate: number;
@@ -78,8 +78,8 @@ export interface SewingTeamDetail {
     TeamID: number;
     TeamNo: string;
     TeamName: string;
-    DayOutput: number;
-    DayTarget: number;
+    OutputQty: number;  // DayOutPut
+    MOPlanQty: number;  // DayTarget
     InspectedQty: number;
     DefectQty: number;
     DefectRate: number;

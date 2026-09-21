@@ -47,8 +47,9 @@ namespace Backend_LNT_Insight.Controllers
             }
 
             using var db = CreateConnection();
-            string sql = "SELECT CompanyID, CompanyCode, CompanyName FROM [lntdev-db01].[FXPRO].[dbo].[tblCompanyInformation] WHERE CompanyTypeCode = 'MUF' AND ActiveFlag = 1";
-            var result = (await db.QueryAsync<dynamic>(sql)).ToList();
+            // string sql = "SELECT CompanyID, CompanyCode, CompanyName FROM [lntdev-db01].[FXPRO].[dbo].[tblCompanyInformation] WHERE CompanyTypeCode = 'MUF' AND ActiveFlag = 1";
+            var sql = "USP_FXPRO_Insight_GetCompanies";
+            var result = (await db.QueryAsync<dynamic>(sql, commandType:CommandType.StoredProcedure)).ToList();
             return Ok(result);
         }
 
@@ -61,8 +62,9 @@ namespace Backend_LNT_Insight.Controllers
             }
 
             using var db = CreateConnection();
-            string sql = "SELECT SiteID, SiteCode, SiteName FROM [lntdev-db01].[FXPRO].[dbo].[tblCompanySiteInformation] WHERE CompanyID = @CompanyID AND ManufacturingSiteFlag = 1 AND ActiveFlag = 1";
-            var result = (await db.QueryAsync<dynamic>(sql, new { CompanyID = companyID })).ToList();
+            // string sql = "SELECT SiteID, SiteCode, SiteName FROM [lntdev-db01].[FXPRO].[dbo].[tblCompanySiteInformation] WHERE CompanyID = @CompanyID AND ManufacturingSiteFlag = 1 AND ActiveFlag = 1";
+            var sql = "USP_FXPRO_Insight_GetSitesByCompany";
+            var result = (await db.QueryAsync<dynamic>(sql, new { CompanyID = companyID }, commandType: CommandType.StoredProcedure)).ToList();
             return Ok(result);
         }
 
@@ -75,23 +77,24 @@ namespace Backend_LNT_Insight.Controllers
             }
 
             using var db = CreateConnection();
-            string sql = "SELECT SectionID, SectionNo, SectionName FROM [lntdev-db01].[FXPRO].[dbo].[tblCompanySiteDepartmentSection] WHERE CompanyID = @CompanyID AND SiteID = @SiteID AND DepartmentID = @DepartmentID AND ActiveFlag = 1";
-            var result = (await db.QueryAsync<dynamic>(sql, new { CompanyID = companyID, SiteID = siteID, DepartmentID = departmentID })).ToList();
+            // string sql = "SELECT SectionID, SectionNo, SectionName FROM [lntdev-db01].[FXPRO].[dbo].[tblCompanySiteDepartmentSection] WHERE CompanyID = @CompanyID AND SiteID = @SiteID AND DepartmentID = @DepartmentID AND ActiveFlag = 1";
+            var sql = "USP_FXPRO_Insight_GetSectionsByCompanyAndSite";
+            var result = (await db.QueryAsync<dynamic>(sql, new { CompanyID = companyID, SiteID = siteID, DepartmentID = departmentID }, commandType: CommandType.StoredProcedure)).ToList();
             return Ok(result);
         }
 
-        [HttpGet("{companyID}/sites/{siteID}/sections/{sectionID}/date/{dateDay}/production-vs-plan")]
-        public async Task<IActionResult> GetProductionVsPlan(string companyID, string siteID, int sectionID, DateTime dateDay)
-        {
-            if (_useLocalMockData)
-            {
-                return GetMockData("GetProductionVsPlan.json");
-            }
+        // [HttpGet("{companyID}/sites/{siteID}/sections/{sectionID}/date/{dateDay}/production-vs-plan")]
+        // public async Task<IActionResult> GetProductionVsPlan(string companyID, string siteID, int sectionID, DateTime dateDay)
+        // {
+        //     if (_useLocalMockData)
+        //     {
+        //         return GetMockData("GetProductionVsPlan.json");
+        //     }
 
-            using var db = CreateConnection();
-            var result = (await db.QueryAsync<dynamic>("USP_ProductionVsPlan", new { CompanyID = companyID, SiteID = siteID, SectionID = sectionID, Date = dateDay.Date }, commandType: CommandType.StoredProcedure)).ToList();
-            return Ok(result);
-        }
+        //     using var db = CreateConnection();
+        //     var result = (await db.QueryAsync<dynamic>("USP_ProductionVsPlan", new { CompanyID = companyID, SiteID = siteID, SectionID = sectionID, Date = dateDay.Date }, commandType: CommandType.StoredProcedure)).ToList();
+        //     return Ok(result);
+        // }
         // [HttpGet("{companyID}/sites/{siteID}/date/{dateDay}/section/{sectionID}/shift_work")]
         // public async Task<IActionResult> GetShiftWorkList(string companyID, string siteID, DateTime dateDay, int sectionID)
         // {
@@ -152,7 +155,8 @@ namespace Backend_LNT_Insight.Controllers
         //     return Ok(result);
         // }
 
-        // data for detail table chart
+        // data for detail table chart 
+        // Function PRODUCTION OUTPUT STATUS
         [HttpGet("{companyID}/sites/{siteID}/sections/{sectionID}/date/{dateDay}/sewing_detail")]
         public async Task<IActionResult> GetSewingTeamPerformanceDetails(string companyID, string siteID, int sectionID, DateTime dateDay)
         {
@@ -176,7 +180,7 @@ namespace Backend_LNT_Insight.Controllers
                 return GetMockData("GetWorkshiftList.json");
             }
             using var db = CreateConnection();
-            var result = (await db.QueryAsync<dynamic>("USP_Dashboard_WorkShift_GetList", new{CompanyID = companyID, SiteID = siteID, WorkDate = dateDay.Date, SectionID = sectionID}, commandType: CommandType.StoredProcedure)).ToList();
+            var result = (await db.QueryAsync<dynamic>("USP_FXPRO_Insight_Dashboard_WorkShift_GetList", new{CompanyID = companyID, SiteID = siteID, WorkDate = dateDay.Date, SectionID = sectionID}, commandType: CommandType.StoredProcedure)).ToList();
             return Ok(result);
         }
         // Get Analysis data by shiftwork for show on popup when click bar on chart table.
@@ -188,11 +192,14 @@ namespace Backend_LNT_Insight.Controllers
                 return GetMockData("GetDataSewingTeamAnalysis.json");
             }
             using var db = CreateConnection();
-            var result = (await db.QueryAsync<dynamic>("USP_Dashboard_SewingTeamOutputAnalysis_GetData", new{CompanyID = companyID, SiteID = siteID, Date = dateDay.Date, TeamID = teamID, ShiftWorkID = shiftworkID}, commandType: CommandType.StoredProcedure)).ToList();
+            // var result = (await db.QueryAsync<dynamic>("USP_Dashboard_SewingTeamOutputAnalysis_GetData", new{CompanyID = companyID, SiteID = siteID, Date = dateDay.Date, TeamID = teamID, ShiftWorkID = shiftworkID}, commandType: CommandType.StoredProcedure)).ToList();
+            // var result = (await db.QueryAsync<dynamic>("USP_Dashboard_SewingTeamOutputAnalysis_GetData_WithoutOrder", new{CompanyID = companyID, SiteID = siteID, Date = dateDay.Date, TeamID = teamID, ShiftWorkID = shiftworkID}, commandType: CommandType.StoredProcedure)).ToList();
+            var result = (await db.QueryAsync<dynamic>("USP_FXPRO_Insight_Dashboard_SewingTeamOutputAnalysis_GetData", new{CompanyID = companyID, SiteID = siteID, Date = dateDay.Date, TeamID = teamID, ShiftWorkID = shiftworkID}, commandType: CommandType.StoredProcedure)).ToList();
+
             return Ok(result);
         }
 
-        // data for after popup when click bar on table chart
+        // data for bellow popup when click bar on table chart
         [HttpGet("{companyID}/sites/{siteID}/sections/{sectionID}/date/{dateDay}/team/{teamID}/team_defect_analysis")]
         public async Task<IActionResult> GetDataTeamSewingDefectAnalysis(string companyID, string siteID, int sectionID, DateTime dateDay, int teamID )
         {
