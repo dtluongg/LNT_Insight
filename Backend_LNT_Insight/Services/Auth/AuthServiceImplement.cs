@@ -48,7 +48,7 @@ namespace Backend_LNT_Insight.Services.Auth
                 };
             }
 
-            // xác thực mật khẩu:
+            // [SỬA TẠI ĐÂY]: Xác thực thông minh - Chấp nhận cả 2 loại mật khẩu và không cập nhật DB
             if (string.IsNullOrEmpty(userFind.Password) || !PWHelperHash.VerifyPassword(loginRequest.Password, userFind.Password))
             {
                 return new LoginResponse
@@ -71,7 +71,7 @@ namespace Backend_LNT_Insight.Services.Auth
             // Get list company follow user:
             var userCompanies = (await db.QueryAsync<CompanyDto>(
                     "select * from [dbo].[tblMastUserCompany] where UserID = @UserID",
-                    new {userFind.UserID}
+                    new { userFind.UserID }
                 )).ToList();
 
 
@@ -116,7 +116,7 @@ namespace Backend_LNT_Insight.Services.Auth
         public async Task<bool> ResetPasswordAsync(ResetPasswordRequest resetPasswordRequest)
         {
             using IDbConnection db = new SqlConnection(_connectionString);
-            
+
             // Check if user exists first to verify the target username is valid
             var userExists = await db.ExecuteScalarAsync<int>(
                 "SELECT COUNT(1) FROM tblMastUser WHERE UserID = @UserID",
