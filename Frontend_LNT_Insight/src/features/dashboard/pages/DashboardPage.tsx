@@ -226,7 +226,7 @@ export const DashboardPage: React.FC = () => {
               title="TOTAL OUTPUT"
               value={totalOutput.toLocaleString()}
               subtitle="Cumulative Actual Output (PCS)"
-              icon={<SettingsIcon size={20} />}
+              icon={<TrendingUp size={20} />}
               trendValue={outputTrend.trendValue}
               trendType={outputTrend.trendType}
               trendLabel="vs. previous day"
@@ -237,7 +237,7 @@ export const DashboardPage: React.FC = () => {
               title="ACHIEVEMENT RATE"
               value={`${achievementRate.toFixed(1)}%`}
               subtitle="Actual Output / Shift Plan"
-              icon={<TargetIcon size={20} />}
+              icon={<CheckCircle2 size={20} />}
               trendValue={rateTrend.trendValue}
               trendType={rateTrend.trendType}
               trendLabel="vs. previous day"
@@ -259,11 +259,11 @@ export const DashboardPage: React.FC = () => {
               title="DEFECT GMT"
               value={defectGMT.toString()}
               subtitle="Defect (PCS) / Defect Rate"
-              icon={<ShieldAlert size={20} />}
+              icon={<AlertTriangle size={20} />}
               trendValue={defectTrend.trendValue}
               trendType={defectTrend.trendType}
               trendLabel="vs. previous day"
-              titleColorClass="text-[#590a1a]"
+              // titleColorClass="text-[#590a1a]"
               onClick={() => setIsDefectModalOpen(true)}
             />
           </div>
@@ -556,14 +556,14 @@ export const DashboardPage: React.FC = () => {
 
               {/* Item 4: Defect rate */}
               <div className="flex items-center gap-3.5 sm:px-4">
-                <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-full bg-blue-50 text-[#590a1a]/90 flex items-center justify-center shrink-0">
                   <AlertTriangle size={18} />
                 </div>
                 <div>
                   <div className="text-[13px] font-medium text-slate-500">
                     Defect rate {defectTrend.diff <= 0 ? 'decreased' : 'increased'}
                   </div>
-                  <div className={`text-[19px] font-bold leading-tight ${defectTrend.diff <= 0 ? 'text-blue-600' : 'text-rose-600'}`}>
+                  <div className={`text-[19px] font-bold leading-tight ${defectTrend.diff <= 0 ? 'text-[#590a1a]/90' : 'text-rose-600'}`}>
                     {defectTrend.trendValue}
                   </div>
                   <div className="text-[12px] text-slate-400">vs. previous day</div>
