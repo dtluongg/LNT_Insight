@@ -258,10 +258,10 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                             </p>
                             <div className="flex items-baseline">
                                 <p className="text-2xl font-semibold text-green-500">
-                                    {production.DayOutput?.toLocaleString() ?? 0}/
+                                    {production.OutputQty?.toLocaleString() ?? 0}/
                                 </p>
                                 <p className="text-lg font-semibold text-amber-400">
-                                    {production.DayTarget?.toLocaleString() ?? 0}
+                                    {production.MOPlanQty?.toLocaleString() ?? 0}
                                 </p>
                             </div>
                         </div>
@@ -285,14 +285,14 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                             </p>
                         </div>
 
-                        <div>
+                        {/* <div>
                             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                                 Section
                             </p>
                             <p className="mt-1 text-sm font-bold text-slate-700 truncate">
                                 {filter.SectionName || `Section ${filter.SectionID}`}
                             </p>
-                        </div>
+                        </div> */}
 
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
