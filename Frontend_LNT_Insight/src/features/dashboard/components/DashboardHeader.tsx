@@ -176,11 +176,28 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
     const prevWorkingDay = getPreviousWorkingDay(draftFilter.Date);
 
     const handleJumpToPreviousDay = () => {
-        const prevDate = getPreviousWorkingDay(draftFilter.Date);
+        const prevDate = prevWorkingDay;
         if (!prevDate) return;
         const newFilter = {
             ...draftFilter,
             Date: prevDate
+        };
+        setDraftFilter(newFilter);
+        onApplyFilter(newFilter);
+        setLatestUpdate(
+            new Date().toLocaleString('vi-VN', { hour12: false })
+        );
+    };
+
+    // =========================================================
+    const nextWorkingDay = getNextWorkingDay(draftFilter.Date);
+
+    const handleJumpToNextWorkingDay = () => {
+        const nextDate = nextWorkingDay;
+        if(!nextDate) return;
+        const newFilter = {
+            ...draftFilter,
+            Date: nextDate
         };
         setDraftFilter(newFilter);
         onApplyFilter(newFilter);
@@ -264,10 +281,29 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                         <span className="text-xs text-slate-400 font-medium">
                             Latest Update: {latestUpdate}
                         </span>
+                        
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200/60 shadow-xs">
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                             Previous Day Comparison: {prevWorkingDay}
                         </span>
+                        <button
+                            type="button"
+                            onClick={handleJumpToPreviousDay}
+                            disabled={isLoading}
+                            title={`Load Previous Working Day (${prevWorkingDay})`}
+                            className="h-full py-0.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-700 flex items-center gap-1 text-[13px] font-bold shadow-xs transition-all cursor-pointer disabled:opacity-60 shrink-0"
+                        >
+                            <ChevronLeft size={16} className="text-slate-600" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleJumpToNextWorkingDay}
+                            disabled={isLoading}
+                            title={`Load Next Working Day (${nextWorkingDay})`}
+                            className="h-full py-0.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-700 flex items-center gap-1 text-[13px] font-bold shadow-xs transition-all cursor-pointer disabled:opacity-60 shrink-0"
+                        >
+                            <ChevronRight size={16} className="text-slate-600" />
+                        </button>
                     </div>
                 </div>
             </div>
@@ -281,7 +317,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                         <span className="text-[12px] font-bold tracking-wider uppercase">DAY</span>
                     </div>
                     <div className="relative flex items-center gap-1.5">
-                        <button
+                        {/* <button
                             type="button"
                             onClick={handleJumpToPreviousDay}
                             disabled={isLoading}
@@ -289,7 +325,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                             className="h-10 px-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-700 flex items-center gap-1 text-[13px] font-bold shadow-xs transition-all cursor-pointer disabled:opacity-60 shrink-0"
                         >
                             <ChevronLeft size={16} className="text-slate-600" />
-                        </button>
+                        </button> */}
                         <input
                             type="date"
                             value={draftFilter.Date}
@@ -297,6 +333,15 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                             onChange={handleDateChange}
                             className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-[14px] font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer"
                         />
+                        {/* <button
+                            type="button"
+                            onClick={handleJumpToNextWorkingDay}
+                            disabled={isLoading}
+                            title={`Load Next Working Day (${nextWorkingDay})`}
+                            className="h-10 px-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-700 flex items-center gap-1 text-[13px] font-bold shadow-xs transition-all cursor-pointer disabled:opacity-60 shrink-0"
+                        >
+                            <ChevronRight size={16} className="text-slate-600" />
+                        </button> */}
                     </div>
                 </div>
 

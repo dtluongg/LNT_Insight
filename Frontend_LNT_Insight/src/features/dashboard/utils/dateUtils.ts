@@ -31,5 +31,14 @@ export const getNextWorkingDay = (dateInput: string): string => { // dateInput m
         date.setDate(date.getDate() + 1);
     }
 
+    // prevent now day
+    const dateToday = new Date();
+    dateToday.setHours(0, 0, 0, 0);
+    const targetDate = new Date(date);
+    targetDate.setHours(0, 0, 0, 0);
+    if(targetDate.getTime() > dateToday.getTime()){
+        return dateInput;
+    }
+    
     return date.toISOString().split('T')[0];
 }

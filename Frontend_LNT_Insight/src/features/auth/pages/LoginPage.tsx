@@ -232,7 +232,7 @@ export const LoginPage: React.FC = () => {
 
           {/* Clean Footer */}
           <div className="mt-8 pt-5 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500">
-            <span>&copy; 2026 LNTSoft Team</span>
+            <span>&copy; 2026 LNTSOFT BUSINESS SOLUTION</span>
             <span className="flex items-center gap-1 text-slate-400">
               <ShieldCheck size={12} className="text-cyan-400" />
               256-bit Encrypted
