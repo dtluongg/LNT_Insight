@@ -311,7 +311,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             {/* Filters & Actions Form */}
             <div className="flex flex-wrap items-end gap-3">
                 {/* 1. Date Input */}
-                <div className="flex flex-col gap-1.5 items-center">
+                <div className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-1.5 text-slate-700">
                         <Calendar size={13} className="text-slate-600" />
                         <span className="text-[12px] font-bold tracking-wider uppercase">DAY</span>
