@@ -71,26 +71,26 @@ const CustomizedContent = (props: any) => {
                     x={x + width / 2}
                     y={y + height / 2 - 4}
                     textAnchor="middle"
-                    fill="#fff"
-                    fontSize={11}
-                    fontWeight={600}
+                    fill="#0f172a"
+                    fontSize={19}
+                    fontWeight={100}
                     className="select-none pointer-events-none"
                 >
                     {name.split('/')[0]}
                 </text>
             )}
-            {width > 60 && height > 45 && (
+            {width > 60 && height > 30 && (
                 <text
                     x={x + width / 2}
                     y={y + height / 2 + 12}
                     textAnchor="middle"
-                    fill="#fff"
-                    fontSize={10}
-                    fontWeight={500}
+                    fill="#0f172a"
+                    fontSize={14}
+                    fontWeight={100}
                     opacity={0.95}
                     className="select-none pointer-events-none"
                 >
-                    {value} Qty
+                    Qty: {value} 
                 </text>
             )}
         </g>
@@ -627,7 +627,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                         <Treemap
                                             data={defectChartData}
                                             dataKey="value"
-                                            stroke="#fff"
+                                            stroke="#000"
                                             fill="#8884d8"
                                             content={<CustomizedContent />}
                                         >

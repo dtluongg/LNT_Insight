@@ -52,8 +52,8 @@ export const ProductionOutputTableModal: React.FC<ProductionOutputTableModalProp
     },
   ];
 
-  const totalOutput = data.reduce((sum, item) => sum + (item.DayOutput || 0), 0);
-  const totalTarget = data.reduce((sum, item) => sum + (item.DayTarget || 0), 0);
+  const totalOutput = data.reduce((sum, item) => sum + (item. OutputQty || 0), 0);
+  const totalTarget = data.reduce((sum, item) => sum + (item.MOPlanQty || 0), 0);
   const totalInspected = data.reduce((sum, item) => sum + (item.InspectedQty || 0), 0);
   const totalDefect = data.reduce((sum, item) => sum + (item.DefectQty || 0), 0);
 

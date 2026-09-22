@@ -61,14 +61,14 @@ const CustomizedContent = (props: any) => {
                     y={y + height / 2 - 4}
                     textAnchor="middle"
                     fill="#0f172a"
-                    fontSize={16}
+                    fontSize={19}
                     fontWeight={100}
                     className="select-none pointer-events-none"
                 >
                     {name.split('/')[0]}
                 </text>
             )}
-            {width > 60 && height > 45 && (
+            {width > 60 && height > 30 && (
                 <text
                     x={x + width / 2}
                     y={y + height / 2 + 12}
@@ -79,7 +79,7 @@ const CustomizedContent = (props: any) => {
                     opacity={0.95}
                     className="select-none pointer-events-none"
                 >
-                    {value} Qty
+                    Qty: {value}
                 </text>
             )}
         </g>
@@ -184,7 +184,7 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
                                 Section
                             </p>
                             <p className="mt-1 text-sm font-bold text-slate-700 truncate">
-                                {filter.SectionName || `Section ${filter.SectionID}`}
+                                {`${filter.SectionName}`}
                             </p>
                         </div>
 
@@ -200,14 +200,14 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
 
                     {/* KPI Cards */}
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                        <div className="rounded-xl border border-green-100 bg-green-300-50/50 p-5 transition-all hover:shadow-xs">
-                            <p className="text-xs font-bold uppercase tracking-wider text-green-400">
+                        <div className="rounded-xl border border-[#A855F7]/10 bg-[#A855F7]/10 p-5 transition-all hover:shadow-xs">
+                            <p className="text-xs font-bold uppercase tracking-wider text-[#A855F7]">
                                 Inspected Qty
                             </p>
-                            <p className="mt-1.5 text-2xl font-semibold text-green-700">
+                            <p className="mt-1.5 text-2xl font-semibold text-[#A855F7]">
                                 {inspectedQty.toLocaleString()}
                             </p>
-                            <p className="mt-0.5 text-xs text-green-500 font-medium">Total sewing inspected</p>
+                            <p className="mt-0.5 text-xs text-[#A855F7] font-medium">Total sewing inspected</p>
                         </div>
 
                         <div className="rounded-xl border border-rose-100 bg-rose-50/50 p-5 transition-all hover:shadow-xs">

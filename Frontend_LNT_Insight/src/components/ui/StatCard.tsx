@@ -63,12 +63,12 @@ const variantStyles: Record<
     bgPreviewColor: 'bg-[#A855F7]/[0.19]'
   },
   defect: {
-    border: 'border-[#0D9488]',
-    title: 'text-[#0D9488]',
-    iconBg: 'bg-[#0D9488]',
-    sparkline: '#0D9488',
-    textPreviewColor: 'text-[#0D9488]',
-    bgPreviewColor: 'bg-[#0D9488]/[0.19]'
+    border: 'border-[#590a1a]',
+    title: 'text-[#590a1a]',
+    iconBg: 'bg-[#590a1a]',
+    sparkline: '#590a1a',
+    textPreviewColor: 'text-[#590a1a]',
+    bgPreviewColor: 'bg-[#590a1a]/[0.19]'
   },
 };
 
@@ -103,12 +103,7 @@ export const StatCard: React.FC<StatCardProps> = ({
     >
       {/* Top row: Circle Icon + Content */}
       <div className="flex items-start gap-3 p-2">
-        {/* Solid circular icon badge */}
-        <div
-          className={`w-11 h-11 rounded-full flex items-center justify-center text-white shrink-0 shadow-xs ${iconBackground}`}
-        >
-          {icon}
-        </div>
+        
 
         {/* Title, Value, Subtitle */}
         <div className="flex-1 min-w-0">
@@ -123,6 +118,12 @@ export const StatCard: React.FC<StatCardProps> = ({
           <span className="block text-[15px] font-medium text-slate-400 mt-0.5 truncate">
             {subtitle}
           </span>
+        </div>
+        {/* Solid circular icon badge */}
+        <div
+          className={`w-13 h-13 m-2 rounded-full flex items-center justify-center text-white shrink-0 shadow-xs ${iconBackground}`}
+        >
+          {icon}
         </div>
       </div>
 

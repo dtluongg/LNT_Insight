@@ -81,7 +81,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                             SiteID: firstSite.SiteID,
                             SiteCode: firstSite.SiteCode,
                             SectionID: '0',
-                            SectionName: ''
+                            SectionName: 'Section All'
                         }));
                     } else {
                         setDraftFilter(prev => ({
@@ -89,7 +89,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                             SiteID: '',
                             SiteCode: '',
                             SectionID: '0',
-                            SectionName: ''
+                            SectionName: 'Section All'
                         }));
                     }
                 }
@@ -116,7 +116,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                     setDraftFilter(prev => ({
                         ...prev,
                         SectionID: '0',
-                        SectionName: ''
+                        SectionName: 'Section All'
                     }));
                     return;
                 }
@@ -135,7 +135,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                     setDraftFilter(prev => ({
                         ...prev,
                         SectionID: '0',
-                        SectionName: ''
+                        SectionName: 'Section All'
                     }));
                 }
             } catch (err) {
@@ -156,7 +156,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             SiteID: siteID,
             SiteCode: site?.SiteCode || '',
             SectionID: '0',
-            SectionName: ''
+            SectionName: 'Section All'
         }));
     };
     // =========================================================
@@ -168,7 +168,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
         setDraftFilter(prev => ({
             ...prev,
             SectionID: sectionID,
-            SectionName: sectionID === '0' ? 'All' : (section?.SectionName || '')
+            SectionName: sectionID === '0' ? 'Section All' : (section?.SectionName || '')
         }));
     };
     // =========================================================

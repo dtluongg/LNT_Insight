@@ -16,7 +16,8 @@ import {
   Lightbulb,
   TrendingUp,
   CheckCircle2,
-  BarChart2
+  BarChart2,
+  ShieldAlert,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -247,7 +248,7 @@ export const DashboardPage: React.FC = () => {
               title="QUALITY INSPECTED GMT"
               value={inspection.toString()}
               subtitle="Sewing End line Inspection"
-              icon={<AlertTriangle size={20} />}
+              icon={<ShieldCheck size={20} />}
               trendValue={qualityTrend.trendValue}
               trendType={qualityTrend.trendType}
               trendLabel="vs. previous day"
@@ -258,11 +259,11 @@ export const DashboardPage: React.FC = () => {
               title="DEFECT GMT"
               value={defectGMT.toString()}
               subtitle="Defect (PCS) / Defect Rate"
-              icon={<ShieldCheck size={20} />}
+              icon={<ShieldAlert size={20} />}
               trendValue={defectTrend.trendValue}
               trendType={defectTrend.trendType}
               trendLabel="vs. previous day"
-              titleColorClass="text-[#0D9488]"
+              titleColorClass="text-[#590a1a]"
               onClick={() => setIsDefectModalOpen(true)}
             />
           </div>
