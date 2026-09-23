@@ -38,13 +38,13 @@ namespace Backend_LNT_Insight.Controllers
             return Ok(result);
         }
 
-        // [HttpGet("users")]
-        // public async Task<IActionResult> GetUsers()
-        // {
-        //     using var db = CreateConnection();
-        //     var result = (await db.QueryAsync<dynamic>("USP_MD_GetUsers", commandType: CommandType.StoredProcedure)).ToList();
-        //     return Ok(result);
-        // }
+        [HttpGet("users")]
+        public async Task<IActionResult> GetUsers()
+        {
+            using var db = CreateConnection();
+            var result = (await db.QueryAsync<dynamic>("USP_FXPRO_Insight_GetInfoUser", commandType: CommandType.StoredProcedure)).ToList();
+            return Ok(result);
+        }
 
         // [HttpGet("company/{companyID}site/{siteID}")]
         // public async Task<IActionResult> GetProductionVsPlan(string companyID, string siteID)

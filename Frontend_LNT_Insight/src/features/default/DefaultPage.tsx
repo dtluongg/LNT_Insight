@@ -12,13 +12,13 @@ import {
   BarChart3
 } from 'lucide-react';
 
-interface BlankPageProps {
+interface DefaultPageProps {
   title?: string;
   subtitle?: string;
   moduleCode?: string;
 }
 
-export const BlankPage: React.FC<BlankPageProps> = ({ 
+export const DefaultPage: React.FC<DefaultPageProps> = ({ 
   title = 'System Module',
   subtitle = 'This feature is currently in the active development and UI integration roadmap.',
   moduleCode

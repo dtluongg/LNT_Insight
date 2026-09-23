@@ -111,7 +111,7 @@ export const LoginPage: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-2xl font-black text-white tracking-wider">LNT</span>
+              <span className="text-2xl font-black text-white tracking-wider">LNTBOOST</span>
               <span className="text-2xl font-black bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300 bg-clip-text text-transparent tracking-wider">
                 INSIGHT
               </span>
