@@ -22,7 +22,7 @@ import { getModuleRoute, getSubModuleRoute } from '../app/routesConfig';
 import { createPortal } from 'react-dom';
 
 // Hàm ánh xạ Icon dựa trên tên hoặc ID phân hệ
-const getModuleIcon = (ModuleName: string, id: string) => {
+const getModuleIcon = (ModuleName: string) => {
   const nameLower = String(ModuleName).toLowerCase();
 
   if (nameLower.includes('executive')) {
@@ -162,7 +162,7 @@ export const Sidebar: React.FC = () => {
                             className={`shrink-0 transition-colors ${isActive ? 'text-[var(--color-brand-cyan)]' : 'text-blue-200/70 group-hover:text-white'
                               }`}
                           >
-                            {getModuleIcon(module.ModuleMasterName, module.ModuleMasterID)}
+                            {getModuleIcon(module.ModuleMasterName)}
                           </div>
 
                           {!isCollapsed && (
@@ -192,7 +192,7 @@ export const Sidebar: React.FC = () => {
                   {!isCollapsed && isExpanded && submodules[module.ModuleMasterID] && (
                     <div className="mt-1 ml-5 pl-3 border-l border-white/15 space-y-0.5">
                       {submodules[module.ModuleMasterID].map((sub) => {
-                        const route = getSubModuleRoute(sub.ModuleMasterID, sub.ModuleMasterSubID);
+                        const route = getSubModuleRoute(sub.ModuleMasterID, Number(sub.ModuleMasterSubID));
                         const path = route?.path ?? `/coming-soon`;
 
                         return (

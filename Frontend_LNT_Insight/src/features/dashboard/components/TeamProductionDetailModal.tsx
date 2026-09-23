@@ -3,7 +3,6 @@ import {
     ResponsiveContainer,
     ComposedChart,
     Bar,
-    Line,
     XAxis,
     YAxis,
     CartesianGrid,
@@ -23,7 +22,7 @@ import { EndlineDefectAnalysisTableModal } from './EndlineDefectAnalysisTableMod
 interface TeamProductionDetailModalProps {
     open: boolean;
     filter: DashboardFilter;
-    production: SewingTeamDetail;
+    production: SewingTeamDetail | null;
     onClose: () => void;
 }
 
@@ -511,7 +510,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                         backgroundColor: 'rgba(15, 23, 42, 0.95)',
                                                         color: '#f8fafc'
                                                     }}
-                                                    formatter={(val: any, name: string) => {
+                                                    formatter={(val: any, name: any) => {
                                                         if (name === 'Running Output') return [val?.toLocaleString(), name];
                                                         if (name === 'Cumulative Variance') return [`${val?.toLocaleString()}`, name];
                                                         return [val, name];
