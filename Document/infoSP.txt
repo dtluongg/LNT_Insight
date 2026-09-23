@@ -1,0 +1,18 @@
+1. USP_FXPRO_Insight_CheckUser - AuthServiceImplement - Line 38
+2. USP_FXPRO_Insight_Dashboard_SewingTeamOutputAnalysis_GetData - CompanyController - Line 197
+3. USP_FXPRO_Insight_Dashboard_WorkShift_GetList - CompanyController - Line 183
+4. USP_FXPRO_Insight_GetCompanies - CompanyController - Line 151
+5. USP_FXPRO_Insight_GetInfoAllUser - no 
+6. USP_FXPRO_Insight_GetInfoUser - AuthServiceImplement - Line 62
+7. USP_FXPRO_Insight_GetMastUserCompany - AuthServiceImplement - Line 74
+8. USP_FXPRO_Insight_GetModules - MasterDataController - Line 29
+9. USP_FXPRO_Insight_GetSectionsByCompanyAndSite - CompanyController - Line 81
+10. USP_FXPRO_Insight_GetSitesByCompany - CompanyController - Line 66
+11. USP_FXPRO_Insight_GetSubModules - MasterDataController - Line 37
+12. USP_FXPRO_Insight_SaveRefreshToken - AuthServiceImplement - Line 86
+13. USP_FXPRO_Insight_SewingTeamPerformance_DefectDetail - CompanyController - Line 145 & 210
+14. USP_FXPRO_Insight_SewingTeamPerformance_Detail - CompanyController - Line 169
+15. USP_FXPRO_Insight_SewingTeamPerformance_Summary - CompanyController - Line 133
+
+
+
