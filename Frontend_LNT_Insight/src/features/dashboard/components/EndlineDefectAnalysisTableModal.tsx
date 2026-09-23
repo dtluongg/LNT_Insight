@@ -14,49 +14,55 @@ export const EndlineDefectAnalysisTableModal: React.FC<EndlineDefectAnalysisTabl
     data,
     onClose,
 }) => {
-    const dataSort = [...data].sort((a, b) => b.DefectQty - a.DefectQty);
-    if (!open) return null;
+    // sap xep lai du lieu 
+    // const dataSortASC = data
+    //     .map((item, index) => ({ index, value: item.DefectQty })) // tao 1 mang moi
+    //     .sort((a, b) => a.value - b.value)
+    //     .map(sorted => data[sorted.index]);
 
+    // const dataSort = [...data].sort((a, b) => a.DefectQty - b.DefectQty);
+    const dataSort = [...data].sort((a, b) => b.DefectQty - a.DefectQty);
+    // ==================================================================================
+    if (!open) return null;
     const columnsForTable = [
         {
             header: 'Defect Name',
             accessor: (row: OverallDefectAnalysis) => (row.DefectName != null ? row.DefectName.toLocaleString() : '-'),
-            className: 'text-left font-semibold text-slate-800 dark:text-slate-100',
+            className: 'text-right',
         },
         {
             header: 'Defect Qty',
             accessor: (row: OverallDefectAnalysis) => (row.DefectQty != null ? row.DefectQty.toLocaleString() : '-'),
-            className: 'text-right font-bold text-rose-600 dark:text-rose-400',
+            className: 'text-right',
         }
     ];
-
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-6"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6"
             onClick={onClose}
         >
             <div
-                className="w-full max-w-4xl rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] transition-colors duration-200"
+                className="w-full max-w-6xl rounded-xl bg-white shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex-shrink-0">
+                <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 flex-shrink-0">
                     <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                             <Layers size={22} />
                         </div>
                         <div>
-                            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+                            <h2 className="text-lg font-bold text-slate-800">
                                 Defect Analysis Table Detail
                             </h2>
-                            <p className="text-xs text-slate-400 dark:text-slate-400">
+                            <p className="text-xs text-slate-400">
                                 Detailed Defect Name, Defect Qty
                             </p>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 text-xl font-bold cursor-pointer transition-colors"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 text-xl font-bold cursor-pointer transition-colors"
                     >
                         ×
                     </button>
@@ -73,5 +79,5 @@ export const EndlineDefectAnalysisTableModal: React.FC<EndlineDefectAnalysisTabl
                 </div>
             </div>
         </div>
-    );
-};
+    )
+}

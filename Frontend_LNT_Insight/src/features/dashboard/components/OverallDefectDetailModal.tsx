@@ -132,26 +132,26 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-6"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6"
             onClick={onClose}
         >
             <div
-                className="w-full max-w-8xl rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] transition-colors duration-200"
+                className="w-full max-w-8xl rounded-xl bg-white shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex-shrink-0">
+                <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 flex-shrink-0">
                     <div>
-                        <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
+                        <h2 className="text-lg font-semibold text-slate-800">
                             Defect GMT Detail (Overall)
                         </h2>
-                        <p className="mt-1 text-sm text-slate-400 dark:text-slate-400">
+                        <p className="mt-1 text-sm text-slate-400">
                             Overall Defect Analysis
                         </p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 text-xl font-bold transition-colors cursor-pointer"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 text-xl font-bold"
                     >
                         ×
                     </button>
@@ -160,39 +160,39 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
                 {/* Content - Scrollable if content overflows */}
                 <div className="overflow-y-auto p-6 space-y-6 flex-1">
                     {/* Dashboard Filter Information */}
-                    <div className="grid grid-cols-2 gap-4 border border-slate-100 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-800/40 p-4 md:grid-cols-4">
+                    <div className="grid grid-cols-2 gap-4 border border-slate-100 rounded-xl bg-slate-50/50 p-4 md:grid-cols-4">
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                                 Company
                             </p>
-                            <p className="mt-1 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">
+                            <p className="mt-1 text-sm font-bold text-slate-700 truncate">
                                 {filter.CompanyName || filter.CompanyID}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                                 Site
                             </p>
-                            <p className="mt-1 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">
+                            <p className="mt-1 text-sm font-bold text-slate-700 truncate">
                                 {filter.SiteCode || filter.SiteID}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                                 Section
                             </p>
-                            <p className="mt-1 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">
+                            <p className="mt-1 text-sm font-bold text-slate-700 truncate">
                                 {`${filter.SectionName}`}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                                 Date
                             </p>
-                            <p className="mt-1 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">
+                            <p className="mt-1 text-sm font-bold text-slate-700 truncate">
                                 {filter.Date}
                             </p>
                         </div>
@@ -200,68 +200,69 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
 
                     {/* KPI Cards */}
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                        <div className="rounded-xl border border-purple-500/20 dark:border-purple-500/30 bg-purple-500/10 dark:bg-purple-950/40 p-5 transition-all hover:shadow-xs">
-                            <p className="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
+                        <div className="rounded-xl border border-[#A855F7]/10 bg-[#A855F7]/10 p-5 transition-all hover:shadow-xs">
+                            <p className="text-xs font-bold uppercase tracking-wider text-[#A855F7]">
                                 Inspected Qty
                             </p>
-                            <p className="mt-1.5 text-2xl font-semibold text-purple-600 dark:text-purple-400">
+                            <p className="mt-1.5 text-2xl font-semibold text-[#A855F7]">
                                 {inspectedQty.toLocaleString()}
                             </p>
-                            <p className="mt-0.5 text-xs text-purple-500 dark:text-purple-400 font-medium">Total sewing inspected</p>
+                            <p className="mt-0.5 text-xs text-[#A855F7] font-medium">Total sewing inspected</p>
                         </div>
 
-                        <div className="rounded-xl border border-rose-100 dark:border-rose-900/60 bg-rose-50/50 dark:bg-rose-950/40 p-5 transition-all hover:shadow-xs">
-                            <p className="text-xs font-bold uppercase tracking-wider text-rose-400 dark:text-rose-400">
+                        <div className="rounded-xl border border-rose-100 bg-rose-50/50 p-5 transition-all hover:shadow-xs">
+                            <p className="text-xs font-bold uppercase tracking-wider text-rose-400">
                                 Defect Qty
                             </p>
-                            <p className="mt-1.5 text-2xl font-semibold text-rose-600 dark:text-rose-400">
+                            <p className="mt-1.5 text-2xl font-semibold text-rose-600">
                                 {defectQty.toLocaleString()}
                             </p>
-                            <p className="mt-0.5 text-xs text-rose-500 dark:text-rose-400 font-medium">Total defective pieces</p>
+                            <p className="mt-0.5 text-xs text-rose-500 font-medium">Total defective pieces</p>
                         </div>
 
-                        <div className="rounded-xl border border-amber-100 dark:border-amber-900/60 bg-amber-50/50 dark:bg-amber-950/40 p-5 transition-all hover:shadow-xs">
-                            <p className="text-xs font-bold uppercase tracking-wider text-amber-500 dark:text-amber-400">
+                        <div className="rounded-xl border border-amber-100 bg-amber-50/50 p-5 transition-all hover:shadow-xs">
+                            <p className="text-xs font-bold uppercase tracking-wider text-amber-400">
                                 Defect Rate
                             </p>
-                            <p className="mt-1.5 text-2xl font-semibold text-amber-600 dark:text-amber-400">
+                            <p className="mt-1.5 text-2xl font-semibold text-amber-600">
                                 {defectRate.toFixed(2)}%
                             </p>
-                            <p className="mt-0.5 text-xs text-amber-500 dark:text-amber-400 font-medium">Defective pieces ratio</p>
+                            <p className="mt-0.5 text-xs text-amber-500 font-medium">Defective pieces ratio</p>
                         </div>
                     </div>
 
                     {/* Chart Block Container */}
                     <div className="flex flex-col gap-3">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider pl-1">
+                            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1">
                                 Defect Distribution Chart (Treemap)
                             </h3>
                             <button
                                 type='button'
                                 onClick={() => setIsDataDetailTableOverallDefectOpen(true)}
-                                className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+                                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
                                 title="View defect detail data table"
                             >
                                 <Ellipsis size={18} />
                             </button>
                         </div>
 
+
                         {loading ? (
-                            <div className="flex h-80 items-center justify-center border border-slate-100 dark:border-slate-800 rounded-xl bg-slate-50/20 dark:bg-slate-800/20">
+                            <div className="flex h-80 items-center justify-center border border-slate-100 rounded-xl bg-slate-50/20">
                                 <div className="flex flex-col items-center gap-3">
                                     <div className="w-8 h-8 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
                                     <span className="text-xs font-semibold text-slate-400">Loading defect details...</span>
                                 </div>
                             </div>
                         ) : defects.length === 0 ? (
-                            <div className="flex h-80 items-center justify-center border border-dashed border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/10">
+                            <div className="flex h-80 items-center justify-center border border-dashed border-slate-200 rounded-xl bg-slate-50/10">
                                 <span className="text-sm text-slate-400 font-medium">
                                     No defect details available for the selected filters.
                                 </span>
                             </div>
                         ) : (
-                            <div className="bg-slate-50/50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+                            <div className="bg-slate-50/30 p-4 rounded-xl border border-slate-100/80">
                                 <ResponsiveContainer width="100%" height={360}>
                                     <Treemap
                                         data={chartData}
@@ -275,15 +276,15 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
                                                 if (active && payload && payload.length) {
                                                     const data = payload[0].payload;
                                                     return (
-                                                        <div className="bg-white dark:bg-slate-900 p-3 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 max-w-xs">
+                                                        <div className="bg-white p-3 rounded-lg shadow-lg border border-slate-100 max-w-xs">
                                                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Defect Category</p>
-                                                            <p className="text-xs font-bold text-slate-800 dark:text-slate-100 mt-1 leading-snug">{data.name}</p>
-                                                            <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 justify-between">
+                                                            <p className="text-xs font-bold text-slate-800 mt-1 leading-snug">{data.name}</p>
+                                                            <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100 justify-between">
                                                                 <div className="flex items-center gap-1.5">
                                                                     <div className="w-2 h-2 rounded-full bg-rose-500" />
-                                                                    <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">Qty</span>
+                                                                    <span className="text-xs text-slate-500 font-semibold">Qty</span>
                                                                 </div>
-                                                                <span className="text-xs font-bold text-rose-600 dark:text-rose-400">{data.value} PCS</span>
+                                                                <span className="text-xs font-bold text-rose-600">{data.value} PCS</span>
                                                             </div>
                                                         </div>
                                                     );

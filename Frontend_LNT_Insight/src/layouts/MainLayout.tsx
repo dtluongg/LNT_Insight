@@ -5,7 +5,7 @@ import { Header } from './Header';
 
 export const MainLayout: React.FC = () => {
   return (
-    <div className="flex w-full h-screen overflow-hidden bg-[var(--color-background)] text-[var(--color-text)] transition-colors duration-200 font-sans">
+    <div className="flex w-full h-screen overflow-hidden bg-slate-50 font-sans">
       {/* Sidebar */}
       <Sidebar />
 

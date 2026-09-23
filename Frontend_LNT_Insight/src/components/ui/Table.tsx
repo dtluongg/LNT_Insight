@@ -15,10 +15,10 @@ interface TableProps<T> {
 
 export function Table<T>({ columns, data, keyExtractor, className = '' }: TableProps<T>) {
   return (
-    <div className={`w-full overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-800 ${className}`}>
+    <div className={`w-full overflow-x-auto rounded-xl border border-slate-100 ${className}`}>
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="bg-slate-900 dark:bg-slate-950 border-b border-slate-800 dark:border-slate-800 text-slate-300 dark:text-slate-200 text-xs font-semibold uppercase tracking-wider">
+          <tr className="bg-slate-900 border-b border-slate-800 text-slate-300 text-xs font-semibold uppercase tracking-wider">
             {columns.map((column, index) => (
               <th key={index} className={`px-4 py-3.5 ${column.className || ''}`}>
                 {column.header}
@@ -26,9 +26,9 @@ export function Table<T>({ columns, data, keyExtractor, className = '' }: TableP
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-sm text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900">
+        <tbody className="divide-y divide-slate-100 text-sm text-slate-700 bg-white">
           {data.map((row, rowIndex) => (
-            <tr key={keyExtractor(row, rowIndex)} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+            <tr key={keyExtractor(row, rowIndex)} className="hover:bg-slate-50 transition-colors">
               {columns.map((column, colIndex) => {
                 const cellContent =
                   typeof column.accessor === 'function'
@@ -44,7 +44,7 @@ export function Table<T>({ columns, data, keyExtractor, className = '' }: TableP
           ))}
           {data.length === 0 && (
             <tr>
-              <td colSpan={columns.length} className="text-center py-8 text-slate-400 dark:text-slate-500">
+              <td colSpan={columns.length} className="text-center py-8 text-slate-400">
                 Không có dữ liệu.
               </td>
             </tr>
