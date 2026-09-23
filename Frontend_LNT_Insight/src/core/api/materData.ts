@@ -7,10 +7,10 @@ import type {
 
 
 export const masterDataApi = {
-    // getUsers: async (): Promise<MastUserInfo[]> => {
-    //     const raw = await apiFetch<any[]>('/MasterData/users');
-    //     return raw;
-    // },
+    getUsers: async (): Promise<MastUserInfo[]> => {
+        const raw = await apiFetch<any[]>('/MasterData/users');
+        return raw;
+    },
     getModules: async (): Promise<ModuleMasterInfo[]> => {
         const raw = await apiFetch<any[]>('/MasterData/modules');
         return raw;

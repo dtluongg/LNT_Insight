@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Sparkles, 
   ArrowLeft, 
-  Construction, 
   ShieldCheck, 
   Users, 
   Briefcase, 

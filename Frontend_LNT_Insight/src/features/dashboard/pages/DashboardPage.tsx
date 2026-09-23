@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { data, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../../app/providers/AuthProvider';
 import { DashboardHeader } from '../components/DashboardHeader';
 import { TeamProductionDetailModal } from '../components/TeamProductionDetailModal';
@@ -7,17 +7,14 @@ import { OverallDefectDetailModal } from '../components/OverallDefectDetailModal
 import { ProductionOutputTableModal } from '../components/ProductionOutputTableModal';
 import {
   Target as TargetIcon,
-  Settings as SettingsIcon,
   AlertTriangle,
   ShieldCheck,
   Ellipsis,
-  Activity,
   LayoutGrid,
   Lightbulb,
   TrendingUp,
   CheckCircle2,
   BarChart2,
-  ShieldAlert,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -28,7 +25,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
 } from 'recharts';
 import { StatCard } from '../../../components/ui/StatCard';
 import { companiesApi } from '../../../core/api/companies';
@@ -432,7 +428,7 @@ export const DashboardPage: React.FC = () => {
                         fontSize: '12px',
                         padding: '10px 14px'
                       }}
-                      formatter={(value: any, name: string) => {
+                      formatter={(value: any, name: any) => {
                         if (name === "Target") return [value ? value.toLocaleString() : '-', 'Target'];
                         if (name === "Output") return [value ? value.toLocaleString() : '0', 'Actual Output'];
                         if (name === "Inspected") return [value ? value.toLocaleString() : '0', 'Inspected'];

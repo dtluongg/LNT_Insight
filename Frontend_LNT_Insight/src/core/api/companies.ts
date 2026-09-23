@@ -1,5 +1,5 @@
 import { apiFetch } from './httpClient';
-import type { CompanyInfo, SiteInfo, SectionInfo, ProductionVsPlanInfo, SewingTeamSummay, SewingTeamDetail, OverallDefectAnalysis, WorkshiftInfo, SewingTeamAnalysis } from '../../types';
+import type { CompanyInfo, SiteInfo, SectionInfo, SewingTeamSummay, SewingTeamDetail, OverallDefectAnalysis, WorkshiftInfo, SewingTeamAnalysis } from '../../types';
 import { getPreviousWorkingDay } from '../../features/dashboard/utils/dateUtils';
 
 export const companiesApi = {
@@ -22,11 +22,11 @@ export const companiesApi = {
         const raw = await apiFetch<any[]>(`/companies/${companyID}/sites/${siteID}/sections?departmentID=${departmentID}`);
         return raw;
     },
-    getProductionVsPlan: async (companyID: string, siteID: string, sectionID: number, dateDay: Date): Promise<ProductionVsPlanInfo[]> => {
-        const formattedDate = dateDay.toISOString().split('T')[0];
-        const raw = await apiFetch<any[]>(`/companies/${companyID}/sites/${siteID}/sections/${sectionID}/date/${formattedDate}/production-vs-plan`);
-        return raw;
-    },
+    // getProductionVsPlan: async (companyID: string, siteID: string, sectionID: number, dateDay: Date): Promise<ProductionVsPlanInfo[]> => {
+    //     const formattedDate = dateDay.toISOString().split('T')[0];
+    //     const raw = await apiFetch<any[]>(`/companies/${companyID}/sites/${siteID}/sections/${sectionID}/date/${formattedDate}/production-vs-plan`);
+    //     return raw;
+    // },
     getTeamSewingSummary: async (companyID: string, siteID: string, sectionID: number, dateDay: Date): Promise<SewingTeamSummay[]> => {
         const formattedDate = dateDay.toISOString().split('T')[0];
         const raw = await apiFetch<any[]>(`/companies/${companyID}/sites/${siteID}/sections/${sectionID}/date/${formattedDate}/sewing_summary`);

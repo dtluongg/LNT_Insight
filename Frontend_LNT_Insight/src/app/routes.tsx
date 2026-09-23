@@ -4,7 +4,7 @@ import { useAuth } from './providers/AuthProvider';
 import { LoginPage } from '../features/auth/pages/LoginPage';
 import { DashboardPage } from '../features/dashboard/pages/DashboardPage';
 import { MainLayout } from '../layouts/MainLayout';
-import { BlankPage } from '../features/default/Blankpage';
+import { BlankPage } from '../features/default/BlankPage';
 import { DefaultPage } from '../features/default/DefaultPage';
 
 // Component bảo vệ Route yêu cầu Đăng nhập
