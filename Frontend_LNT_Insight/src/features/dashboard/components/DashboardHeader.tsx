@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, RefreshCw, ChevronDown, MapPin, Layers, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
+// import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../../app/providers/AuthProvider';
 import { companiesApi } from '../../../core/api/companies';
 // import { getPreviousWorkingDayClient } from '../../../utils/dateUtils';
@@ -22,7 +22,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
     // Master data
     const [sites, setSites] = useState<SiteInfo[]>([]);
     const [sections, setSections] = useState<SectionInfo[]>([]);
-    const [searchParams, setSearchParams] = useSearchParams();
+    // const [searchParams, setSearchParams] = useSearchParams();
     // =========================================================
 
     // Draft filter
@@ -40,7 +40,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
 
     // Sync draft khi Dashboard filter thay đổi từ bên ngoài
     useEffect(() => {
-        setDraftFilter(prev => ({
+        setDraftFilter(() => ({
             ...filter,
             CompanyID: selectedCompanyID || filter.CompanyID
         }));

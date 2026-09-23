@@ -2,8 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Sparkles, 
-  ArrowLeft, 
-  Construction, 
+  ArrowLeft,
   ShieldCheck, 
   Users, 
   Briefcase, 

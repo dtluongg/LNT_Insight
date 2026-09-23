@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import { DashboardPage } from "../features/dashboard/pages/DashboardPage";
-import { BlankPage } from "../features/blankPage/pages/BlankPage";
+// import { BlankPage } from "../features/blankPage/pages/BlankPage";
 
 export interface ModuleRouteConfig {
     moduleMasterID: string,
