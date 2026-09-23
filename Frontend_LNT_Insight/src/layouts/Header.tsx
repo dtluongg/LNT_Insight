@@ -181,7 +181,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
               >
                 <div className="flex items-center gap-2">
                   <Sun size={15} className="text-amber-500" />
-                  <span>Sáng</span>
+                  <span>Light</span>
                 </div>
                 {theme === 'light' && <Check size={14} className="text-blue-600 dark:text-blue-400" />}
               </button>
@@ -200,7 +200,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
               >
                 <div className="flex items-center gap-2">
                   <Moon size={15} className="text-indigo-400" />
-                  <span>Tối</span>
+                  <span>Dark</span>
                 </div>
                 {theme === 'dark' && <Check size={14} className="text-blue-600 dark:text-blue-400" />}
               </button>
@@ -219,7 +219,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
               >
                 <div className="flex items-center gap-2">
                   <Monitor size={15} className="text-slate-400" />
-                  <span>Hệ thống</span>
+                  <span>System</span>
                 </div>
                 {theme === 'system' && <Check size={14} className="text-blue-600 dark:text-blue-400" />}
               </button>
