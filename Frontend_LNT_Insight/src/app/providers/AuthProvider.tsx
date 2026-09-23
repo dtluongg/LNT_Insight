@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { User, LoginResponse } from '../../types';
+import type { User, LoginResponse, AuthorizedCompanyDto } from '../../types';
 import { authStorage } from '../../core/auth/authStorage';
 
 interface AuthContextType {
   user: User | null;
-  authorizedCompanies: string[]; // Danh sách mã các công ty được phân quyền
+  authorizedCompanies: AuthorizedCompanyDto[]; // Danh sách cac cong ty dc phan quyen
   selectedCompanyID: string;
   setSelectedCompanyID: (companyID: string) => void;
   loginMessage: string | null; // Message phản hồi khi đăng nhập
@@ -19,7 +19,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [authorizedCompanies, setAuthorizedCompanies] = useState<string[]>([]);
+  const [authorizedCompanies, setAuthorizedCompanies] = useState<AuthorizedCompanyDto[]>([]);
   const [selectedCompanyID, setSelectedCompanyIDState] = useState<string>('');
   const [loginMessage, setLoginMessage] = useState<string | null>(null);
 
@@ -37,12 +37,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const companies = authStorage.getAuthorizedCompanies();
       setAuthorizedCompanies(companies);
 
+      const companyIds = companies.map(c => c.companyID);
       const storedCompany = authStorage.getSelectedCompany();
-      const validCompany = (storedCompany && (companies.length === 0 || companies.includes(storedCompany)))
+      const validCompany = (storedCompany && (companyIds.length === 0 || companyIds.includes(storedCompany)))
         ? storedCompany
-        : (storedUser.defaultCompanyID && (companies.length === 0 || companies.includes(storedUser.defaultCompanyID)))
+        : (storedUser.defaultCompanyID && (companyIds.length === 0 || companyIds.includes(storedUser.defaultCompanyID)))
           ? storedUser.defaultCompanyID
-          : companies[0] || storedUser.defaultCompanyID || '';
+          : companyIds[0] || storedUser.defaultCompanyID || '';
 
       setSelectedCompanyIDState(validCompany);
       if (validCompany) {
@@ -60,20 +61,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     authStorage.setUser(data.user);
     setUser(data.user);
 
-    // Lưu danh sách mã công ty (lọc các giá trị trùng lặp)
-    const companyIds = Array.from(
-      new Set((data.authorizedCompanies || []).map((item) => item.companyID))
-    );
-    authStorage.setAuthorizedCompanies(companyIds);
-    setAuthorizedCompanies(companyIds);
+    // Lọc trùng lặp đối tượng dựa trên companyID
+    const uniqueCompanies = (data.authorizedCompanies || []).reduce<AuthorizedCompanyDto[]>((acc, current) => {
+      if (!acc.some(item => item.companyID === current.companyID)) {
+        acc.push(current);
+      }
+      return acc;
+    }, []);
 
+    authStorage.setAuthorizedCompanies(uniqueCompanies);
+    setAuthorizedCompanies(uniqueCompanies);
+
+    const companyIds = uniqueCompanies.map(c => c.companyID);
     const defaultCompany = (data.user?.defaultCompanyID && (companyIds.length === 0 || companyIds.includes(data.user.defaultCompanyID)))
       ? data.user.defaultCompanyID
       : companyIds[0] || data.user?.defaultCompanyID || '';
 
     changeSelectedCompanyID(defaultCompany);
-
-    // Lưu thông báo phản hồi (nếu có)
     setLoginMessage(data.message || null);
   };
 

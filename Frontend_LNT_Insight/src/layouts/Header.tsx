@@ -28,6 +28,17 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
 
   const [openPopupLogout, setOpenPopupLogout] = useState(false);
 
+  const currentCompany = authorizedCompanies.find((comp) => {
+    const id = typeof comp === 'string' ? comp : comp.companyID;
+    return id === selectedCompanyID;
+  });
+
+  const selectedCompanyName = currentCompany
+    ? (typeof currentCompany === 'object'
+        ? currentCompany.companyName || currentCompany.companyCode || currentCompany.companyID
+        : currentCompany)
+    : selectedCompanyID || 'Select Company';
+
   // Fetch full name from user auth or masterData API
   useEffect(() => {
     if (user?.fullName) {
@@ -87,21 +98,27 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
             <button
               type="button"
               onClick={() => setIsCompanyDropdownOpen(!isCompanyDropdownOpen)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 hover:border-blue-400 dark:hover:border-blue-500 shadow-xs hover:shadow-sm transition-all cursor-pointer group focus:outline-hidden"
+              className="relative p-[1.5px] rounded-2xl overflow-hidden cursor-pointer group focus:outline-hidden transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.98]"
             >
-              <Building2 size={16} className="text-blue-600 dark:text-blue-400 shrink-0" />
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase hidden sm:inline">
-                Company:
-              </span>
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-100 tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                {selectedCompanyID || 'Select Company'}
-              </span>
-              <ChevronDown
-                size={14}
-                className={`text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-transform duration-200 ${
-                  isCompanyDropdownOpen ? 'rotate-180 text-blue-600 dark:text-blue-400' : ''
-                }`}
-              />
+              {/* Hiệu ứng viền xoay chuyển động (Border Beam) khi hover */}
+              <span className="absolute inset-[-1000%] bg-[conic-gradient(from_90deg_at_50%_50%,#3b82f6_0%,#06b6d4_50%,#3b82f6_100%)] opacity-0 group-hover:opacity-100 group-hover:animate-[spin_3s_linear_infinite] transition-opacity duration-300 pointer-events-none" />
+
+              {/* Lớp nền và nội dung hiển thị to, rõ ràng hơn */}
+              <div className="relative flex items-center gap-2.5 px-4 py-2 rounded-[14px] bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 group-hover:border-transparent transition-colors">
+                <Building2 size={18} className="text-blue-600 dark:text-blue-400 shrink-0" />
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase hidden sm:inline tracking-wider">
+                  Company:
+                </span>
+                <span className="text-sm font-bold text-slate-800 dark:text-slate-100 tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  {selectedCompanyName}
+                </span>
+                <ChevronDown
+                  size={16}
+                  className={`text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-transform duration-200 ml-0.5 ${
+                    isCompanyDropdownOpen ? 'rotate-180 text-blue-600 dark:text-blue-400' : ''
+                  }`}
+                />
+              </div>
             </button>
 
             {/* Custom Company Dropdown */}
@@ -117,13 +134,17 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
                 </div>
                 <div className="max-h-56 overflow-y-auto space-y-0.5">
                   {authorizedCompanies.map((comp) => {
-                    const isSelected = comp === selectedCompanyID;
+                    const compID = typeof comp === 'string' ? comp : comp.companyID;
+                    const compName = typeof comp === 'object' ? (comp.companyName || comp.companyCode || comp.companyID) : comp;
+                    // const compCode = typeof comp === 'object' && comp.companyCode ? comp.companyCode : null;
+                    const isSelected = compID === selectedCompanyID;
+                    
                     return (
                       <button
-                        key={comp}
+                        key={compID}
                         type="button"
                         onClick={() => {
-                          setSelectedCompanyID(comp);
+                          setSelectedCompanyID(compID);
                           setIsCompanyDropdownOpen(false);
                         }}
                         className={`w-full flex items-center justify-between px-3 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
@@ -134,7 +155,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
                       >
                         <div className="flex items-center gap-2">
                           <Building2 size={14} className={isSelected ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'} />
-                          <span>{comp}</span>
+                          <span>{compName}</span>
                         </div>
                         {isSelected && <Check size={14} className="text-blue-600 dark:text-blue-400 shrink-0" />}
                       </button>

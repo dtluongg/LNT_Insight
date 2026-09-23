@@ -1,4 +1,4 @@
-import type { User } from '../../types';
+import type { AuthorizedCompanyDto, User } from '../../types';
 
 const TOKEN_KEY = 'auth_token';
 const REFRESH_TOKEN_KEY = 'auth_refresh_token';
@@ -29,17 +29,17 @@ export const authStorage = {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
   },
 
-  getAuthorizedCompanies: (): string[] => {
+  getAuthorizedCompanies: (): AuthorizedCompanyDto[] => {
     const data = localStorage.getItem(AUTHORIZED_COMPANIES_KEY);
     if (!data) return [];
     try {
-      return JSON.parse(data) as string[];
+      return JSON.parse(data) as AuthorizedCompanyDto[];
     } catch {
       return [];
     }
   },
 
-  setAuthorizedCompanies: (companies: string[]): void => {
+  setAuthorizedCompanies: (companies: AuthorizedCompanyDto[]): void => {
     localStorage.setItem(AUTHORIZED_COMPANIES_KEY, JSON.stringify(companies));
   },
 

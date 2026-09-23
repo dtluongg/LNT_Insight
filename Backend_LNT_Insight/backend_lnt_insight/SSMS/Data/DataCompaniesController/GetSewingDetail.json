@@ -1,0 +1,211 @@
+[
+  {
+    "SectionID": 1,
+    "TeamID": 1,
+    "TeamNo": "LINE-01",
+    "TeamName": "S1|LINE-01",
+    "OutputQty": 0,
+    "MOPlanQty": 199,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 1,
+    "TeamID": 2,
+    "TeamNo": "LINE-02",
+    "TeamName": "S1|LINE-02",
+    "OutputQty": 0,
+    "MOPlanQty": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 1,
+    "TeamID": 3,
+    "TeamNo": "LINE-03",
+    "TeamName": "S1|LINE-03",
+    "OutputQty": 0,
+    "MOPlanQty": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 1,
+    "TeamID": 4,
+    "TeamNo": "LINE-04",
+    "TeamName": "S1|LINE-04",
+    "OutputQty": 0,
+    "MOPlanQty": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 1,
+    "TeamID": 19,
+    "TeamNo": "LINE-01&03",
+    "TeamName": "S1|LINE-01&03",
+    "OutputQty": 0,
+    "MOPlanQty": 229,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 2,
+    "TeamID": 5,
+    "TeamNo": "LINE-05",
+    "TeamName": "S2|LINE-05",
+    "OutputQty": 51,
+    "MOPlanQty": 255,
+    "InspectedQty": 58,
+    "DefectQty": 5,
+    "DefectRate": 8.62
+  },
+  {
+    "SectionID": 2,
+    "TeamID": 6,
+    "TeamNo": "LINE-06",
+    "TeamName": "S2|LINE-06",
+    "OutputQty": 52,
+    "MOPlanQty": 288,
+    "InspectedQty": 68,
+    "DefectQty": 5,
+    "DefectRate": 7.35
+  },
+  {
+    "SectionID": 2,
+    "TeamID": 7,
+    "TeamNo": "LINE-07",
+    "TeamName": "S2|LINE-07",
+    "OutputQty": 168,
+    "MOPlanQty": 119,
+    "InspectedQty": 41,
+    "DefectQty": 3,
+    "DefectRate": 7.32
+  },
+  {
+    "SectionID": 2,
+    "TeamID": 8,
+    "TeamNo": "LINE-08",
+    "TeamName": "S2|LINE-08",
+    "OutputQty": 0,
+    "MOPlanQty": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 3,
+    "TeamID": 9,
+    "TeamNo": "LINE-09",
+    "TeamName": "S3|LINE-09",
+    "OutputQty": 0,
+    "MOPlanQty": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 3,
+    "TeamID": 10,
+    "TeamNo": "LINE-10",
+    "TeamName": "S3|LINE-10",
+    "OutputQty": 0,
+    "MOPlanQty": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 3,
+    "TeamID": 11,
+    "TeamNo": "LINE-11",
+    "TeamName": "S3|LINE-11",
+    "OutputQty": 0,
+    "MOPlanQty": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 3,
+    "TeamID": 12,
+    "TeamNo": "LINE-12",
+    "TeamName": "S3|LINE-12",
+    "OutputQty": 0,
+    "MOPlanQty": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 4,
+    "TeamID": 13,
+    "TeamNo": "LINE-13",
+    "TeamName": "S4|LINE-13",
+    "OutputQty": 0,
+    "MOPlanQty": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 4,
+    "TeamID": 14,
+    "TeamNo": "LINE-14",
+    "TeamName": "S4|LINE-14",
+    "OutputQty": 0,
+    "MOPlanQty": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 4,
+    "TeamID": 15,
+    "TeamNo": "LINE-15",
+    "TeamName": "S5|LINE-15",
+    "OutputQty": 0,
+    "MOPlanQty": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 4,
+    "TeamID": 16,
+    "TeamNo": "LINE-16",
+    "TeamName": "S5|LINE-16",
+    "OutputQty": 0,
+    "MOPlanQty": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 5,
+    "TeamID": 17,
+    "TeamNo": "LINE-17",
+    "TeamName": "S5|LINE-17",
+    "OutputQty": 0,
+    "MOPlanQty": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  },
+  {
+    "SectionID": 5,
+    "TeamID": 18,
+    "TeamNo": "LINE-18",
+    "TeamName": "S5|LINE-18",
+    "OutputQty": 0,
+    "MOPlanQty": 0,
+    "InspectedQty": 0,
+    "DefectQty": 0,
+    "DefectRate": null
+  }
+]

@@ -1,0 +1,52 @@
+{
+    "isSuccess": true,
+    "message": "",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiTE5UU09GVDMiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTc4OTcyMDk3NCwiaXNzIjoiTE5UQk9PU1RfRU1TIiwiYXVkIjoiTE5UQk9PU1RfRU1TX1VzZXJzIn0.t2vEyahUjcT_wp4dkgwqE64MRV9xSiJopLWiSH043LQ",
+    "refreshToken": "+S4govUVXOpQY7r5QNBDAXDzUC/OWmAL/HZJV7buBapT6marR4dOlw5x4xsqQ6ZRbmr7anU3DY6+8lwf9o/B9w==",
+    "user": {
+        "username": "LNTSOFT3",
+        "fullName": "LNTSOFT_3",
+        "email": "",
+        "isAdmin": true,
+        "defaultCompanyID": "COM01",
+        "defaultSiteID": null
+    },
+    "authorizedCompanies": [
+        {
+            "companyID": "COM01"
+        },
+        {
+            "companyID": "COM02"
+        },
+        {
+            "companyID": "COM03"
+        },
+        {
+            "companyID": "COM04"
+        },
+        {
+            "companyID": "COM05"
+        },
+        {
+            "companyID": "COM07"
+        },
+        {
+            "companyID": "COM01"
+        },
+        {
+            "companyID": "COM02"
+        },
+        {
+            "companyID": "COM03"
+        },
+        {
+            "companyID": "COM04"
+        },
+        {
+            "companyID": "COM05"
+        },
+        {
+            "companyID": "COM07"
+        }
+    ]
+}

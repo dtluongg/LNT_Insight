@@ -89,6 +89,8 @@ namespace Backend_LNT_Insight.Dtos.AuthDto
 
     public record CompanyDto {
         public string CompanyID { get; init; } = string.Empty;
+        public string CompanyCode {get; init;} = string.Empty;
+        public string CompanyName {get; init;} = string.Empty;
     }
 
     public record SiteDto

@@ -1,0 +1,22 @@
+[
+    {
+        "CompanyID": "COM01",
+        "CompanyCode": "CM1",
+        "CompanyName": "COMPANY- 01 "
+    },
+    {
+        "CompanyID": "COM02",
+        "CompanyCode": "CM2",
+        "CompanyName": "COMPANY- 02"
+    },
+    {
+        "CompanyID": "COM03",
+        "CompanyCode": "CM3",
+        "CompanyName": "COMPANY- 03"
+    },
+    {
+        "CompanyID": "COM07",
+        "CompanyCode": "CM7",
+        "CompanyName": "COMPANY- 07"
+    }
+]

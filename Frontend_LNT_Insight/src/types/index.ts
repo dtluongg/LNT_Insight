@@ -8,6 +8,8 @@ export interface User {
 }
 export interface AuthorizedCompanyDto {
     companyID: string;
+    companyCode?: string;
+    companyName?: string;
 }
 // Cấu trúc phản hồi từ API Đăng nhập thành công
 export interface LoginResponse {
