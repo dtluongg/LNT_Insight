@@ -4,7 +4,8 @@ import { useAuth } from './providers/AuthProvider';
 import { LoginPage } from '../features/auth/pages/LoginPage';
 import { DashboardPage } from '../features/dashboard/pages/DashboardPage';
 import { MainLayout } from '../layouts/MainLayout';
-import { BlankPage } from '../features/blankPage/pages/BlankPage';
+import { BlankPage } from '../features/default/Blankpage';
+import { DefaultPage } from '../features/default/DefaultPage';
 
 // Component bảo vệ Route yêu cầu Đăng nhập
 const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
@@ -38,7 +39,7 @@ const PublicRoute: React.FC<{ children: React.ReactElement }> = ({ children }) =
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/coming-soon" replace />;
+    return <Navigate to="/blankpage" replace />;
   }
 
   return children;
@@ -56,9 +57,13 @@ export const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/coming-soon" replace />} />
+        <Route index element={<Navigate to="/blankpage" replace />} />
         <Route
           path="coming-soon"
+          element={<DefaultPage />}
+        />
+        <Route
+          path="blankpage"
           element={<BlankPage />}
         />
         <Route
@@ -78,6 +83,7 @@ export const AppRoutes: React.FC = () => {
       />
 
       {/* Catch-all route chuyển về trang gốc */}
+      {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
