@@ -23,7 +23,7 @@ export const ProductionOutputTableModal: React.FC<ProductionOutputTableModalProp
     {
       header: 'Team Name',
       accessor: 'TeamName' as const,
-      className: 'font-semibold text-slate-800',
+      className: 'font-semibold text-slate-800 dark:text-slate-100',
     },
     {
       header: 'Day Output',
@@ -52,38 +52,38 @@ export const ProductionOutputTableModal: React.FC<ProductionOutputTableModalProp
     },
   ];
 
-  const totalOutput = data.reduce((sum, item) => sum + (item. OutputQty || 0), 0);
+  const totalOutput = data.reduce((sum, item) => sum + (item.OutputQty || 0), 0);
   const totalTarget = data.reduce((sum, item) => sum + (item.MOPlanQty || 0), 0);
   const totalInspected = data.reduce((sum, item) => sum + (item.InspectedQty || 0), 0);
   const totalDefect = data.reduce((sum, item) => sum + (item.DefectQty || 0), 0);
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-6"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-6xl rounded-xl bg-white shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="w-full max-w-6xl rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] transition-colors duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 flex-shrink-0">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400">
               <Layers size={22} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-800">
+              <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
                 Production Output Status - Detail Table
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-400 dark:text-slate-400">
                 Detailed production, inspection, and defect status by team
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 text-xl font-bold cursor-pointer transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 text-xl font-bold cursor-pointer transition-colors"
           >
             ×
           </button>
@@ -92,39 +92,39 @@ export const ProductionOutputTableModal: React.FC<ProductionOutputTableModalProp
         {/* Content */}
         <div className="overflow-y-auto p-6 space-y-5 flex-1">
           {/* Filter badges */}
-          <div className="grid grid-cols-2 gap-4 border border-slate-100 rounded-xl bg-slate-50/60 p-4 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 border border-slate-100 dark:border-slate-800 rounded-xl bg-slate-50/60 dark:bg-slate-800/40 p-4 md:grid-cols-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-400">
                 Company
               </p>
-              <p className="mt-1 text-sm font-bold text-slate-700 truncate">
+              <p className="mt-1 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">
                 {filter.CompanyName || filter.CompanyID}
               </p>
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-400">
                 Site
               </p>
-              <p className="mt-1 text-sm font-bold text-slate-700 truncate">
+              <p className="mt-1 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">
                 {filter.SiteCode || filter.SiteID}
               </p>
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-400">
                 Section
               </p>
-              <p className="mt-1 text-sm font-bold text-slate-700 truncate">
+              <p className="mt-1 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">
                 {filter.SectionName || `Section ${filter.SectionID}`}
               </p>
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-400">
                 Date
               </p>
-              <p className="mt-1 text-sm font-bold text-slate-700 truncate">
+              <p className="mt-1 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">
                 {filter.Date}
               </p>
             </div>
@@ -132,21 +132,21 @@ export const ProductionOutputTableModal: React.FC<ProductionOutputTableModalProp
 
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="rounded-lg border border-slate-100 bg-white p-3 shadow-xs">
-              <span className="text-xs text-slate-400 font-medium">Total Teams</span>
-              <p className="text-lg font-bold text-slate-800">{data.length}</p>
+            <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/60 p-3 shadow-xs">
+              <span className="text-xs text-slate-400 dark:text-slate-400 font-medium">Total Teams</span>
+              <p className="text-lg font-bold text-slate-800 dark:text-slate-100">{data.length}</p>
             </div>
-            <div className="rounded-lg border border-slate-100 bg-white p-3 shadow-xs">
-              <span className="text-xs text-slate-400 font-medium">Total Output</span>
-              <p className="text-lg font-bold text-blue-600">{totalOutput.toLocaleString()} PCS</p>
+            <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/60 p-3 shadow-xs">
+              <span className="text-xs text-slate-400 dark:text-slate-400 font-medium">Total Output</span>
+              <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{totalOutput.toLocaleString()} PCS</p>
             </div>
-            <div className="rounded-lg border border-slate-100 bg-white p-3 shadow-xs">
-              <span className="text-xs text-slate-400 font-medium">Total Target</span>
-              <p className="text-lg font-bold text-slate-700">{totalTarget.toLocaleString()} PCS</p>
+            <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/60 p-3 shadow-xs">
+              <span className="text-xs text-slate-400 dark:text-slate-400 font-medium">Total Target</span>
+              <p className="text-lg font-bold text-slate-700 dark:text-slate-200">{totalTarget.toLocaleString()} PCS</p>
             </div>
-            <div className="rounded-lg border border-slate-100 bg-white p-3 shadow-xs">
-              <span className="text-xs text-slate-400 font-medium">Total Defect</span>
-              <p className="text-lg font-bold text-amber-600">{totalDefect.toLocaleString()} / {totalInspected.toLocaleString()}</p>
+            <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/60 p-3 shadow-xs">
+              <span className="text-xs text-slate-400 dark:text-slate-400 font-medium">Total Defect</span>
+              <p className="text-lg font-bold text-amber-600 dark:text-amber-400">{totalDefect.toLocaleString()} / {totalInspected.toLocaleString()}</p>
             </div>
           </div>
 

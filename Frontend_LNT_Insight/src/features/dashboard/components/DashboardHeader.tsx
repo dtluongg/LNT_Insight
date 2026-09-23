@@ -247,12 +247,12 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
     // =========================================================
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-xs px-4 py-2 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 shrink-0">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs px-4 py-2 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 shrink-0 transition-colors duration-200">
             {/* Title info with Sewing Machine Icon */}
             <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-sky-100/70 border border-sky-200/50 flex items-center justify-center shrink-0 shadow-xs">
+                <div className="w-12 h-12 rounded-2xl bg-sky-100/70 dark:bg-sky-950/60 border border-sky-200/50 dark:border-sky-800/50 flex items-center justify-center shrink-0 shadow-xs">
                     <svg
-                        className="w-6 h-6 text-sky-600"
+                        className="w-6 h-6 text-sky-600 dark:text-sky-400"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -274,15 +274,15 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                     </svg>
                 </div>
                 <div className="flex flex-col">
-                    <h1 className="text-xl lg:text-2xl font-bold text-slate-800 tracking-tight leading-tight">
+                    <h1 className="text-xl lg:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-tight">
                         Sewing Team Performance
                     </h1>
                     <div className="flex flex-wrap items-center gap-2 mt-0.5">
-                        <span className="text-xs text-slate-400 font-medium">
+                        <span className="text-xs text-slate-400 dark:text-slate-400 font-medium">
                             Latest Update: {latestUpdate}
                         </span>
                         
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200/60 shadow-xs">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60 shadow-xs">
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                             Previous Day Comparison: {prevWorkingDay}
                         </span>
@@ -291,18 +291,18 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                             onClick={handleJumpToPreviousDay}
                             disabled={isLoading}
                             title={`Load Previous Working Day (${prevWorkingDay})`}
-                            className="h-full py-0.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-700 flex items-center gap-1 text-[13px] font-bold shadow-xs transition-all cursor-pointer disabled:opacity-60 shrink-0"
+                            className="h-full py-0.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center gap-1 text-[13px] font-bold shadow-xs transition-all cursor-pointer disabled:opacity-60 shrink-0"
                         >
-                            <ChevronLeft size={16} className="text-slate-600" />
+                            <ChevronLeft size={16} className="text-slate-600 dark:text-slate-300" />
                         </button>
                         <button
                             type="button"
                             onClick={handleJumpToNextWorkingDay}
                             disabled={isLoading}
                             title={`Load Next Working Day (${nextWorkingDay})`}
-                            className="h-full py-0.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-700 flex items-center gap-1 text-[13px] font-bold shadow-xs transition-all cursor-pointer disabled:opacity-60 shrink-0"
+                            className="h-full py-0.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center gap-1 text-[13px] font-bold shadow-xs transition-all cursor-pointer disabled:opacity-60 shrink-0"
                         >
-                            <ChevronRight size={16} className="text-slate-600" />
+                            <ChevronRight size={16} className="text-slate-600 dark:text-slate-300" />
                         </button>
                     </div>
                 </div>
@@ -312,43 +312,25 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
             <div className="flex flex-wrap items-end gap-3">
                 {/* 1. Date Input */}
                 <div className="flex flex-col gap-1.5">
-                    <div className="flex items-center gap-1.5 text-slate-700">
-                        <Calendar size={13} className="text-slate-600" />
+                    <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                        <Calendar size={13} className="text-slate-600 dark:text-slate-400" />
                         <span className="text-[12px] font-bold tracking-wider uppercase">DAY</span>
                     </div>
                     <div className="relative flex items-center gap-1.5">
-                        {/* <button
-                            type="button"
-                            onClick={handleJumpToPreviousDay}
-                            disabled={isLoading}
-                            title={`Load Previous Working Day (${prevWorkingDay})`}
-                            className="h-10 px-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-700 flex items-center gap-1 text-[13px] font-bold shadow-xs transition-all cursor-pointer disabled:opacity-60 shrink-0"
-                        >
-                            <ChevronLeft size={16} className="text-slate-600" />
-                        </button> */}
                         <input
                             type="date"
                             value={draftFilter.Date}
                             max={todayStr}
                             onChange={handleDateChange}
-                            className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-[14px] font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer"
+                            className="h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 text-[14px] font-semibold text-slate-700 dark:text-slate-100 shadow-xs hover:border-slate-300 dark:hover:border-slate-600 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer"
                         />
-                        {/* <button
-                            type="button"
-                            onClick={handleJumpToNextWorkingDay}
-                            disabled={isLoading}
-                            title={`Load Next Working Day (${nextWorkingDay})`}
-                            className="h-10 px-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-700 flex items-center gap-1 text-[13px] font-bold shadow-xs transition-all cursor-pointer disabled:opacity-60 shrink-0"
-                        >
-                            <ChevronRight size={16} className="text-slate-600" />
-                        </button> */}
                     </div>
                 </div>
 
                 {/* 2. Site Select */}
                 <div className="flex flex-col gap-1.5 min-w-[130px]">
-                    <div className="flex items-center gap-1.5 text-slate-700">
-                        <MapPin size={13} className="text-slate-600" />
+                    <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                        <MapPin size={13} className="text-slate-600 dark:text-slate-400" />
                         <span className="text-[12px] font-bold tracking-wider uppercase">SITE</span>
                     </div>
                     <div className="relative">
@@ -356,20 +338,20 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                             value={draftFilter.SiteID}
                             onChange={handleSiteChange}
                             disabled={siteOptions.length === 0}
-                            className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-3 pr-8 text-[14px] font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer appearance-none disabled:bg-slate-50 disabled:opacity-60"
+                            className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 pl-3 pr-8 text-[14px] font-semibold text-slate-700 dark:text-slate-100 shadow-xs hover:border-slate-300 dark:hover:border-slate-600 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer appearance-none disabled:bg-slate-50 dark:disabled:bg-slate-900 disabled:opacity-60"
                         >
                             {siteOptions.map(si => (
-                                <option key={si.value} value={si.value}>{si.label}</option>
+                                <option key={si.value} value={si.value} className="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100">{si.label}</option>
                             ))}
                         </select>
-                        <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                        <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none" />
                     </div>
                 </div>
 
                 {/* 3. Section Select */}
                 <div className="flex flex-col gap-1.5 min-w-[110px]">
-                    <div className="flex items-center gap-1.5 text-slate-700">
-                        <Layers size={13} className="text-slate-600" />
+                    <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                        <Layers size={13} className="text-slate-600 dark:text-slate-400" />
                         <span className="text-[12px] font-bold tracking-wider uppercase">SECTION</span>
                     </div>
                     <div className="relative">
@@ -377,13 +359,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                             value={draftFilter.SectionID}
                             onChange={handleSectionChange}
                             disabled={sectionOptions.length === 0}
-                            className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-3 pr-8 text-[14px] font-semibold text-slate-700 shadow-xs hover:border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer appearance-none disabled:bg-slate-50 disabled:opacity-60"
+                            className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 pl-3 pr-8 text-[14px] font-semibold text-slate-700 dark:text-slate-100 shadow-xs hover:border-slate-300 dark:hover:border-slate-600 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer appearance-none disabled:bg-slate-50 dark:disabled:bg-slate-900 disabled:opacity-60"
                         >
                             {sectionOptions.map(se => (
-                                <option key={se.value} value={se.value}>{se.label}</option>
+                                <option key={se.value} value={se.value} className="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100">{se.label}</option>
                             ))}
                         </select>
-                        <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                        <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none" />
                     </div>
                 </div>
 

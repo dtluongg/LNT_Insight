@@ -239,25 +239,25 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-6"
             onClick={onClose}
         >
             <div
-                className="w-full max-w-8xl rounded-xl bg-white shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+                className="w-full max-w-8xl rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] transition-colors duration-200"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 flex-shrink-0">
+                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex-shrink-0">
                     <div>
-                        <h2 className="text-lg font-semibold text-slate-800">
+                        <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
                             Production Detail
                         </h2>
                         <div className="flex items-center justify-between mt-1 gap-6" >
-                            <p className="mt-1 text-lg font-semibold text-slate-600">
+                            <p className="mt-1 text-lg font-semibold text-slate-600 dark:text-slate-300">
                                 Team: {production.TeamName}
                             </p>
                             <div className="flex items-baseline">
-                                <p className="text-2xl font-semibold text-green-500">
+                                <p className="text-2xl font-semibold text-emerald-500 dark:text-emerald-400">
                                     {production.OutputQty?.toLocaleString() ?? 0}/
                                 </p>
                                 <p className="text-lg font-semibold text-amber-400">
@@ -268,43 +268,34 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                     </div>
                     <div className="grid grid-cols-2 gap-4 p-6 md:grid-cols-5 flex-shrink-0">
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-400">
                                 Company
                             </p>
-                            <p className="mt-1 text-sm font-bold text-slate-700 truncate">
+                            <p className="mt-1 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">
                                 {filter.CompanyName || filter.CompanyID}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-400">
                                 Site
                             </p>
-                            <p className="mt-1 text-sm font-bold text-slate-700 truncate">
+                            <p className="mt-1 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">
                                 {filter.SiteCode || filter.SiteID}
                             </p>
                         </div>
 
-                        {/* <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                                Section
-                            </p>
-                            <p className="mt-1 text-sm font-bold text-slate-700 truncate">
-                                {filter.SectionName || `Section ${filter.SectionID}`}
-                            </p>
-                        </div> */}
-
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-400">
                                 Date
                             </p>
-                            <p className="mt-1 text-sm font-bold text-slate-700 truncate">
+                            <p className="mt-1 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">
                                 {filter.Date}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-400">
                                 Shiftwork
                             </p>
                             {loadingShiftworks ? (
@@ -313,12 +304,12 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                 <div className="mt-2 text-xs text-slate-400">No shifts</div>
                             ) : (
                                 <select
-                                    className="mt-1 block w-full rounded-md border border-slate-200 bg-white py-1 px-2.5 text-xs font-bold text-slate-700 shadow-xs focus:border-blue-500 focus:outline-hidden focus:ring-1 focus:ring-blue-500"
+                                    className="mt-1 block w-full rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-1 px-2.5 text-xs font-bold text-slate-700 dark:text-slate-100 shadow-xs focus:border-blue-500 focus:outline-hidden focus:ring-1 focus:ring-blue-500"
                                     value={selectedShiftworkID ?? ''}
                                     onChange={(e) => setSelectedShiftworkID(Number(e.target.value))}
                                 >
                                     {shiftworks.map((sw) => (
-                                        <option key={sw.ShiftWorkID} value={sw.ShiftWorkID}>
+                                        <option key={sw.ShiftWorkID} value={sw.ShiftWorkID} className="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100">
                                             {sw.ShiftWorkName}
                                         </option>
                                     ))}
@@ -328,7 +319,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                     </div>
                     <button
                         onClick={onClose}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 text-xl font-bold"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 text-xl font-bold transition-colors cursor-pointer"
                     >
                         ×
                     </button>
@@ -337,21 +328,21 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                 {/* Content Area - Scrollable */}
                 <div className="overflow-y-auto flex-1 flex flex-col min-h-0">
                     {/* Tabs Selector Navigation */}
-                    <div className="flex items-center justify-between">
-                        <div className="flex border-b border-slate-200 px-6 flex-shrink-0">
+                    <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
+                        <div className="flex px-6 flex-shrink-0">
                             <button
-                                className={`py-3 px-6 text-sm font-semibold border-b-2 transition-all duration-200 ${activeTab === 'hourly_cumulative_output'
-                                    ? 'border-blue-600 text-blue-600'
-                                    : 'border-transparent text-slate-400 hover:text-slate-700'
+                                className={`py-3 px-6 text-sm font-semibold border-b-2 transition-all duration-200 cursor-pointer ${activeTab === 'hourly_cumulative_output'
+                                    ? 'border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400'
+                                    : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                                     }`}
                                 onClick={() => setActiveTab('hourly_cumulative_output')}
                             >
                                 Cumulative Output Analysis
                             </button>
                             <button
-                                className={`py-3 px-6 text-sm font-semibold border-b-2 transition-all duration-200 ${activeTab === 'hourly_production_output'
-                                    ? 'border-blue-600 text-blue-600'
-                                    : 'border-transparent text-slate-400 hover:text-slate-700'
+                                className={`py-3 px-6 text-sm font-semibold border-b-2 transition-all duration-200 cursor-pointer ${activeTab === 'hourly_production_output'
+                                    ? 'border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400'
+                                    : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                                     }`}
                                 onClick={() => setActiveTab('hourly_production_output')}
                             >
@@ -361,11 +352,10 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                         <button
                             type="button"
                             onClick={() => setIsTableModalOpen(true)}
-                            className="mr-5 p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition-colors cursor-pointer border border-slate-200 hover:border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
-
+                            className="mr-5 p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer border border-slate-200 dark:border-slate-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
                             title="View production data table"
                         >
-                            <h3 className='text-sm'>Hourly Team Production Details</h3>
+                            <h3 className='text-sm font-medium'>Hourly Team Production Details</h3>
                         </button>
                     </div>
 
@@ -373,30 +363,30 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                     <div className="p-6 flex-1 min-h-[400px]">
                         {activeTab === 'hourly_cumulative_output' ? (
                             <div className="h-full flex flex-col gap-4">
-                                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1">
+                                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider pl-1">
                                     Cumulative Output vs. Target
                                 </h3>
                                 {loadingAnalysis ? (
-                                    <div className="flex flex-1 items-center justify-center border border-slate-100 rounded-xl bg-slate-50/20">
+                                    <div className="flex flex-1 items-center justify-center border border-slate-100 dark:border-slate-800 rounded-xl bg-slate-50/20 dark:bg-slate-800/20">
                                         <div className="flex flex-col items-center gap-3">
-                                            <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                                            <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
                                             <span className="text-xs font-semibold text-slate-400">Loading hourly output data...</span>
                                         </div>
                                     </div>
                                 ) : hourlyAnalysis.length === 0 ? (
-                                    <div className="flex flex-1 items-center justify-center border border-dashed border-slate-200 rounded-xl bg-slate-50/10">
+                                    <div className="flex flex-1 items-center justify-center border border-dashed border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/10">
                                         <span className="text-sm text-slate-400 font-medium">
                                             No hourly output data found for selected workshift.
                                         </span>
                                     </div>
                                 ) : (
-                                    <div className="bg-slate-50/30 p-4 rounded-xl border border-slate-100/80 flex-1 flex flex-col">
+                                    <div className="bg-slate-50/50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-100 dark:border-slate-800 flex-1 flex flex-col">
                                         <ResponsiveContainer width="100%" height={360}>
                                             <ComposedChart
                                                 data={hourlyAnalysis}
                                                 margin={{ top: 20, right: 20, bottom: 20, left: 10 }}
                                             >
-                                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} opacity={0.3} />
                                                 <XAxis
                                                     dataKey="ShiftHourID"
                                                     stroke="#94a3b8"
@@ -415,9 +405,10 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                 <Tooltip
                                                     contentStyle={{
                                                         borderRadius: '12px',
-                                                        border: 'none',
-                                                        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
-                                                        fontFamily: 'sans-serif'
+                                                        border: '1px solid rgba(255,255,255,0.1)',
+                                                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                                                        color: '#f8fafc',
+                                                        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.5)'
                                                     }}
                                                 />
                                                 <Legend
@@ -426,20 +417,16 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     wrapperStyle={{ fontSize: '12px', fontWeight: 500, paddingTop: '20px' }}
                                                     content={() => (
                                                         <div className="flex justify-center items-center gap-6 text-[13px] font-medium pt-2">
-                                                            {/* 1. Target (Màu vàng) */}
                                                             <div className="flex items-center gap-1.5">
                                                                 <span className="w-3 h-3 rounded-full bg-[#10B981]" />
-                                                                <span className="text-slate-600">Running Output</span>
+                                                                <span className="text-slate-600 dark:text-slate-300">Running Output</span>
                                                             </div>
-
-                                                            {/* 2. Output (Màu xanh kết quả) */}
                                                             <div className="flex items-center gap-1.5">
                                                                 <span className="w-3 h-3 rounded-full bg-[#F59E0B]" />
-                                                                <span className="text-slate-600">Cumulative Plan</span>
+                                                                <span className="text-slate-600 dark:text-slate-300">Cumulative Plan</span>
                                                             </div>
                                                         </div>
                                                     )}
-
                                                 />
                                                 <Bar
                                                     id='bar-running-output'
@@ -448,10 +435,8 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     fill="#10B981"
                                                     radius={[4, 4, 0, 0]}
                                                     barSize={32}
-                                                    label={{ position: 'top', fill: '#000', fontSize: 13, fontWeight: 400 }}
-                                                >
-                                                    {/* <LabelList dataKey="RunningOutput" position="insideTop" angle={0} fill="#fff" fontSize={20} fontWeight={500} /> */}
-                                                </Bar>
+                                                    label={{ position: 'top', fill: '#10B981', fontSize: 13, fontWeight: 500 }}
+                                                />
                                                 <Bar
                                                     id='bar-cumulative-plan'
                                                     dataKey="CumulativePlan"
@@ -459,18 +444,8 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     fill="#F59E0B"
                                                     radius={[4, 4, 0, 0]}
                                                     barSize={32}
-                                                    label={{ position: 'top', fill: '#000', fontSize: 13, fontWeight: 400 }}
+                                                    label={{ position: 'top', fill: '#F59E0B', fontSize: 13, fontWeight: 500 }}
                                                 />
-                                                {/* <Line
-                                                    type="monotone"
-                                                    dataKey="HourlyPlan"
-                                                    name="HourlyPlan"
-                                                    stroke="#3B82F6"
-                                                    strokeWidth={3}
-                                                    dot={{ r: 4, fill: "#3B82F6", stroke: "#fff", strokeWidth: 2 }}
-                                                    activeDot={{ r: 6 }}
-                                                    label={{ position: 'top', fill: '#2563EB', fontSize: 10, fontWeight: 600 }}
-                                                /> */}
                                             </ComposedChart>
                                         </ResponsiveContainer>
                                     </div>
@@ -478,25 +453,25 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                             </div>
                         ) : (
                             <div className="h-full flex flex-col gap-4">
-                                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1">
+                                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider pl-1">
                                     Running Output vs. Cumulative Variance
                                 </h3>
 
                                 {loadingAnalysis ? (
-                                    <div className="flex flex-1 items-center justify-center border border-slate-100 rounded-xl bg-slate-50/20">
+                                    <div className="flex flex-1 items-center justify-center border border-slate-100 dark:border-slate-800 rounded-xl bg-slate-50/20 dark:bg-slate-800/20">
                                         <div className="flex flex-col items-center gap-3">
-                                            <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                                            <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
                                             <span className="text-xs font-semibold text-slate-400">Loading hourly output data...</span>
                                         </div>
                                     </div>
                                 ) : hourlyAnalysis.length === 0 ? (
-                                    <div className="flex flex-1 items-center justify-center border border-dashed border-slate-200 rounded-xl bg-slate-50/10">
+                                    <div className="flex flex-1 items-center justify-center border border-dashed border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/10">
                                         <span className="text-sm text-slate-400 font-medium">
                                             No hourly output data found for selected workshift.
                                         </span>
                                     </div>
                                 ) : (
-                                    <div className="bg-slate-50/30 p-4 rounded-xl border border-slate-100/80 flex-1 flex flex-col">
+                                    <div className="bg-slate-50/50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-100 dark:border-slate-800 flex-1 flex flex-col">
                                         <ResponsiveContainer width="100%" height={360}>
                                             <ComposedChart
                                                 data={hourlyAnalysis}
@@ -504,13 +479,12 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                 margin={{ top: 20, right: 20, bottom: 20, left: 10 }}
                                             >
                                                 <defs>
-
                                                     <linearGradient id="popupRunningOutput" x1="0" y1="0" x2="0" y2="1">
                                                         <stop offset="0%" stopColor="#2563EB" stopOpacity={0.95} />
                                                         <stop offset="100%" stopColor="#1D4ED8" stopOpacity={0.75} />
                                                     </linearGradient>
                                                 </defs>
-                                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} opacity={0.3} />
                                                 <XAxis
                                                     dataKey="ShiftHourID"
                                                     stroke="#94a3b8"
@@ -525,12 +499,18 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     tickLine={false}
                                                     axisLine={false}
                                                     dx={-10}
-                                                    domain={['auto', 'auto']}  // cho phép mở trục dải số âm bên dưới nếu có.
+                                                    domain={['auto', 'auto']}
                                                 />
 
-                                                <ReferenceLine y={0} stroke="#64748b" strokeWidth={1.5} /> // vẽ kẻ trục 0 phân định trên dưới
+                                                <ReferenceLine y={0} stroke="#64748b" strokeWidth={1.5} />
 
                                                 <Tooltip
+                                                    contentStyle={{
+                                                        borderRadius: '12px',
+                                                        border: '1px solid rgba(255,255,255,0.1)',
+                                                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                                                        color: '#f8fafc'
+                                                    }}
                                                     formatter={(val: any, name: string) => {
                                                         if (name === 'Running Output') return [val?.toLocaleString(), name];
                                                         if (name === 'Cumulative Variance') return [`${val?.toLocaleString()}`, name];
@@ -548,7 +528,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     stackId="varianceStack"
                                                     fill="#10B981"
                                                     barSize={32}
-                                                    label={{ position: 'center', fill: '#fff', fontSize: 20, fontWeight: 400 }}
+                                                    label={{ position: 'center', fill: '#fff', fontSize: 16, fontWeight: 500 }}
                                                 />
                                                 <Bar
                                                     dataKey="CumulativeVariance"
@@ -561,8 +541,6 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     <LabelList
                                                         content={(props: any) => {
                                                             const { x, y, width, height, index } = props;
-
-                                                            // Lấy trực tiếp từ mảng dữ liệu gốc thông qua index
                                                             const originalItem = hourlyAnalysis[index];
                                                             const val = Number(originalItem?.CumulativeVariance) || 0;
 
@@ -575,16 +553,15 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                                     fill="#ffffff"
                                                                     textAnchor="middle"
                                                                     dominantBaseline="central"
-                                                                    fontSize={20}
-                                                                    fontWeight={400}
+                                                                    fontSize={16}
+                                                                    fontWeight={500}
                                                                 >
-                                                                    {val.toLocaleString()} {/* get default value */}
+                                                                    {val.toLocaleString()}
                                                                 </text>
                                                             );
                                                         }}
                                                     />
                                                 </Bar>
-
                                             </ComposedChart>
                                         </ResponsiveContainer>
                                     </div>
@@ -592,37 +569,34 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                             </div>
                         )}
                         <div className="h-full flex flex-col gap-4 mt-6">
-                            {/* <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1">
-                                Team End-Line Defect Analysis
-                            </h3> */}
                             <div className="flex items-center justify-between">
-                                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider pl-1">
+                                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider pl-1">
                                     Team End-Line Defect Analysis
                                 </h3>
                                 <button
                                     type="button"
                                     onClick={() => setIsTableModalOpen2(true)}
-                                    className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
+                                    className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
                                     title="View production data table"
                                 >
                                     <Ellipsis size={18} />
                                 </button>
                             </div>
                             {loadingDefects ? (
-                                <div className="flex flex-1 items-center justify-center border border-slate-100 rounded-xl bg-slate-50/20">
+                                <div className="flex flex-1 items-center justify-center border border-slate-100 dark:border-slate-800 rounded-xl bg-slate-50/20 dark:bg-slate-800/20">
                                     <div className="flex flex-col items-center gap-3">
                                         <div className="w-8 h-8 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
                                         <span className="text-xs font-semibold text-slate-400">Loading defect data...</span>
                                     </div>
                                 </div>
                             ) : teamDefects.length === 0 ? (
-                                <div className="flex flex-1 items-center justify-center border border-dashed border-slate-200 rounded-xl bg-slate-50/10">
+                                <div className="flex flex-1 items-center justify-center border border-dashed border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/10">
                                     <span className="text-sm text-slate-400 font-medium">
                                         No defect data found for this team.
                                     </span>
                                 </div>
                             ) : (
-                                <div className="bg-slate-50/30 p-4 rounded-xl border border-slate-100/80 flex-1 flex flex-col">
+                                <div className="bg-slate-50/50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-100 dark:border-slate-800 flex-1 flex flex-col">
                                     <ResponsiveContainer width="100%" height={360}>
                                         <Treemap
                                             data={defectChartData}
@@ -636,15 +610,15 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     if (active && payload && payload.length) {
                                                         const data = payload[0].payload;
                                                         return (
-                                                            <div className="bg-white p-3 rounded-lg shadow-lg border border-slate-100 max-w-xs">
+                                                            <div className="bg-white dark:bg-slate-900 p-3 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 max-w-xs">
                                                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Defect Category</p>
-                                                                <p className="text-xs font-bold text-slate-800 mt-1 leading-snug">{data.name}</p>
-                                                                <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100 justify-between">
+                                                                <p className="text-xs font-bold text-slate-800 dark:text-slate-100 mt-1 leading-snug">{data.name}</p>
+                                                                <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 justify-between">
                                                                     <div className="flex items-center gap-1.5">
                                                                         <div className="w-2 h-2 rounded-full bg-rose-500" />
-                                                                        <span className="text-xs text-slate-500 font-semibold">Qty</span>
+                                                                        <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">Qty</span>
                                                                     </div>
-                                                                    <span className="text-xs font-bold text-rose-600">{data.value} PCS</span>
+                                                                    <span className="text-xs font-bold text-rose-600 dark:text-rose-400">{data.value} PCS</span>
                                                                 </div>
                                                             </div>
                                                         );
