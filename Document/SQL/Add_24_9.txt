@@ -1,0 +1,48 @@
+USE [FXPROInsight]
+GO
+/****** Object:  Table [dbo].[tblCompanyInformation]    Script Date: 9/24/2026 1:59:07 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tblCompanyInformation](
+	[CompanyID] [nvarchar](5) NOT NULL,
+	[CompanyCode] [nvarchar](10) NULL,
+	[CompanyName] [nvarchar](200) NULL,
+	[AddressLine1] [nvarchar](500) NULL,
+	[AddressLine2] [nvarchar](500) NULL,
+	[City] [nvarchar](100) NULL,
+	[Province] [nvarchar](100) NULL,
+	[PostalCode] [nvarchar](50) NULL,
+	[CountryCode] [nvarchar](5) NULL,
+	[Telephone] [nvarchar](50) NULL,
+	[Fax] [nvarchar](50) NULL,
+	[Email] [nvarchar](50) NULL,
+	[PrimaryCurrencyCode] [nvarchar](5) NULL,
+	[SecondaryCurrencyCode] [nvarchar](5) NULL,
+	[CompanyTypeCode] [nvarchar](5) NULL,
+	[TAXCode] [nvarchar](100) NULL,
+	[ActiveFlag] [bit] NULL,
+	[VendorNo] [nchar](10) NULL,
+ CONSTRAINT [PK_tblCompanyInformation] PRIMARY KEY CLUSTERED 
+(
+	[CompanyID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+INSERT [dbo].[tblCompanyInformation] ([CompanyID], [CompanyCode], [CompanyName], [AddressLine1], [AddressLine2], [City], [Province], [PostalCode], [CountryCode], [Telephone], [Fax], [Email], [PrimaryCurrencyCode], [SecondaryCurrencyCode], [CompanyTypeCode], [TAXCode], [ActiveFlag], [VendorNo]) VALUES (N'COM01', N'CM1', N'COMPANY- 01 ', N'Address Line 1 ', N'Lô T2-4, đường D1, Khu Công Nghệ Cao, Phường Tân Phú, TP Thủ Đức, TP Hồ Chí Minh Lot T2-4, D1 Road, Saigon Hi-tech Park, Thu Duc city, Đ. D1, Phường Tân Phú, Thủ Đức, Thành phố Hồ Chí Minh', N'City', N'Province ', N'..', N'VN', N'Tel..', N'Fax..', N'mail ', N'USD', N'IDR', N'MUF', N'0301737478', 1, N'6039436   ')
+GO
+INSERT [dbo].[tblCompanyInformation] ([CompanyID], [CompanyCode], [CompanyName], [AddressLine1], [AddressLine2], [City], [Province], [PostalCode], [CountryCode], [Telephone], [Fax], [Email], [PrimaryCurrencyCode], [SecondaryCurrencyCode], [CompanyTypeCode], [TAXCode], [ActiveFlag], [VendorNo]) VALUES (N'COM02', N'CM2', N'COMPANY- 02', N'Address Line 1 ', N'Address Line 2', N'City', N'Province', N'..', N'VN', N'Tel..', N'Fax..', N'mail ', N'USD', N'VND', N'MUF', N'..', 1, NULL)
+GO
+INSERT [dbo].[tblCompanyInformation] ([CompanyID], [CompanyCode], [CompanyName], [AddressLine1], [AddressLine2], [City], [Province], [PostalCode], [CountryCode], [Telephone], [Fax], [Email], [PrimaryCurrencyCode], [SecondaryCurrencyCode], [CompanyTypeCode], [TAXCode], [ActiveFlag], [VendorNo]) VALUES (N'COM03', N'CM3', N'COMPANY- 03', N'Address Line 1 ', N'Address Line 2', N'City', N'Province', N'..', N'VN', N'Tel..', N'Fax..', N'mail ', N'USD', N'USD', N'MUF', N'1301054096', 1, NULL)
+GO
+INSERT [dbo].[tblCompanyInformation] ([CompanyID], [CompanyCode], [CompanyName], [AddressLine1], [AddressLine2], [City], [Province], [PostalCode], [CountryCode], [Telephone], [Fax], [Email], [PrimaryCurrencyCode], [SecondaryCurrencyCode], [CompanyTypeCode], [TAXCode], [ActiveFlag], [VendorNo]) VALUES (N'COM04', N'TC1', N'TRADING COMPANY- 01', N'Address Line 1 ', N'Address Line 2', N'City', N'Province', N'..', N'SG', N'Tel..', N'Fax..', N'mail ', N'USD', N'USD', N'BRK', N'..', 1, NULL)
+GO
+INSERT [dbo].[tblCompanyInformation] ([CompanyID], [CompanyCode], [CompanyName], [AddressLine1], [AddressLine2], [City], [Province], [PostalCode], [CountryCode], [Telephone], [Fax], [Email], [PrimaryCurrencyCode], [SecondaryCurrencyCode], [CompanyTypeCode], [TAXCode], [ActiveFlag], [VendorNo]) VALUES (N'COM05', N'TC2', N'TRADING COMPANY- 02', N'Address Line 1 ', N'Address Line 2', N'City', N'Province', N'..', N'HK', N'Tel..', N'Fax..', N'mail ', N'USD', N'USD', N'BRK', NULL, 1, NULL)
+GO
+INSERT [dbo].[tblCompanyInformation] ([CompanyID], [CompanyCode], [CompanyName], [AddressLine1], [AddressLine2], [City], [Province], [PostalCode], [CountryCode], [Telephone], [Fax], [Email], [PrimaryCurrencyCode], [SecondaryCurrencyCode], [CompanyTypeCode], [TAXCode], [ActiveFlag], [VendorNo]) VALUES (N'COM06', N'FC1', N'Forwarding Company1', N'Address Line 1 ', N'Address Line 2', N'City', N'Province', N'..', N'VN', N'Tel..', N'Fax..', N'mail ', N'USD', N'USD', N'FRD', NULL, 0, NULL)
+GO
+INSERT [dbo].[tblCompanyInformation] ([CompanyID], [CompanyCode], [CompanyName], [AddressLine1], [AddressLine2], [City], [Province], [PostalCode], [CountryCode], [Telephone], [Fax], [Email], [PrimaryCurrencyCode], [SecondaryCurrencyCode], [CompanyTypeCode], [TAXCode], [ActiveFlag], [VendorNo]) VALUES (N'COM07', N'CM7', N'COMPANY- 07', N'Address Line 1 ', N'Address Line 2', N'City', N'Province', N'..', N'VN', N'Tel..', N'Fax..', N'mail ', N'VND', N'USD', N'MUF', N'..', 1, NULL)
+GO
+ALTER TABLE [dbo].[tblCompanyInformation] ADD  CONSTRAINT [DF_tblCompanyInformation_ActiveFlag]  DEFAULT ((1)) FOR [ActiveFlag]
+GO
