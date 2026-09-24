@@ -18,7 +18,7 @@ export function Table<T>({ columns, data, keyExtractor, className = '' }: TableP
     <div className={`w-full overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-800 ${className}`}>
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="bg-slate-900 dark:bg-slate-950 border-b border-slate-800 dark:border-slate-800 text-slate-300 dark:text-slate-200 text-xs font-semibold uppercase tracking-wider">
+          <tr className="bg-slate-300 dark:bg-slate-950 border-b border-slate-800 dark:border-slate-800 text-slate-300 dark:text-slate-200 text-xs font-semibold uppercase tracking-wider">
             {columns.map((column, index) => (
               <th key={index} className={`px-4 py-3.5 ${column.className || ''}`}>
                 {column.header}
