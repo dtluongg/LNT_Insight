@@ -1,17 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  User as UserIcon,
-  Lock,
-  Activity,
-  CheckCircle2,
-  AlertCircle,
-  ShieldCheck,
-  Layers,
-  ArrowRight,
-  Eye,
-  EyeOff
-} from 'lucide-react';
+import { User as UserIcon, Lock, Activity, CheckCircle2, AlertCircle, ShieldCheck, Layers, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../../app/providers/AuthProvider';
 import { authService } from '../services/authService';
 
@@ -91,36 +80,27 @@ export const LoginPage: React.FC = () => {
         className="absolute inset-0 opacity-[0.05] pointer-events-none"
         style={{
           backgroundImage: `radial-gradient(circle, #38bdf8 1.5px, transparent 1.5px)`,
-          backgroundSize: '32px 32px'
+          backgroundSize: '32px 32px',
         }}
       />
 
       {/* Main Responsive Grid Container */}
       <div className="relative z-10 w-full max-w-5xl mx-auto px-4 py-8 flex flex-col lg:flex-row items-center justify-between gap-12">
-
         {/* Left Hero Section */}
         <div className="flex-1 space-y-8 text-center lg:text-left">
           {/* Logo & Brand Name */}
           <div className="flex items-center justify-center lg:justify-start gap-3">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-400 p-0.5 shadow-lg shadow-blue-500/30">
               <div className="w-full h-full bg-[#0a1128] rounded-[14px] flex items-center justify-center">
-                <img
-                  src="/logo_lnt_insight.png"
-                  alt="LNT Insight"
-                  className="w-7 h-7 object-contain"
-                />
+                <img src="/logo_lnt_insight.png" alt="LNT Insight" className="w-7 h-7 object-contain" />
               </div>
             </div>
             <div className="flex flex-col text-left">
               <div className="flex items-center gap-1.5">
                 <span className="text-2xl font-black text-white tracking-wider">LNT</span>
-                <span className="text-2xl font-black bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300 bg-clip-text text-transparent tracking-wider">
-                  INSIGHT
-                </span>
+                <span className="text-2xl font-black bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300 bg-clip-text text-transparent tracking-wider">INSIGHT</span>
               </div>
-              <span className="text-[11px] font-bold text-cyan-400/80 uppercase tracking-widest">
-                Enterprise Edition
-              </span>
+              <span className="text-[11px] font-bold text-cyan-400/80 uppercase tracking-widest">Enterprise Edition</span>
             </div>
           </div>
 
@@ -129,9 +109,7 @@ export const LoginPage: React.FC = () => {
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight tracking-tight">
               Production Reporting & <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 bg-clip-text text-transparent">Monitoring System</span>
             </h1>
-            <p className="text-sm sm:text-base text-slate-400 max-w-xl leading-relaxed">
-              Real-time sewing performance analytics, quality control defect tracking, and multi-site factory monitoring in one unified platform.
-            </p>
+            <p className="text-sm sm:text-base text-slate-400 max-w-xl leading-relaxed">Real-time sewing performance analytics, quality control defect tracking, and multi-site factory monitoring in one unified platform.</p>
           </div>
 
           {/* Feature Badges */}
@@ -170,7 +148,9 @@ export const LoginPage: React.FC = () => {
           {/* System Status Pill */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-slate-800 text-xs font-medium text-slate-400">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>System Status: <strong className="text-emerald-400 font-semibold">Operational</strong></span>
+            <span>
+              System Status: <strong className="text-emerald-400 font-semibold">Operational</strong>
+            </span>
           </div>
         </div>
 
@@ -182,12 +162,8 @@ export const LoginPage: React.FC = () => {
 
             {/* Form Title */}
             <div className="mb-6 text-center sm:text-left">
-              <h2 className="text-2xl font-bold text-white tracking-tight">
-                Welcome Back
-              </h2>
-              <p className="text-xs text-slate-400 mt-1">
-                Please enter your credentials to access your account.
-              </p>
+              <h2 className="text-2xl font-bold text-white tracking-tight">Welcome Back</h2>
+              <p className="text-xs text-slate-400 mt-1">Please enter your credentials to access your account.</p>
             </div>
 
             {/* Error Message Alert */}
@@ -210,9 +186,7 @@ export const LoginPage: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Username Input */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                  Username
-                </label>
+                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Username</label>
                 <div className="relative flex items-center">
                   <UserIcon size={18} className="absolute left-3.5 text-slate-400 pointer-events-none" />
                   <input
@@ -220,22 +194,17 @@ export const LoginPage: React.FC = () => {
                     placeholder="Enter your username..."
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className={`w-full h-11 pl-11 pr-4 rounded-xl bg-slate-950/70 border text-sm text-white placeholder:text-slate-500 focus:outline-hidden transition-all duration-200 ${fieldErrors.username
-                        ? 'border-rose-500 focus:ring-2 focus:ring-rose-500/20'
-                        : 'border-slate-800 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20'
-                      }`}
+                    className={`w-full h-11 pl-11 pr-4 rounded-xl bg-slate-950/70 border text-sm text-white placeholder:text-slate-500 focus:outline-hidden transition-all duration-200 ${
+                      fieldErrors.username ? 'border-rose-500 focus:ring-2 focus:ring-rose-500/20' : 'border-slate-800 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20'
+                    }`}
                   />
                 </div>
-                {fieldErrors.username && (
-                  <span className="text-xs font-medium text-rose-400">{fieldErrors.username}</span>
-                )}
+                {fieldErrors.username && <span className="text-xs font-medium text-rose-400">{fieldErrors.username}</span>}
               </div>
 
               {/* Password Input */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                  Password
-                </label>
+                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Password</label>
                 <div className="relative flex items-center">
                   <Lock size={18} className="absolute left-3.5 text-slate-400 pointer-events-none" />
                   <input
@@ -243,33 +212,21 @@ export const LoginPage: React.FC = () => {
                     placeholder="Enter your password..."
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className={`w-full h-11 pl-11 pr-11 rounded-xl bg-slate-950/70 border text-sm text-white placeholder:text-slate-500 focus:outline-hidden transition-all duration-200 ${fieldErrors.password
-                        ? 'border-rose-500 focus:ring-2 focus:ring-rose-500/20'
-                        : 'border-slate-800 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20'
-                      }`}
+                    className={`w-full h-11 pl-11 pr-11 rounded-xl bg-slate-950/70 border text-sm text-white placeholder:text-slate-500 focus:outline-hidden transition-all duration-200 ${
+                      fieldErrors.password ? 'border-rose-500 focus:ring-2 focus:ring-rose-500/20' : 'border-slate-800 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20'
+                    }`}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
-                  >
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer">
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
-                {fieldErrors.password && (
-                  <span className="text-xs font-medium text-rose-400">{fieldErrors.password}</span>
-                )}
+                {fieldErrors.password && <span className="text-xs font-medium text-rose-400">{fieldErrors.password}</span>}
               </div>
 
               {/* Remember Me & Forgot Password */}
               <div className="flex items-center justify-between text-xs pt-1">
                 <label className="flex items-center gap-2 text-slate-400 hover:text-slate-300 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 rounded-md border-slate-700 bg-slate-950 text-cyan-500 focus:ring-cyan-500/30 cursor-pointer"
-                  />
+                  <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded-md border-slate-700 bg-slate-950 text-cyan-500 focus:ring-cyan-500/30 cursor-pointer" />
                   Remember me
                 </label>
                 <a href="#" className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors">
