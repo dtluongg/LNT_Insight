@@ -34,13 +34,14 @@ import type { DashboardFilter } from '../types/TeamSewingFilters';
 
 export const DashboardPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { selectedCompanyID } = useAuth();
+  const { selectedCompanyID, authorizedCompanies } = useAuth();
+  const currentCompany = authorizedCompanies.find((item) => item.companyID === selectedCompanyID);
   const todayStr = new Date().toLocaleDateString('sv-SE');
 
   // Dashboard Filter
   const [filter, setFilter] = useState<DashboardFilter>({
     CompanyID: selectedCompanyID || searchParams.get('companyId') || searchParams.get('CompanyId') || 'COM01',
-    CompanyName: '',
+    CompanyName: currentCompany.companyName,
 
     SiteID: searchParams.get('siteId') || searchParams.get('SiteId') || 'Site1',
     SiteCode: '',
@@ -56,7 +57,8 @@ export const DashboardPage: React.FC = () => {
     if (selectedCompanyID && selectedCompanyID !== filter.CompanyID) {
       setFilter(prev => ({
         ...prev,
-        CompanyID: selectedCompanyID
+        CompanyID: selectedCompanyID,
+        CompanyName: filter.CompanyName
       }));
       setSearchParams(prev => {
         prev.set('companyId', selectedCompanyID);
@@ -121,7 +123,7 @@ export const DashboardPage: React.FC = () => {
         })
         // set data
         setFilterProductionData(mapDataFilter);
-        console.log("data filter: ", mapDataFilter);
+        // console.log("data filter: ", mapDataFilter);
 
       } catch (err) {
         console.error('Failed to fetch dashboard data', err);
@@ -295,7 +297,15 @@ export const DashboardPage: React.FC = () => {
                 const target = item.DayTargetTotal ?? 0;
                 const output = item.DayOutputTotal ?? 0;
                 const rate = (item.DayPercent ?? 0);
-                const displayRate = `${((output / target) * 100).toFixed(1)}%`;
+                // const displayRate = `${((output / target) * 100).toFixed(1)}%`;
+                // const displayRate = `${((output / target) * 100).toFixed(1)}%`;
+                
+                // calculate when output and target > 0
+                const calculatedRate = target > 0 && output > 0 ? (output/target)*100 : 0;
+                // format view number and %
+                const displayRate = `${calculatedRate.toFixed(1)}%`;
+                // calculate width progress
+                const progressWidth = Math.min(Math.max(calculatedRate, 0), 100);
 
                 return (
                   <div key={item.SectionID} className="flex flex-col gap-1.5 bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700/60">
@@ -321,7 +331,8 @@ export const DashboardPage: React.FC = () => {
                       <div
                         className="h-full rounded-full transition-all duration-300"
                         style={{
-                          width: `${Math.min(rate, 100)}%`,
+                          // width: `${Math.min(rate, 100)}%`,
+                          width: `${progressWidth}%`,
                           backgroundColor: teamColor,
                         }}
                       />

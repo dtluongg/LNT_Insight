@@ -9,7 +9,6 @@ import {
     Tooltip,
     Legend,
     Treemap,
-    LabelList,
     ReferenceLine
 } from 'recharts';
 import { Ellipsis } from 'lucide-react';
@@ -116,6 +115,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
     // Modal:
     const [isTableModalOpen, setIsTableModalOpen] = useState(false);
     const [isTableModalOpen2, setIsTableModalOpen2] = useState(false);
+    // console.log(filter);
 
     // Fetch Shiftwork List & Team Defects on Modal Open
     useEffect(() => {
@@ -158,7 +158,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                         dateObj,
                         production.TeamID
                     );
-                    console.log(production.SectionID)
+                    // console.log(production.SectionID)
                     setTeamDefects(defects);
                 } catch (error) {
                     console.error('Failed to fetch team defect analysis', error);
@@ -535,32 +535,46 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     stackId="varianceStack"
                                                     fill="#1D4ED8"
                                                     barSize={32}
-                                                    radius={[4, 4, 0, 0]}
-                                                >
-                                                    <LabelList
-                                                        content={(props: any) => {
-                                                            const { x, y, width, height, index } = props;
-                                                            const originalItem = hourlyAnalysis[index];
-                                                            const val = Number(originalItem?.CumulativeVariance) || 0;
+                                                    shape={(props: any) => {
+                                                        const { x, y, width, height, payload } = props;
+                                                        
+                                                        // Lấy đúng giá trị từ payload của chính cột đó
+                                                        const val = Number(payload?.CumulativeVariance);
+                                                        
+                                                        // Vẽ thân cột hình chữ nhật bình thường
+                                                        // Lưu ý: với số âm, height có thể âm nên dùng Math.abs để vẽ SVG rect chuẩn
+                                                        const barHeight = Math.abs(height);
+                                                        const barY = height < 0 ? y + height : y;
 
-                                                            if (val === 0) return null;
-
-                                                            return (
-                                                                <text
-                                                                    x={x + width / 2}
-                                                                    y={y + height / 2}
-                                                                    fill="#ffffff"
-                                                                    textAnchor="middle"
-                                                                    dominantBaseline="central"
-                                                                    fontSize={16}
-                                                                    fontWeight={500}
-                                                                >
-                                                                    {val.toLocaleString()}
-                                                                </text>
-                                                            );
-                                                        }}
-                                                    />
-                                                </Bar>
+                                                        return (
+                                                            <g>
+                                                                <rect
+                                                                    x={x}
+                                                                    y={barY}
+                                                                    width={width}
+                                                                    height={barHeight}
+                                                                    fill="#1D4ED8"
+                                                                    rx={4}
+                                                                    ry={4}
+                                                                />
+                                                                {/* Chỉ vẽ nhãn khi có giá trị khác 0 */}
+                                                                {Number.isFinite(val) && val !== 0 && (
+                                                                    <text
+                                                                        x={x + width / 2}
+                                                                        y={barY + barHeight / 2}
+                                                                        fill="#ffffff"
+                                                                        textAnchor="middle"
+                                                                        dominantBaseline="central"
+                                                                        fontSize={15}
+                                                                        fontWeight={600}
+                                                                    >
+                                                                        {val.toLocaleString()}
+                                                                    </text>
+                                                                )}
+                                                            </g>
+                                                        );
+                                                    }}
+                                                />
                                             </ComposedChart>
                                         </ResponsiveContainer>
                                     </div>

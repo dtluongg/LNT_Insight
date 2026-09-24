@@ -13,7 +13,7 @@ export interface TrendResult {
 export const comparisonTrendResult = (preValue: number, curValue: number, isPercent: boolean = false): TrendResult => {
     if (isPercent) { // if value has flag isPercent, just get data current minus prev to show data.
         const diff = curValue - preValue;
-        const absDiff = Math.abs(diff).toFixed(1);
+        const absDiff = Math.abs(diff).toFixed(2);
         if (diff > 0) {
             return { trendValue: `+${absDiff}%`, trendType: 'up', diff };
         } else if (diff < 0) {
