@@ -41,7 +41,7 @@ export const DashboardPage: React.FC = () => {
   // Dashboard Filter
   const [filter, setFilter] = useState<DashboardFilter>({
     CompanyID: selectedCompanyID || searchParams.get('companyId') || searchParams.get('CompanyId') || 'COM01',
-    CompanyName: currentCompany.companyName,
+    CompanyName: currentCompany?.companyName ?? '',
 
     SiteID: searchParams.get('siteId') || searchParams.get('SiteId') || 'Site1',
     SiteCode: '',
@@ -296,7 +296,7 @@ export const DashboardPage: React.FC = () => {
                 const teamColor = colors[idx % colors.length];
                 const target = item.DayTargetTotal ?? 0;
                 const output = item.DayOutputTotal ?? 0;
-                const rate = (item.DayPercent ?? 0);
+                // const rate = (item.DayPercent ?? 0);
                 // const displayRate = `${((output / target) * 100).toFixed(1)}%`;
                 // const displayRate = `${((output / target) * 100).toFixed(1)}%`;
                 
