@@ -17,7 +17,7 @@ interface DashboardHeaderProps {
 export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onApplyFilter, isLoading = false }) => {
 
     const todayStr = new Date().toLocaleDateString('sv-SE');
-    const { selectedCompanyID } = useAuth();
+    const { selectedCompanyID, authorizedCompanies } = useAuth();
 
     // Master data
     const [sites, setSites] = useState<SiteInfo[]>([]);
@@ -40,66 +40,67 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
 
     // Sync draft khi Dashboard filter thay đổi từ bên ngoài
     useEffect(() => {
-        setDraftFilter(() => ({
+        setDraftFilter({
             ...filter,
             CompanyID: selectedCompanyID || filter.CompanyID
-        }));
+        });
     }, [filter, selectedCompanyID]);
 
-    // Đồng bộ draftFilter.CompanyID khi selectedCompanyID trên Header tổng thay đổi
+    // Fetch sites khi selectedCompanyID ở Header tổng thay đổi
     useEffect(() => {
-        if (selectedCompanyID && selectedCompanyID !== draftFilter.CompanyID) {
-            setDraftFilter(prev => ({
-                ...prev,
-                CompanyID: selectedCompanyID
-            }));
-        }
-    }, [selectedCompanyID]);
-    // =========================================================
-
-    // Fetch sites when selected company changes
-    useEffect(() => {
-        const companyID = draftFilter.CompanyID || selectedCompanyID;
+        const companyID = selectedCompanyID || filter.CompanyID;
         if (!companyID) return;
+
+        const currentComp = authorizedCompanies?.find((comp) => {
+            const id = typeof comp === 'string' ? comp : comp.companyID;
+            return id === companyID;
+        });
+        const companyName = currentComp
+            ? (typeof currentComp === 'object' ? currentComp.companyName || currentComp.companyCode || currentComp.companyID : currentComp)
+            : companyID;
+
         const fetchSites = async () => {
             try {
                 const data = await companiesApi.getSites(companyID);
                 setSites(data);
-                const currentSite = data.find(
-                    site => site.SiteID === draftFilter.SiteID
-                );
-                if (currentSite) {
-                    setDraftFilter(prev => ({
-                        ...prev,
-                        SiteCode: currentSite.SiteCode
-                    }));
+
+                if (data.length > 0) {
+                    const currentSite = data.find(site => site.SiteID === draftFilter.SiteID);
+                    const targetSite = currentSite || data[0];
+
+                    const updatedFilter: DashboardFilter = {
+                        ...filter,
+                        CompanyID: companyID,
+                        CompanyName: companyName,
+                        SiteID: targetSite.SiteID,
+                        SiteCode: targetSite.SiteCode,
+                        SectionID: '0',
+                        SectionName: 'All'
+                    };
+
+                    setDraftFilter(updatedFilter);
+                    onApplyFilter(updatedFilter);
                 } else {
-                    const firstSite = data[0];
-                    if (firstSite) {
-                        setDraftFilter(prev => ({
-                            ...prev,
-                            SiteID: firstSite.SiteID,
-                            SiteCode: firstSite.SiteCode,
-                            SectionID: '0',
-                            SectionName: 'All'
-                        }));
-                    } else {
-                        setDraftFilter(prev => ({
-                            ...prev,
-                            SiteID: '',
-                            SiteCode: '',
-                            SectionID: '0',
-                            SectionName: 'All'
-                        }));
-                    }
+                    const emptyFilter: DashboardFilter = {
+                        ...filter,
+                        CompanyID: companyID,
+                        CompanyName: companyName,
+                        SiteID: '',
+                        SiteCode: '',
+                        SectionID: '0',
+                        SectionName: 'All'
+                    };
+                    setDraftFilter(emptyFilter);
+                    onApplyFilter(emptyFilter);
                 }
             } catch (err) {
                 console.error('Failed to fetch sites', err);
                 setSites([]);
             }
         };
+
         fetchSites();
-    }, [draftFilter.CompanyID, selectedCompanyID]);
+    }, [selectedCompanyID, authorizedCompanies]);
     // =========================================================
 
     // Fetch sections when selected company or site changes
