@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User as UserIcon, Lock, CheckCircle2, AlertCircle, ShieldCheck, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../../app/providers/AuthProvider';
@@ -58,6 +58,12 @@ export const LoginPage: React.FC = () => {
 
       login(response);
 
+      if (rememberMe) {
+        localStorage.setItem('remembered_username', username);
+      } else {
+        localStorage.removeItem('remembered_username');
+      }
+
       // Delay nhẹ 600ms để người dùng kịp quan sát thông báo thành công từ server
       setTimeout(() => {
         navigate('/dashboard');
@@ -67,6 +73,14 @@ export const LoginPage: React.FC = () => {
       setIsLoading(false);
     }
   };
+  useEffect(() => {
+    const rememberedUsername = localStorage.getItem('remembered_username');
+
+    if (rememberedUsername) {
+      setUsername(rememberedUsername);
+      setRememberMe(true);
+    }
+  }, []);
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-[#071638] font-sans text-slate-100 select-none">
@@ -190,6 +204,8 @@ export const LoginPage: React.FC = () => {
                             ? 'border-rose-500/70 focus:ring-2 focus:ring-rose-500/20'
                             : 'border-slate-700/70 focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/10'
                         }`}
+                        name="username"
+                        autoComplete="username"
                       />
                     </div>
 
@@ -216,6 +232,8 @@ export const LoginPage: React.FC = () => {
                             ? 'border-rose-500/70 focus:ring-2 focus:ring-rose-500/20'
                             : 'border-slate-700/70 focus:border-cyan-400/70 focus:ring-2 focus:ring-cyan-400/10'
                         }`}
+                        name="password"
+                        autoComplete="current-password"
                       />
 
                       <button

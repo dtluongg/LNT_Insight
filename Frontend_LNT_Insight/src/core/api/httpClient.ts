@@ -23,7 +23,7 @@ function onRefreshed(token: string) {
 // Hàm httpClient bọc fetch
 export async function apiFetch<T>(endpoint: string, options: RequestInit = {}):
     Promise<T> {
-    const token = localStorage.getItem('auth_token');
+    const token = sessionStorage.getItem('auth_token');
     const headers = new Headers(options.headers || {});
     headers.set('Content-Type', 'application/json');
     if (token) {
@@ -38,7 +38,7 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}):
 
     // Nếu gặp lỗi 401 UNAUTHORIZED (là token hết hạn)
     if (response.status === 401 && endpoint !== '/auth/refresh' && endpoint !== '/auth/login') {
-        const refreshToken = localStorage.getItem('auth_refresh_token');
+        const refreshToken = sessionStorage.getItem('auth_refresh_token');
         if (!refreshToken) {
             // Không có refreshToken, yêu cầu đăng nhập lại
             clearAuthStorage();
@@ -64,9 +64,9 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}):
                 }
                 const tokenModel = await refreshResponse.json();
 
-                // Lưu token mới vào localStorage
-                localStorage.setItem('auth_token', tokenModel.accessToken);
-                localStorage.setItem('auth_refresh_token', tokenModel.refreshToken)
+                // Lưu token mới vào sessionStorage
+                sessionStorage.setItem('auth_token', tokenModel.accessToken);
+                sessionStorage.setItem('auth_refresh_token', tokenModel.refreshToken)
 
                 isRefreshing = false;
                 onRefreshed(tokenModel.accessToken);
@@ -118,12 +118,12 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}):
 
 // tạo function dọn dẹp bộ nhớ đệm xác thực:
 function clearAuthStorage() {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('auth_refresh_token');
-    localStorage.removeItem('auth_user');
-    localStorage.removeItem('selected_site_id');
-    localStorage.removeIten('selected_module_id');
-    localStorage.removeItem('is_site_confirmed');
+    sessionStorage.removeItem('auth_token');
+    sessionStorage.removeItem('auth_refresh_token');
+    sessionStorage.removeItem('auth_user');
+    sessionStorage.removeItem('selected_site_id');
+    sessionStorage.removeIten('selected_module_id');
+    sessionStorage.removeItem('is_site_confirmed');
 }
 
 // lấy thông báo từ response json hoặc text thô:
