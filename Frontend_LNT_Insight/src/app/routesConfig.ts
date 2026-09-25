@@ -25,7 +25,7 @@ export const moduleRoutes: ModuleRouteConfig[] = [
 export const subModuleRoutes: SubModuleRouteConfig[] = [
     {
         moduleMasterID: 'MD003',
-        subModuleMasterID: 2,
+        subModuleMasterID: 1,
         path: '/sewing/team-performance',
         component: DashboardPage,
     },
