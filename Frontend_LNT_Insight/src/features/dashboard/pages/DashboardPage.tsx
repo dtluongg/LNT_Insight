@@ -39,6 +39,7 @@ export const DashboardPage: React.FC = () => {
   const todayStr = new Date().toLocaleDateString('sv-SE');
 
   // Dashboard Filter
+  const initialSectionID = searchParams.get('sectionId') || searchParams.get('SectionId') || '0';
   const [filter, setFilter] = useState<DashboardFilter>({
     CompanyID: selectedCompanyID || searchParams.get('companyId') || searchParams.get('CompanyId') || 'COM01',
     CompanyName: currentCompany?.companyName ?? '',
@@ -47,7 +48,7 @@ export const DashboardPage: React.FC = () => {
     SiteCode: '',
 
     SectionID: searchParams.get('sectionId') || searchParams.get('SectionId') || '0',
-    SectionName: '',
+    SectionName: initialSectionID === '0' ? 'All' : '',
 
     Date: searchParams.get('date') || searchParams.get('Date') || todayStr,
   });
@@ -55,17 +56,20 @@ export const DashboardPage: React.FC = () => {
   // Đồng bộ filter.CompanyID khi selectedCompanyID ở Main Header thay đổi
   useEffect(() => {
     if (selectedCompanyID && selectedCompanyID !== filter.CompanyID) {
+      // find company:
+      const findCurrentCompany = authorizedCompanies.find((comp) => comp.companyID === selectedCompanyID );
+      const newCompanyName = findCurrentCompany?.companyName ?? '';
       setFilter(prev => ({
         ...prev,
         CompanyID: selectedCompanyID,
-        CompanyName: filter.CompanyName
+        CompanyName: newCompanyName
       }));
       setSearchParams(prev => {
         prev.set('companyId', selectedCompanyID);
         return prev;
       });
     }
-  }, [selectedCompanyID]);
+  }, [selectedCompanyID, authorizedCompanies]);
 
   const [productionData, setProductionData] = useState<SewingTeamDetail[]>([]);
   const [filterProductionData, setFilterProductionData] = useState<any[]>([]);

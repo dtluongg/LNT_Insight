@@ -118,6 +118,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
                         SectionID: '0',
                         SectionName: 'All'
                     }));
+                    // Đồng bộ lên filter cha nếu trang DashboardPage chưa có SectionName
+                    if (!filter.SectionName) {
+                        onApplyFilter({
+                            ...filter,
+                            SectionID: '0',
+                            SectionName: 'All'
+                        });
+                    }
                     return;
                 }
 

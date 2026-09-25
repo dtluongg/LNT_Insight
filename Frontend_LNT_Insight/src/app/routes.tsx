@@ -63,6 +63,14 @@ export const AppRoutes: React.FC = () => {
           element={<DefaultPage />}
         />
         <Route
+            path="coming-soon/:moduleId"
+            element={<DefaultPage />}
+        />
+        <Route
+            path="coming-soon/:moduleId/:subModuleID"
+            element={<DefaultPage />}
+        />
+        <Route
           path="blankpage"
           element={<BlankPage />}
         />

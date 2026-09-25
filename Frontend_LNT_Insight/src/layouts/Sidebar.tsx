@@ -61,17 +61,43 @@ export const Sidebar: React.FC = () => {
 
   // Tải danh sách Modules chính từ API khi mount
   useEffect(() => {
-    const fetchModules = async () => {
-      try {
-        const data = await masterDataApi.getModules();
-        setModules(data);
-      } catch (err) {
-        console.error('Lỗi tải modules chính:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchModules();
+      const fetchModules = async () => {
+          try {
+              const data = await masterDataApi.getModules();
+              setModules(data);
+
+              const subModuleResults: {
+                  [moduleId: string]: SubModuleInfo[];
+              } = {};
+
+              await Promise.all(
+                  data.map(async (module) => {
+                      try {
+                          const subData = await masterDataApi.getSubModules(
+                              module.ModuleMasterID
+                          );
+
+                          subModuleResults[module.ModuleMasterID] = subData;
+                      } catch (err) {
+                          console.error(
+                              `Lỗi tải submodules cho module ${module.ModuleMasterID}:`,
+                              err
+                          );
+
+                          subModuleResults[module.ModuleMasterID] = [];
+                      }
+                  })
+              );
+
+              setSubmodules(subModuleResults);
+          } catch (err) {
+              console.error('Lỗi tải modules chính:', err);
+          } finally {
+              setIsLoading(false);
+          }
+      };
+
+      fetchModules();
   }, []);
 
   // Gọi API tải submodules khi click vào Module chính
@@ -140,7 +166,15 @@ export const Sidebar: React.FC = () => {
             modules.map((module) => {
               const isExpanded = expandedModuleId === module.ModuleMasterID;
               const moduleRoute = getModuleRoute(module.ModuleMasterID);
-              const modulePath = moduleRoute?.path ?? `/coming-soon`;
+              const modulePath =
+                  moduleRoute?.path ??
+                  `/coming-soon/${module.ModuleMasterID}`;
+
+              const moduleSubmodules =
+                  submodules[module.ModuleMasterID] ?? [];
+
+              const hasSubmodules =
+                  moduleSubmodules.length > 0;
 
               return (
                 <div key={module.ModuleMasterID} className="flex flex-col">
@@ -148,6 +182,7 @@ export const Sidebar: React.FC = () => {
                   <div className="group relative flex items-center w-full rounded-xl transition-colors duration-150">
                     <NavLink
                       to={modulePath}
+                      end
                       title={isCollapsed ? module.ModuleMasterName : undefined}
                       className={({ isActive }) =>
                         `flex-1 flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-semibold tracking-wide transition-all ${isActive
@@ -175,17 +210,24 @@ export const Sidebar: React.FC = () => {
                     </NavLink>
 
                     {/* Expand/Collapse Button */}
-                    {!isCollapsed && (
+                    {!isCollapsed && hasSubmodules && (
                       <button
-                        type="button"
-                        onClick={() => handleModuleClick(module.ModuleMasterID)}
-                        aria-label="Toggle submodules"
-                        className={`p-2 mr-1 rounded-lg text-blue-200/60 hover:text-white hover:bg-white/10 transition-all ${isExpanded ? 'text-[var(--color-brand-cyan)]' : ''
+                          type="button"
+                          onClick={() => handleModuleClick(module.ModuleMasterID)}
+                          aria-label="Toggle submodules"
+                          className={`p-2 mr-1 rounded-lg text-blue-200/60 hover:text-white hover:bg-white/10 transition-all ${
+                              isExpanded
+                                  ? 'text-[var(--color-brand-cyan)]'
+                                  : ''
                           }`}
                       >
-                        {isExpanded ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+                          {isExpanded ? (
+                              <ChevronDown size={15} />
+                          ) : (
+                              <ChevronRight size={15} />
+                          )}
                       </button>
-                    )}
+                  )}
                   </div>
 
                   {/* SubModules Accordion */}
@@ -193,7 +235,9 @@ export const Sidebar: React.FC = () => {
                     <div className="mt-1 ml-5 pl-3 border-l border-white/15 space-y-0.5">
                       {submodules[module.ModuleMasterID].map((sub) => {
                         const route = getSubModuleRoute(sub.ModuleMasterID, Number(sub.ModuleMasterSubID));
-                        const path = route?.path ?? `/coming-soon`;
+                        const path =
+                          route?.path ??
+                          `/coming-soon/${sub.ModuleMasterID}/${sub.ModuleMasterSubID}`;
 
                         return (
                           <NavLink
