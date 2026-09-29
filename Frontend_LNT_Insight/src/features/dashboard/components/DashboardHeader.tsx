@@ -9,17 +9,18 @@ import type { SiteInfo, SectionInfo } from '../../../types';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
 
 interface DashboardHeaderProps {
-    filter: DashboardFilter;
-    onApplyFilter: (filter: DashboardFilter) => void;
-    isLoading?: boolean;
+    filter: DashboardFilter;  // data filter chính thức từ dashboard
+    onApplyFilter: (filter: DashboardFilter) => void; // hàm callback đẩy filter mới quay về dashboard
+    isLoading?: boolean; // trạng thái đang tải dữ liệu hay không
 }
 
 export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onApplyFilter, isLoading = false }) => {
 
     const todayStr = new Date().toLocaleDateString('sv-SE');
+    // Lấy danh sách công ty và công ty đang active từ Context toàn cục
     const { selectedCompanyID, authorizedCompanies } = useAuth();
 
-    // Master data
+    // Master data => set when company change
     const [sites, setSites] = useState<SiteInfo[]>([]);
     const [sections, setSections] = useState<SectionInfo[]>([]);
     // const [searchParams, setSearchParams] = useSearchParams();
@@ -53,7 +54,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
 
         const currentComp = authorizedCompanies?.find((comp) => {
             const id = typeof comp === 'string' ? comp : comp.companyID;
-            return id === companyID;
+            return id === companyID; // hàm find return company có id === companyID lấy từ selectedCompanyID
         });
         const companyName = currentComp
             ? (typeof currentComp === 'object' ? currentComp.companyName || currentComp.companyCode || currentComp.companyID : currentComp)

@@ -92,17 +92,18 @@ export const DashboardPage: React.FC = () => {
         const prevDateStr = await companiesApi.getPreviousWorkingDay(filter.CompanyID, filter.SiteID, filter.Date);
         const prevDateObj = new Date(prevDateStr);
 
-        const [prodResult, summaryResult, prevSummaryResult] = await Promise.all([
+        const [prodResult, summaryResult, prevSummaryResult, prodResultForOverview] = await Promise.all([
           companiesApi.getTeamSewingDetail(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj),
           companiesApi.getTeamSewingSummary(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj),
-          companiesApi.getTeamSewingSummary(filter.CompanyID, filter.SiteID, Number(filter.SectionID), prevDateObj)
+          companiesApi.getTeamSewingSummary(filter.CompanyID, filter.SiteID, Number(filter.SectionID), prevDateObj),
+          companiesApi.getTeamSewingDetail(filter.CompanyID, filter.SiteID, 0, dateObj),
         ]);
         setProductionData(prodResult);
         setDataSewingTeamSummary(summaryResult);
         setPrevDataSewingTeamSummary(prevSummaryResult);
 
         // filter for get sumary:
-        const datafilter = prodResult.reduce((acc, cur) => {
+        const datafilter = prodResultForOverview.reduce((acc, cur) => {
           const dataGroup = cur.SectionID;
           // neu như object chua co bien nao thuoc sectionID thi tao bien moi voi value mac dinh
           if (!acc[dataGroup]) {

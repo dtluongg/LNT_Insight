@@ -16,23 +16,31 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
   const [displayName, setDisplayName] = useState<string>(
     user?.fullName || user?.username || 'User'
   );
+  // Quản lý việc đóng/mở của 3 dropdown menu
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCompanyDropdownOpen, setIsCompanyDropdownOpen] = useState(false);
   const [isThemeDropdownOpen, setIsThemeDropdownOpen] = useState(false);
   
   const [avatarUrl] = useState<string | null>(null);
 
+  // Ref tham chiếu đến DOM element để phát hiện click ra bên ngoài
   const dropdownRef = useRef<HTMLDivElement>(null);
   const companyDropdownRef = useRef<HTMLDivElement>(null);
   const themeDropdownRef = useRef<HTMLDivElement>(null);
-
+  // Quản lý popup xác nhận đăng xuất
   const [openPopupLogout, setOpenPopupLogout] = useState(false);
 
+  // =========================================================
+  // 3. TÍNH TOÁN TRỰC TIẾP TÊN CÔNG TY HIỂN THỊ (DERIVED VALUE)
+  // Tuyệt đối không lưu tên vào useState để tránh lỗi vòng lặp render
+  // =========================================================
   const currentCompany = authorizedCompanies.find((comp) => {
+    // Nếu comp là chuỗi thì so sánh trực tiếp, nếu là Object thì lấy thuộc tính companyID
     const id = typeof comp === 'string' ? comp : comp.companyID;
     return id === selectedCompanyID;
   });
 
+  // Ưu tiên: Tên công ty -> Mã code -> Mã ID -> Chữ mặc định 'Select Company'
   const selectedCompanyName = currentCompany
     ? (typeof currentCompany === 'object'
         ? currentCompany.companyName || currentCompany.companyCode || currentCompany.companyID
@@ -63,13 +71,14 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
   // Click outside listener for all dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (dropdownRef.current && !dropdownRef.current.contains(target)) {
         setIsDropdownOpen(false);
       }
-      if (companyDropdownRef.current && !companyDropdownRef.current.contains(event.target as Node)) {
+      if (companyDropdownRef.current && !companyDropdownRef.current.contains(target)) {
         setIsCompanyDropdownOpen(false);
       }
-      if (themeDropdownRef.current && !themeDropdownRef.current.contains(event.target as Node)) {
+      if (themeDropdownRef.current && !themeDropdownRef.current.contains(target)) {
         setIsThemeDropdownOpen(false);
       }
     };
