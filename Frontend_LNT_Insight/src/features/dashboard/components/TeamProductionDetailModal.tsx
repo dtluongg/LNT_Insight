@@ -7,7 +7,6 @@ import {
     YAxis,
     CartesianGrid,
     Tooltip,
-    Legend,
     Treemap,
     ReferenceLine
 } from 'recharts';
