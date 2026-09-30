@@ -7,7 +7,6 @@ import {
     YAxis,
     CartesianGrid,
     Tooltip,
-    Legend,
     Treemap,
     ReferenceLine
 } from 'recharts';
@@ -362,9 +361,23 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                     <div className="p-6 flex-1 min-h-[400px]">
                         {activeTab === 'hourly_cumulative_output' ? (
                             <div className="h-full flex flex-col gap-4">
-                                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider pl-1">
-                                    Cumulative Output vs. Target
-                                </h3>
+                                <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2'>
+                                    <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider pl-1">
+                                        Cumulative Output vs. Target
+                                    </h3>
+                                    <div className='flex items-center gap-4 text-xs font-medium'>
+                                        <div className="flex items-center gap-1 5">
+                                            <span className="w-2.5 h-2.5 rounded-full bg-[#38BDF8]" />
+                                            <span className="text-slate-600 dark:text-slate-300">Running Output</span>
+                                        </div>
+                                        <div className="flex items-center gap-1 5">
+                                            <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" />
+                                            <span className="text-slate-600 dark:text-slate-300">Cumulative Plan</span>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                
                                 {loadingAnalysis ? (
                                     <div className="flex flex-1 items-center justify-center border border-slate-100 dark:border-slate-800 rounded-xl bg-slate-50/20 dark:bg-slate-800/20">
                                         <div className="flex flex-col items-center gap-3">
@@ -403,14 +416,22 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                 />
                                                 <Tooltip
                                                     contentStyle={{
-                                                        borderRadius: '12px',
-                                                        border: '1px solid rgba(255,255,255,0.1)',
-                                                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                                                        color: '#f8fafc',
-                                                        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.5)'
-                                                    }}
+                                                    borderRadius: '12px',
+                                                    border: '1px solid rgba(255,255,255,0.1)',
+                                                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                                                    color: '#f8fafc',
+                                                    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.5)',
+                                                    fontSize: '12px',
+                                                    padding: '10px 14px'
+                                                }}
+                                                formatter={(value: any, name: any) => {
+                                                    if (name === "RunningOutput") return [value ? value.toLocaleString() : '0', 'Running Output'];
+                                                    if (name === "CumulativePlan") return [value ? value.toLocaleString() : '0', 'Cumulative Plan'];
+                                                    // if (name === "Inspected") return [value ? value.toLocaleString() : '0', 'Inspected'];
+                                                    return [value, name];
+                                                }}
                                                 />
-                                                <Legend
+                                                {/* <Legend
                                                     height={36}
                                                     iconType="circle"
                                                     wrapperStyle={{ fontSize: '12px', fontWeight: 500, paddingTop: '20px' }}
@@ -426,20 +447,20 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                             </div>
                                                         </div>
                                                     )}
-                                                />
+                                                /> */}
                                                 <Bar
                                                     id='bar-running-output'
                                                     dataKey="RunningOutput"
-                                                    name="Running Output"
-                                                    fill="#10B981"
+                                                    name="RunningOutput"
+                                                    fill="#38BDF8"
                                                     radius={[4, 4, 0, 0]}
                                                     barSize={32}
-                                                    label={{ position: 'top', fill: '#10B981', fontSize: 13, fontWeight: 500 }}
+                                                    label={{ position: 'top', fill: '#38BDF8', fontSize: 13, fontWeight: 500 }}
                                                 />
                                                 <Bar
                                                     id='bar-cumulative-plan'
                                                     dataKey="CumulativePlan"
-                                                    name="Cumulative Plan"
+                                                    name="CumulativePlan"
                                                     fill="#F59E0B"
                                                     radius={[4, 4, 0, 0]}
                                                     barSize={32}
@@ -452,9 +473,21 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                             </div>
                         ) : (
                             <div className="h-full flex flex-col gap-4">
-                                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider pl-1">
-                                    Running Output vs. Cumulative Variance
-                                </h3>
+                                <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2'>
+                                    <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider pl-1">
+                                        Running Output vs. Cumulative Variance
+                                    </h3>
+                                    <div className='flex items-center gap-4 text-xs font-medium'>
+                                        <div className="flex items-center gap-1 5">
+                                            <span className="w-2.5 h-2.5 rounded-full bg-[#38BDF8]" />
+                                            <span className="text-slate-600 dark:text-slate-300">Running Output</span>
+                                        </div>
+                                        <div className="flex items-center gap-1 5">
+                                            <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" />
+                                            <span className="text-slate-600 dark:text-slate-300">Cumulative Variance</span>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 {loadingAnalysis ? (
                                     <div className="flex flex-1 items-center justify-center border border-slate-100 dark:border-slate-800 rounded-xl bg-slate-50/20 dark:bg-slate-800/20">
@@ -516,16 +549,16 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                         return [val, name];
                                                     }}
                                                 />
-                                                <Legend
+                                                {/* <Legend
                                                     height={36}
                                                     iconType="circle"
                                                     wrapperStyle={{ fontSize: '12px', fontWeight: 500, paddingTop: '20px' }}
-                                                />
+                                                /> */}
                                                 <Bar
                                                     dataKey="RunningOutput"
                                                     name="Running Output"
                                                     stackId="varianceStack"
-                                                    fill="#10B981"
+                                                    fill="#38BDF8"
                                                     barSize={32}
                                                     label={{ position: 'center', fill: '#fff', fontSize: 16, fontWeight: 500 }}
                                                 />
@@ -533,7 +566,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                     dataKey="CumulativeVariance"
                                                     name="Cumulative Variance"
                                                     stackId="varianceStack"
-                                                    fill="#1D4ED8"
+                                                    fill="#F59E0B"
                                                     barSize={32}
                                                     shape={(props: any) => {
                                                         const { x, y, width, height, payload } = props;
@@ -553,7 +586,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                                                                     y={barY}
                                                                     width={width}
                                                                     height={barHeight}
-                                                                    fill="#1D4ED8"
+                                                                    fill="#F59E0B"
                                                                     rx={4}
                                                                     ry={4}
                                                                 />
