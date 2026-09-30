@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { Bell, ChevronDown, User as UserIcon, LogOut, ShieldCheck, Mail, Building2, Check, Sun, Moon, Monitor } from 'lucide-react';
 import { useAuth } from '../app/providers/AuthProvider';
 import { useTheme } from '../app/providers/ThemeProvider';
@@ -313,6 +314,16 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
                   {user?.isAdmin ? 'Administrator' : 'Standard User'}
                 </div>
               </div>
+
+              {/* Admin Access Management Link */}
+              <Link
+                to="/admin/user-access"
+                onClick={() => setIsDropdownOpen(false)}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer mb-1"
+              >
+                <ShieldCheck size={16} className="text-blue-600 dark:text-blue-400" />
+                <span>User Permissions</span>
+              </Link>
 
               {/* Logout Option */}
               <button

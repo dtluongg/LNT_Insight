@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using System.Text.Json;
 
 namespace Backend_LNT_Insight.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    // [Authorize]
     public class MasterDataController : ControllerBase
     {
         private readonly string _connectionString;
@@ -53,5 +54,55 @@ namespace Backend_LNT_Insight.Controllers
         //     var result = (await db.QueryAsync<dynamic>("USP_ProductionVsPlan", new { CompanyID = companyID, SiteID = siteID}, commandType: CommandType.StoredProcedure)).ToList();
         //     return Ok(result);
         // }
+
+        [HttpGet("user_working")]
+        public async Task<IActionResult> GetUserWorking()
+        {
+            using var db = CreateConnection();
+            var result = (await db.QueryAsync<dynamic>("USP_FXPRO_GetAllUserWorking", commandType: CommandType.StoredProcedure)).ToList();
+            return Ok(result);
+        }
+
+
+        [HttpPost("manage_user")]
+        public async Task<IActionResult> UpdateUserModuleAccess([FromBody] JsonElement rawJson){
+            string fullJson = rawJson.GetRawText();
+            using var db = CreateConnection();
+            // var parameters = new DynamicParameters();
+            // parameters.Add("@JsonUpdateUserModuleAccess", fullJson);
+            var result = (await db.ExecuteAsync(
+                sql: "[dbo].[USP_FXPRO_Insight_UpdateUserModuleAccess]",
+                new {JsonUpdateUserModuleAccess = fullJson},
+                commandType: CommandType.StoredProcedure
+                // param: parameters
+            ));
+            return Ok(new { Success = true});
+        }
+
+        [HttpGet("manage_user/{userID}")]
+        public async Task<IActionResult> GetUserModuleAccess(string userID){
+            using var db = CreateConnection();
+            var result = (await db.QueryAsync(
+                sql: "[dbo].[USP_FXPRO_Get_Insight_UpdateUserModuleAccess]",
+                new {UserID = userID},
+                commandType: CommandType.StoredProcedure
+                // param: parameters
+            ));
+            var rawRows = result.ToList();
+            // use C# LINQ to unbox and group agrregate data
+
+            var companyIDs = rawRows.Select(r => new {CompanyID = (string)r.CompanyID}).Distinct().ToList();
+            var modules = rawRows.Select(r => new {
+                ModuleMasterID = (string)r.ModuleMasterID,
+                ModuleMasterSubID = (int)r.ModuleMasterSubID
+            }).Distinct().ToList();
+
+            var resultRespone = new {
+                UserID = userID,
+                CompanyIDs = companyIDs,
+                Modules = modules
+            };
+            return Ok(resultRespone);
+        }
     }
 }

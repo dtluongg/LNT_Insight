@@ -30,15 +30,43 @@ export interface MastUserInfo {
     createdTime: string | null;
     isNewUser: boolean | null;
 }
+export interface UserWorkingInfo {
+    UserID: string;
+    ActiveFlag?: boolean;
+    AdminUser?: boolean;
+    RefreshToken?: string | null;
+    RefreshTokenExpiryTime?: string | null;
+}
 export interface ModuleMasterInfo {
     ModuleMasterID: string;
     ModuleMasterName: string;
     icon?: string;
 }
 export interface SubModuleInfo {
-    ModuleMasterSubID: string;
+    ModuleMasterSubID: string | number;
     ModuleMasterName: string;
     ModuleMasterID: string;
+}
+
+export interface UserCompanyAccessItem {
+    companyID: string;
+}
+
+export interface UserModuleAccessItem {
+    moduleMasterID: string;
+    moduleMasterSubID: number;
+}
+
+export interface UserModuleAccessResponse {
+    userID: string;
+    companyIDs: UserCompanyAccessItem[];
+    modules: UserModuleAccessItem[];
+}
+
+export interface UpdateUserModuleAccessPayload {
+    UserID: string;
+    CompanyIDs: { CompanyID: string }[];
+    Modules: { ModuleMasterID: string; ModuleMasterSubID: number }[];
 }
 
 export interface CompanyInfo {

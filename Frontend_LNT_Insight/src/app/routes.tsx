@@ -6,6 +6,7 @@ import { DashboardPage } from '../features/dashboard/pages/DashboardPage';
 import { MainLayout } from '../layouts/MainLayout';
 import { BlankPage } from '../features/default/BlankPage';
 import { DefaultPage } from '../features/default/DefaultPage';
+import { UserAccessManagementPage } from '../features/adminPage';
 
 // Component bảo vệ Route yêu cầu Đăng nhập
 const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
@@ -77,6 +78,10 @@ export const AppRoutes: React.FC = () => {
         <Route
           path="sewing/team-performance"
           element={<DashboardPage />}
+        />
+        <Route
+          path="admin/user-access"
+          element={<UserAccessManagementPage />}
         />
       </Route>
 
