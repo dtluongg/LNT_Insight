@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { PermissionGuard } from './PermissionGuard';
 import { useAuth } from './providers/AuthProvider';
 import { LoginPage } from '../features/auth/pages/LoginPage';
 import { DashboardPage } from '../features/dashboard/pages/DashboardPage';
@@ -75,9 +76,17 @@ export const AppRoutes: React.FC = () => {
           path="blankpage"
           element={<BlankPage />}
         />
-        <Route
+        {/* <Route
           path="sewing/team-performance"
           element={<DashboardPage />}
+        /> */}
+        <Route
+          path="sewing/team-performance"
+          element={
+            <PermissionGuard moduleMasterID="MD003" moduleMasterSubID={2}>
+              <DashboardPage />
+            </PermissionGuard>
+          }
         />
         <Route
           path="admin/user-access"
