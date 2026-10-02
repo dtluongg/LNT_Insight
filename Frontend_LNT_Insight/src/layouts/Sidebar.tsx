@@ -51,7 +51,7 @@ const getModuleIcon = (ModuleName: string) => {
 
 
 export const Sidebar: React.FC = () => {
-  const { logout } = useAuth();
+  const { logout, authorizedPermissionMasterModule, authorizedPermissionSubModule } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [modules, setModules] = useState<ModuleMasterInfo[]>([]);
   const [submodules, setSubmodules] = useState<{ [moduleId: string]: SubModuleInfo[] }>({});
@@ -156,117 +156,135 @@ export const Sidebar: React.FC = () => {
 
         {/* Modules List */}
         <nav className="p-3 space-y-1.5 overflow-y-auto overflow-x-hidden max-h-[calc(100vh-145px)] custom-scrollbar">
-          {isLoading ? (
-            <div className="flex flex-col gap-2 py-3 px-1">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-10 rounded-xl bg-white/5 animate-pulse" />
-              ))}
-            </div>
-          ) : (
-            modules.map((module) => {
-              const isExpanded = expandedModuleId === module.ModuleMasterID;
-              const moduleRoute = getModuleRoute(module.ModuleMasterID);
-              const modulePath =
-                  moduleRoute?.path ??
-                  `/coming-soon/${module.ModuleMasterID}`;
+  {isLoading ? (
+    <div className="flex flex-col gap-2 py-3 px-1">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="h-10 rounded-xl bg-white/5 animate-pulse" />
+      ))}
+    </div>
+  ) : (
+    // 1. GIỮ NGUYÊN mảng modules gốc, KHÔNG DÙNG .filter() để ẩn nữa
+    modules.map((module) => {
+      const isExpanded = expandedModuleId === module.ModuleMasterID;
+      
+      // Kiểm tra quyền của Module Master (Cha)
+      const hasMasterPermission = authorizedPermissionMasterModule(module.ModuleMasterID);
 
-              const moduleSubmodules =
-                  submodules[module.ModuleMasterID] ?? [];
+      const moduleRoute = getModuleRoute(module.ModuleMasterID);
+      // NẾU KHÔNG CÓ QUYỀN: Đổi path thành '#' để không bị chuyển trang khi click
+      const modulePath = hasMasterPermission 
+        ? (moduleRoute?.path ?? `/coming-soon/${module.ModuleMasterID}`)
+        : '#';
 
-              const hasSubmodules =
-                  moduleSubmodules.length > 0;
+      const moduleSubmodules = submodules[module.ModuleMasterID] ?? [];
+      const hasSubmodules = moduleSubmodules.length > 0;
 
-              return (
-                <div key={module.ModuleMasterID} className="flex flex-col">
-                  {/* Module Master Item */}
-                  <div className="group relative flex items-center w-full rounded-xl transition-colors duration-150">
-                    <NavLink
-                      to={modulePath}
-                      end
-                      title={isCollapsed ? module.ModuleMasterName : undefined}
-                      className={({ isActive }) =>
-                        `flex-1 flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-semibold tracking-wide transition-all ${isActive
-                          ? 'bg-[var(--color-brand-cyan)]/20 text-cyan-200 ring-1 ring-[var(--color-brand-cyan)]/40 shadow-sm shadow-cyan-950/20'
-                          : 'text-blue-100/75 hover:text-white hover:bg-[var(--color-sidebar-hover)]'
-                        } ${isCollapsed ? 'justify-center px-0' : ''}`
-                      }
-                    >
-                      {({ isActive }) => (
-                        <>
-                          <div
-                            className={`shrink-0 transition-colors ${isActive ? 'text-[var(--color-brand-cyan)]' : 'text-blue-200/70 group-hover:text-white'
-                              }`}
-                          >
-                            {getModuleIcon(module.ModuleMasterName)}
-                          </div>
-
-                          {!isCollapsed && (
-                            <span className="truncate text-left leading-none flex-1">
-                              {module.ModuleMasterName}
-                            </span>
-                          )}
-                        </>
-                      )}
-                    </NavLink>
-
-                    {/* Expand/Collapse Button */}
-                    {!isCollapsed && hasSubmodules && (
-                      <button
-                          type="button"
-                          onClick={() => handleModuleClick(module.ModuleMasterID)}
-                          aria-label="Toggle submodules"
-                          className={`p-2 mr-1 rounded-lg text-blue-200/60 hover:text-white hover:bg-white/10 transition-all ${
-                              isExpanded
-                                  ? 'text-[var(--color-brand-cyan)]'
-                                  : ''
-                          }`}
-                      >
-                          {isExpanded ? (
-                              <ChevronDown size={15} />
-                          ) : (
-                              <ChevronRight size={15} />
-                          )}
-                      </button>
-                  )}
+      return (
+        <div key={module.ModuleMasterID} className="flex flex-col">
+          {/* Module Master Item */}
+          <div className="group relative flex items-center w-full rounded-xl transition-colors duration-150">
+            <NavLink
+              to={modulePath}
+              end
+              title={isCollapsed ? module.ModuleMasterName : undefined}
+              // CHẶN CLICK BẰNG CSS: Nếu không có quyền, thêm 'pointer-events-none opacity-40' để khóa chuột và làm mờ nút
+              className={({ isActive }) =>
+                `flex-1 flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-semibold tracking-wide transition-all ${
+                  !hasMasterPermission
+                    ? 'pointer-events-none opacity-40 cursor-not-allowed text-blue-100/40' 
+                    : isActive
+                      ? 'bg-[var(--color-brand-cyan)]/20 text-cyan-200 ring-1 ring-[var(--color-brand-cyan)]/40 shadow-sm shadow-cyan-950/20'
+                      : 'text-blue-100/75 hover:text-white hover:bg-[var(--color-sidebar-hover)]'
+                } ${isCollapsed ? 'justify-center px-0' : ''}`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <div
+                    className={`shrink-0 transition-colors ${
+                      !hasMasterPermission 
+                        ? 'text-blue-200/30' 
+                        : isActive ? 'text-[var(--color-brand-cyan)]' : 'text-blue-200/70 group-hover:text-white'
+                    }`}
+                  >
+                    {getModuleIcon(module.ModuleMasterName)}
                   </div>
 
-                  {/* SubModules Accordion */}
-                  {!isCollapsed && isExpanded && submodules[module.ModuleMasterID] && (
-                    <div className="mt-1 ml-5 pl-3 border-l border-white/15 space-y-0.5">
-                      {submodules[module.ModuleMasterID].map((sub) => {
-                        const route = getSubModuleRoute(sub.ModuleMasterID, Number(sub.ModuleMasterSubID));
-                        const path =
-                          route?.path ??
-                          `/coming-soon/${sub.ModuleMasterID}/${sub.ModuleMasterSubID}`;
-
-                        return (
-                          <NavLink
-                            key={`${sub.ModuleMasterID}-${sub.ModuleMasterSubID}`}
-                            to={path}
-                            className={({ isActive }) =>
-                              `block px-3 py-2 text-[11px] font-medium rounded-lg transition-all ${isActive
-                                ? 'text-[var(--color-brand-cyan)] bg-white/10 font-semibold'
-                                : 'text-blue-100/65 hover:text-white hover:bg-white/5'
-                              }`
-                            }
-                          >
-                            {sub.ModuleMasterName}
-                          </NavLink>
-                        );
-                      })}
-
-                      {submodules[module.ModuleMasterID].length === 0 && (
-                        <span className="block px-3 py-1.5 text-[11px] text-blue-200/40 italic">
-                          Không có phân hệ con
-                        </span>
-                      )}
-                    </div>
+                  {!isCollapsed && (
+                    <span className="truncate text-left leading-none flex-1">
+                      {module.ModuleMasterName}
+                      {/* Thêm icon ổ khóa nhỏ trực quan nếu bạn muốn */}
+                      {!hasMasterPermission && ' 🔒'} 
+                    </span>
                   )}
-                </div>
-              );
-            })
+                </>
+              )}
+            </NavLink>
+
+            {/* Expand/Collapse Button (Module cha bị khóa thì vẫn cho phép bấm xổ ra để xem các con bên trong) */}
+            {!isCollapsed && hasSubmodules && (
+              <button
+                  type="button"
+                  onClick={() => handleModuleClick(module.ModuleMasterID)}
+                  aria-label="Toggle submodules"
+                  className={`p-2 mr-1 rounded-lg text-blue-200/60 hover:text-white hover:bg-white/10 transition-all ${
+                      isExpanded ? 'text-[var(--color-brand-cyan)]' : ''
+                  }`}
+              >
+                  {isExpanded ? (
+                      <ChevronDown size={15} />
+                  ) : (
+                      <ChevronRight size={15} />
+                  )}
+              </button>
+            )}
+          </div>
+
+          {/* SubModules Accordion */}
+          {!isCollapsed && isExpanded && submodules[module.ModuleMasterID] && (
+            <div className="mt-1 ml-5 pl-3 border-l border-white/15 space-y-0.5">
+              {submodules[module.ModuleMasterID].map((sub) => {
+                // Kiểm tra quyền của SubModule (Con)
+                const hasSubPermission = authorizedPermissionSubModule(sub.ModuleMasterID, Number(sub.ModuleMasterSubID));
+                
+                const route = getSubModuleRoute(sub.ModuleMasterID, Number(sub.ModuleMasterSubID));
+                const path = hasSubPermission
+                  ? (route?.path ?? `/coming-soon/${sub.ModuleMasterID}/${sub.ModuleMasterSubID}`)
+                  : '#'; // Khóa đường dẫn nếu không có quyền
+
+                return (
+                  <NavLink
+                    key={`${sub.ModuleMasterID}-${sub.ModuleMasterSubID}`}
+                    to={path}
+                    // CHẶN CLICK SUBMODULE: Áp dụng 'pointer-events-none opacity-40' nếu thiếu quyền
+                    className={({ isActive }) =>
+                      `block px-3 py-2 text-[11px] font-medium rounded-lg transition-all ${
+                        !hasSubPermission
+                          ? 'pointer-events-none opacity-30 text-blue-100/30 italic'
+                          : isActive
+                            ? 'text-[var(--color-brand-cyan)] bg-white/10 font-semibold'
+                            : 'text-blue-100/65 hover:text-white hover:bg-white/5'
+                      }`
+                    }
+                  >
+                    {sub.ModuleMasterName} {!hasSubPermission && '🔒'}
+                  </NavLink>
+                );
+              })}
+
+              {submodules[module.ModuleMasterID].length === 0 && (
+                <span className="block px-3 py-1.5 text-[11px] text-blue-200/40 italic">
+                  Không có phân hệ con
+                </span>
+              )}
+            </div>
           )}
-        </nav>
+        </div>
+      );
+    })
+  )}
+</nav>
+
       </div>
 
       {/* Bottom Section - Collapse Toggle & Logout */}

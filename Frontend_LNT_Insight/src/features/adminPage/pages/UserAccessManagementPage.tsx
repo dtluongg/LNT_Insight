@@ -223,7 +223,7 @@ export const UserAccessManagementPage: React.FC = () => {
         selectedSubs.forEach((sub) => {
           result.push({
             ModuleMasterID: mId,
-            ModuleMasterSubID: sub.ModuleMasterSubID,
+            ModuleMasterSubID: Number(sub.ModuleMasterSubID),
           });
         });
       } else if (selectedSubmoduleKeys.has(getSubKey(mId, 0))) {
@@ -846,13 +846,14 @@ export const UserAccessManagementPage: React.FC = () => {
                               {company.CompanyCode || cId}
                             </span>
                           </div>
+                          {/* 
                           {company.CompanyName && company.CompanyCode && (
                             <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
                               ID: {cId}
                             </p>
                           )}
+                          */}
                         </div>
-
                         {isChecked && (
                           <span className="shrink-0 text-[10px] font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1">
                             <Check className="w-3 h-3" /> Authorized

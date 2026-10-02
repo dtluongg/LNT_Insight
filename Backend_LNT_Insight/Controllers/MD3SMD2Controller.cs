@@ -40,7 +40,7 @@ namespace Backend_LNT_Insight.Controllers
         }
 
         // function for get list company
-        [HttpGet]
+        [HttpGet("com")]
         public async Task<IActionResult> GetCompanies()
         {
             if (_useLocalMockData)
@@ -55,7 +55,7 @@ namespace Backend_LNT_Insight.Controllers
         }
 
         // function for get all site of company
-        [HttpGet("{companyID}/si")]
+        [HttpGet("com/{comID}/si")]
         public async Task<IActionResult> GetSites(string companyID)
         {
             if (_useLocalMockData)
@@ -65,12 +65,12 @@ namespace Backend_LNT_Insight.Controllers
 
             using var db = CreateConnection();
             string sql = "USP_FXPRO_Insight_GetSites";
-            var result = (await db.QueryAsync<dynamic>(sql, new { CompanyID = companyID })).ToList();
+            var result = (await db.QueryAsync<dynamic>(sql, new { CompanyID = companyID }, commandType: CommandType.StoredProcedure)).ToList();
             return Ok(result);
         }
 
         // function for get all section of company and site
-        [HttpGet("{companyID}/si/{siteID}/se")]
+        [HttpGet("com/{comID}/si/{siID}/se")]
         public async Task<IActionResult> GetSections(string companyID, string siteID, [FromQuery] string departmentID = "DEP05")
         {
             if(_useLocalMockData)
@@ -80,6 +80,21 @@ namespace Backend_LNT_Insight.Controllers
             using var db = CreateConnection();
             string sql = "USP_FXPRO_Insight_GetSections";
             var result = (await db.QueryAsync<dynamic>(sql, new {CompanyID = companyID, SiteID = siteID, DepartmentID = departmentID})).ToList();
+            return Ok(result);
+        }
+
+        // data for 5 statcard:
+        [HttpGet("com/{comID}/si/{siID}/se/{seID}/date/{dateDay}/sewing_summary")]
+        public async Task<IActionResult> GetSewingTeamPerformanceSummary(string companyID, string siteID, int sectionID, DateTime dateDay){
+            if(_useLocalMockData){
+                return GetMockData("GetSewingSummary.json");
+            }
+            using var db = CreateConnection();
+            var result = (
+                            await db.QueryAsync<dynamic>("USP_FXPRO_Insight_SewingTeamPerformance_Summary",
+                            new {CompanyID = companyID, SiteID = siteID, SectionID = sectionID, Date = dateDay.Date},
+                            commandType: CommandType.StoredProcedure)
+                        ).ToList();
             return Ok(result);
         }
     }

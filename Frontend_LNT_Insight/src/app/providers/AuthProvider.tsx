@@ -10,6 +10,8 @@ interface AuthContextType {
   loginMessage: string | null; // Message phản hồi khi đăng nhập
   isAuthenticated: boolean; // Check status loged in?
   isLoading: boolean; // check status loading data
+  authorizedPermissionMasterModule: (moduleMasterID: string) => boolean;
+  authorizedPermissionSubModule: (moduleMasterID: string, moduleMasterSubID: number ) => boolean;
   login: (data: LoginResponse) => void; // function check status loged in
   logout: () => void; // function logout. 
 }
@@ -109,6 +111,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoginMessage(null);
   };
 
+  const permissionForSubModule = (moduleID: string, moduleSubId: number): boolean => {
+    if (!user || !selectedCompanyID) return false;
+    const currentCompany = authorizedCompanies.find(c => c.companyID === selectedCompanyID);
+    if (!currentCompany || !currentCompany.authorizedListModules) return false;
+
+    return currentCompany.authorizedListModules.some(
+      m => m.moduleMasterID === moduleID && m.moduleMasterSubID === moduleSubId
+    );
+  };
+
+  // 2. Hàm check cho Module chính (Chỉ cần có ít nhất 1 Sub thuộc Module đó được cấp quyền)
+  const permissionForMasterModule = (moduleID: string): boolean => {
+    if (!user || !selectedCompanyID) return false;
+    const currentCompany = authorizedCompanies.find(c => c.companyID === selectedCompanyID);
+    if (!currentCompany || !currentCompany.authorizedListModules) return false;
+
+    return currentCompany.authorizedListModules.some(m => m.moduleMasterID === moduleID);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -119,6 +140,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loginMessage,
         isAuthenticated: !!user, // Có user = true, không có = false
         isLoading,
+        authorizedPermissionMasterModule: permissionForMasterModule,
+        authorizedPermissionSubModule: permissionForSubModule,
         login,
         logout
       }}

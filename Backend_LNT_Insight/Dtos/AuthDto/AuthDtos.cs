@@ -102,9 +102,16 @@ namespace Backend_LNT_Insight.Dtos.AuthDto
 
     public record ModuleDto
     {
-        public string CompanySiteID { get; init; } = string.Empty;
         public string ModuleMasterID { get; init; } = string.Empty;
-        public string ModuleMasterName { get; init; } = string.Empty;
+        public int ModuleMasterSubID { get; init; }
+    }
+
+
+    public record UserAuthorizedCompanyModuleDto {
+        public string CompanyID { get; init; } = string.Empty;
+        public string CompanyCode {get; init;} = string.Empty;
+        public string CompanyName {get; init;} = string.Empty;
+        public List<ModuleDto> AuthorizedListModules {get; init; } = new();
     }
 
     public record LoginResponse
@@ -114,8 +121,6 @@ namespace Backend_LNT_Insight.Dtos.AuthDto
         public string Token { get; init; } = string.Empty;
         public string RefreshToken { get; init; } = string.Empty;
         public UserInfoDto User { get; init; } = new();
-        //public List<SiteDto> AuthorizedSites { get; init; } = new();
-        //public List<ModuleDto> AuthorizedModules { get; init; } = new();
-        public List<CompanyDto> AuthorizedCompanies { get; init; } = new();
+        public List<UserAuthorizedCompanyModuleDto> AuthorizedCompanies { get; init; } = new();
     }
 }

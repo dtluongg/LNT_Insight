@@ -69,12 +69,34 @@ namespace Backend_LNT_Insight.Services.Auth
             //if (userInfo.Authorized == false) return null;
 
             // Get list company follow user:
-            var userCompanies = (await db.QueryAsync<CompanyDto>(
-                    // "select * from [lntdev-db01].[FXPRO].[dbo].[tblMastUserCompany] where UserID = @UserID",
-                    "USP_FXPRO_Insight_GetMastUserCompany",
-                    new { userFind.UserID },
-                    commandType: CommandType.StoredProcedure
-                )).ToList();
+            // var userCompanies = (await db.QueryAsync<CompanyDto>(
+            //         // "select * from [lntdev-db01].[FXPRO].[dbo].[tblMastUserCompany] where UserID = @UserID",
+            //         "USP_FXPRO_Insight_GetMastUserCompany",
+            //         new { userFind.UserID },
+            //         commandType: CommandType.StoredProcedure
+            //     )).ToList();
+            var rawPermissions = (await db.QueryAsync<dynamic>(
+                                "USP_FXPRO_Insight_GetMastUserCompanyAuth",
+                                new {userFind.UserID},
+                                commandType: CommandType.StoredProcedure
+                            )).ToList();
+
+            var userCompanies = rawPermissions
+                                .GroupBy(r => new {r.CompanyID, r.CompanyCode, r.CompanyName})
+                                .Select(g => new UserAuthorizedCompanyModuleDto{
+                                    CompanyID = g.Key.CompanyID,
+                                    CompanyCode = g.Key.CompanyCode,
+                                    CompanyName = g.Key.CompanyName,
+                                    AuthorizedListModules = g
+                                        .Where(r => r.ModuleMasterID != null)
+                                        .Select(r => new ModuleDto{
+                                            ModuleMasterID = (string)r.ModuleMasterID,
+                                            ModuleMasterSubID = (int)r.ModuleMasterSubID 
+                                        })
+                                        .Distinct()
+                                        .ToList()
+                                })
+                                .ToList();
 
 
             // Tạo JWT (Access Token và Refresh Token):

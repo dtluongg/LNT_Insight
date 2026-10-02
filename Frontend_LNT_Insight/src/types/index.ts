@@ -6,10 +6,16 @@ export interface User {
     isAdmin: boolean;
     defaultCompanyID: string | null;
 }
+
+export interface ModuleDto {
+    moduleMasterID: string;
+    moduleMasterSubID: number;
+}
 export interface AuthorizedCompanyDto {
     companyID: string;
     companyCode?: string;
     companyName?: string;
+    authorizedListModules: ModuleDto[];
 }
 // Cấu trúc phản hồi từ API Đăng nhập thành công
 export interface LoginResponse {
