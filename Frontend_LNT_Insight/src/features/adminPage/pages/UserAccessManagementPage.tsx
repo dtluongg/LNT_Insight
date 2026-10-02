@@ -10,9 +10,6 @@ import {
   ChevronDown,
   ChevronRight,
   Loader2,
-  AlertCircle,
-  AlertTriangle,
-  Info,
   CheckCircle2,
   X,
   Users,
@@ -22,49 +19,46 @@ import {
 import { masterDataApi } from '../../../core/api/materData';
 import { companiesApi } from '../../../core/api/companies';
 import type {
-  UserWorkingInfo,
   CompanyInfo,
   ModuleMasterInfo,
   SubModuleInfo,
-  UpdateUserModuleAccessPayload
+  UpdateUserModuleAccessPayload,
 } from '../../../types';
+
+interface UserOptionItem {
+  userID: string;
+  isAdmin: boolean;
+}
 
 interface ModuleWithSubmodules extends ModuleMasterInfo {
   submodules: SubModuleInfo[];
 }
 
-export interface UserOptionItem {
-  userID: string;
-  isAdmin: boolean;
-}
-
 export const UserAccessManagementPage: React.FC = () => {
-  // Master data
+  // Master Data
   const [users, setUsers] = useState<UserOptionItem[]>([]);
   const [companies, setCompanies] = useState<CompanyInfo[]>([]);
   const [modules, setModules] = useState<ModuleWithSubmodules[]>([]);
 
-  // Selected User
+  // Selected state
   const [selectedUsername, setSelectedUsername] = useState<string>('');
-
-  // Selected Permissions
-  // Store trimmed string IDs for clean matching
-  const [selectedCompanyIDs, setSelectedCompanyIDs] = useState<Set<string>>(new Set());
-  // Key format: `${trimmedModuleID}__${subID}` (subID = 0 represents parent module access)
+  const [selectedCompanyID, setSelectedCompanyID] = useState<string>('');
+  // Set of keys: `${moduleId}__${subId}` (subId = 0 represents the module itself)
   const [selectedSubmoduleKeys, setSelectedSubmoduleKeys] = useState<Set<string>>(new Set());
 
-  // Snapshot for dirty state checking and reset
-  const [originalCompanyIDs, setOriginalCompanyIDs] = useState<Set<string>>(new Set());
+  // Snapshot for dirty checking & reset (for currently active company)
   const [originalSubmoduleKeys, setOriginalSubmoduleKeys] = useState<Set<string>>(new Set());
+  // Set of company IDs where user has at least one permission
+  const [assignedCompanyIDs, setAssignedCompanyIDs] = useState<Set<string>>(new Set());
 
   // UI States
   const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
   const [isLoadingUserAccess, setIsLoadingUserAccess] = useState<boolean>(false);
+  const [isLoadingCompanyModules, setIsLoadingCompanyModules] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
 
-  // Search Filters
-  const [userSearchText, setUserSearchText] = useState<string>('');
+  // Search filters
   const [companySearchText, setCompanySearchText] = useState<string>('');
   const [moduleSearchText, setModuleSearchText] = useState<string>('');
 
@@ -78,11 +72,10 @@ export const UserAccessManagementPage: React.FC = () => {
     }, 4000);
   };
 
-  // Helper key generator
   const getSubKey = (moduleId: string, subId: string | number) =>
     `${moduleId.trim()}__${String(subId).trim()}`;
 
-  // 1. Load initial master data (Users from user_working, Companies, Modules & Submodules)
+  // 1. Initial Load Master Data
   useEffect(() => {
     const loadMasterData = async () => {
       try {
@@ -91,7 +84,7 @@ export const UserAccessManagementPage: React.FC = () => {
         const [fetchedUsersRaw, fetchedCompanies, fetchedModules] = await Promise.all([
           masterDataApi.getUserWorking().catch((err) => {
             console.error('Failed to load user working list:', err);
-            return [] as UserWorkingInfo[];
+            return [];
           }),
           companiesApi.getCompanies().catch((err) => {
             console.error('Failed to load companies list:', err);
@@ -103,7 +96,7 @@ export const UserAccessManagementPage: React.FC = () => {
           }),
         ]);
 
-        // Standardize user list: only keep userID and isAdmin
+        // Standardize user list
         const normalizedUsers: UserOptionItem[] = (fetchedUsersRaw || [])
           .map((u: any) => ({
             userID: (u.UserID || u.userID || '').trim(),
@@ -112,26 +105,23 @@ export const UserAccessManagementPage: React.FC = () => {
           .filter((u) => u.userID.length > 0);
 
         setUsers(normalizedUsers);
-        setCompanies(fetchedCompanies);
+        setCompanies(fetchedCompanies || []);
 
-        // Fetch submodules for each module
+        // Load submodules for all modules
         const modulesWithSubs: ModuleWithSubmodules[] = await Promise.all(
-          fetchedModules.map(async (mod) => {
+          (fetchedModules || []).map(async (mod) => {
             try {
               const subs = await masterDataApi.getSubModules(mod.ModuleMasterID);
               return { ...mod, submodules: subs || [] };
             } catch (err) {
-              console.error(`Failed to load submodules for module ${mod.ModuleMasterID}:`, err);
+              console.error(`Failed to load submodules for ${mod.ModuleMasterID}:`, err);
               return { ...mod, submodules: [] };
             }
           })
         );
 
         setModules(modulesWithSubs);
-
-        // Default expand all modules
-        const allModIds = new Set(modulesWithSubs.map((m) => m.ModuleMasterID.trim()));
-        setExpandedModules(allModIds);
+        setExpandedModules(new Set(modulesWithSubs.map((m) => m.ModuleMasterID.trim())));
       } catch (error) {
         console.error('Failed to load Master Data:', error);
         showToast('error', 'Failed to load master data from system.');
@@ -143,44 +133,74 @@ export const UserAccessManagementPage: React.FC = () => {
     loadMasterData();
   }, []);
 
-  // 2. Fetch User Permissions when selected user changes
+  // 2. Fetch company-specific module access
+  const fetchCompanyModules = async (username: string, companyId: string) => {
+    if (!username || !companyId) return;
+    try {
+      setIsLoadingCompanyModules(true);
+      const data = await masterDataApi.getUserCompanyModuleAccess(username, companyId);
+
+      const subSet = new Set<string>();
+      (data.modules || []).forEach((item) => {
+        if (item.moduleMasterID !== undefined && item.moduleMasterSubID !== undefined) {
+          const mId = item.moduleMasterID.trim();
+          const subId = Number(item.moduleMasterSubID);
+          subSet.add(getSubKey(mId, subId));
+          // Ensure parent module key (subId = 0) is marked when submodule is granted
+          subSet.add(getSubKey(mId, 0));
+        }
+      });
+
+      setSelectedSubmoduleKeys(subSet);
+      setOriginalSubmoduleKeys(new Set(subSet));
+    } catch (err) {
+      console.error(`Failed to load modules for user ${username} at company ${companyId}:`, err);
+      showToast('error', `Failed to load module permissions for company ${companyId}`);
+      setSelectedSubmoduleKeys(new Set());
+      setOriginalSubmoduleKeys(new Set());
+    } finally {
+      setIsLoadingCompanyModules(false);
+    }
+  };
+
+  // 3. When Selected User changes: Load overview & default active company
   useEffect(() => {
     if (!selectedUsername) {
-      setSelectedCompanyIDs(new Set());
+      setSelectedCompanyID('');
+      setAssignedCompanyIDs(new Set());
       setSelectedSubmoduleKeys(new Set());
-      setOriginalCompanyIDs(new Set());
       setOriginalSubmoduleKeys(new Set());
       return;
     }
 
-    const loadUserPermissions = async () => {
+    const loadUserOverview = async () => {
       try {
         setIsLoadingUserAccess(true);
         const data = await masterDataApi.getUserModuleAccess(selectedUsername);
 
-        // Map Company IDs (trimming spaces from DB)
-        const companySet = new Set(
+        const assignedSet = new Set(
           (data.companyIDs || [])
             .map((item) => item.companyID?.trim())
             .filter(Boolean)
         );
+        setAssignedCompanyIDs(assignedSet);
 
-        // Map Submodule Keys
-        const subSet = new Set<string>();
-        (data.modules || []).forEach((item) => {
-          if (item.moduleMasterID !== undefined && item.moduleMasterSubID !== undefined) {
-            const mId = item.moduleMasterID.trim();
-            const subId = item.moduleMasterSubID;
-            subSet.add(getSubKey(mId, subId));
-            // Ensure parent module key (mId__0) is also marked as granted
-            subSet.add(getSubKey(mId, 0));
-          }
-        });
+        // Auto-select initial company: preference to first authorized company, else first master company
+        let initialCompany = '';
+        if (assignedSet.size > 0) {
+          initialCompany = Array.from(assignedSet)[0];
+        } else if (companies.length > 0) {
+          initialCompany = companies[0].CompanyID.trim();
+        }
 
-        setSelectedCompanyIDs(companySet);
-        setSelectedSubmoduleKeys(subSet);
-        setOriginalCompanyIDs(new Set(companySet));
-        setOriginalSubmoduleKeys(new Set(subSet));
+        setSelectedCompanyID(initialCompany);
+
+        if (initialCompany) {
+          await fetchCompanyModules(selectedUsername, initialCompany);
+        } else {
+          setSelectedSubmoduleKeys(new Set());
+          setOriginalSubmoduleKeys(new Set());
+        }
       } catch (err) {
         console.error(`Failed to load permissions for user ${selectedUsername}:`, err);
         showToast('error', `Failed to load access permissions for user ${selectedUsername}`);
@@ -189,25 +209,36 @@ export const UserAccessManagementPage: React.FC = () => {
       }
     };
 
-    loadUserPermissions();
+    loadUserOverview();
   }, [selectedUsername]);
 
-  // Compute authorized counts and effective payload modules
+  // Active Company Object
+  const activeCompany = useMemo(() => {
+    return companies.find((c) => c.CompanyID.trim() === selectedCompanyID);
+  }, [companies, selectedCompanyID]);
+
+  // Click Company: Switch active company and query modules
+  const handleSelectCompany = (companyId: string) => {
+    const trimmed = companyId.trim();
+    if (trimmed === selectedCompanyID) return;
+    setSelectedCompanyID(trimmed);
+    if (selectedUsername) {
+      fetchCompanyModules(selectedUsername, trimmed);
+    }
+  };
+
+  // Compute authorized counts & effective payload modules for active company
   const {
     authorizedModulesCount,
     authorizedSubmodulesCount,
     effectivePayloadModules,
   } = useMemo(() => {
     const result: { ModuleMasterID: string; ModuleMasterSubID: number }[] = [];
-    const processedModIds = new Set<string>();
     let parentCount = 0;
     let subCount = 0;
 
     modules.forEach((mod) => {
       const mId = mod.ModuleMasterID.trim();
-      processedModIds.add(mId);
-
-      const subKeys = mod.submodules.map((s) => getSubKey(mId, s.ModuleMasterSubID));
       const selectedSubs = mod.submodules.filter((s) =>
         selectedSubmoduleKeys.has(getSubKey(mId, s.ModuleMasterSubID))
       );
@@ -227,21 +258,10 @@ export const UserAccessManagementPage: React.FC = () => {
           });
         });
       } else if (selectedSubmoduleKeys.has(getSubKey(mId, 0))) {
-        // Parent module selected independently without submodules
+        // Parent module selected independently
         result.push({
           ModuleMasterID: mId,
           ModuleMasterSubID: 0,
-        });
-      }
-    });
-
-    // Fallback for any orphaned keys not in master list
-    selectedSubmoduleKeys.forEach((key) => {
-      const [mId, subIdStr] = key.split('__');
-      if (!processedModIds.has(mId)) {
-        result.push({
-          ModuleMasterID: mId,
-          ModuleMasterSubID: Number(subIdStr || 0),
         });
       }
     });
@@ -253,66 +273,46 @@ export const UserAccessManagementPage: React.FC = () => {
     };
   }, [modules, selectedSubmoduleKeys]);
 
-  // Validation Flags: Cross join requires both company and module to insert records into DB
-  const isMissingModules =
-    selectedCompanyIDs.size > 0 && effectivePayloadModules.length === 0;
-  const isMissingCompanies =
-    selectedCompanyIDs.size === 0 && effectivePayloadModules.length > 0;
-  const isRevokingAll =
-    Boolean(selectedUsername) &&
-    selectedCompanyIDs.size === 0 &&
-    effectivePayloadModules.length === 0 &&
-    (originalCompanyIDs.size > 0 || originalSubmoduleKeys.size > 0);
-  const hasValidationError = isMissingModules || isMissingCompanies;
-
-  // Check if there are unsaved changes
+  // Check unsaved changes for the active company
   const hasUnsavedChanges = useMemo(() => {
-    if (!selectedUsername) return false;
-    if (selectedCompanyIDs.size !== originalCompanyIDs.size) return true;
+    if (!selectedUsername || !selectedCompanyID) return false;
     if (selectedSubmoduleKeys.size !== originalSubmoduleKeys.size) return true;
 
-    for (const id of selectedCompanyIDs) {
-      if (!originalCompanyIDs.has(id)) return true;
-    }
     for (const key of selectedSubmoduleKeys) {
       if (!originalSubmoduleKeys.has(key)) return true;
     }
     return false;
-  }, [selectedUsername, selectedCompanyIDs, originalCompanyIDs, selectedSubmoduleKeys, originalSubmoduleKeys]);
+  }, [selectedUsername, selectedCompanyID, selectedSubmoduleKeys, originalSubmoduleKeys]);
 
-  // Reset to original permissions
+  // Reset changes for active company
   const handleReset = () => {
-    setSelectedCompanyIDs(new Set(originalCompanyIDs));
     setSelectedSubmoduleKeys(new Set(originalSubmoduleKeys));
   };
 
-  // Toggle single Company
-  const toggleCompany = (companyId: string) => {
-    const trimmed = companyId.trim();
-    const updated = new Set(selectedCompanyIDs);
-    if (updated.has(trimmed)) {
-      updated.delete(trimmed);
+  // Toggle Parent Module
+  const toggleParentModule = (module: ModuleWithSubmodules) => {
+    const mId = module.ModuleMasterID.trim();
+    const parentKey = getSubKey(mId, 0);
+    const updated = new Set(selectedSubmoduleKeys);
+
+    const isParentSelected =
+      updated.has(parentKey) ||
+      Array.from(updated).some((k) => k.startsWith(`${mId}__`));
+
+    if (isParentSelected) {
+      // Uncheck parent: removes parent access and ALL submodules
+      Array.from(updated).forEach((k) => {
+        if (k.startsWith(`${mId}__`)) updated.delete(k);
+      });
     } else {
-      updated.add(trimmed);
+      // Check parent independently without requiring submodules
+      updated.add(parentKey);
     }
-    setSelectedCompanyIDs(updated);
+
+    setSelectedSubmoduleKeys(updated);
   };
 
-  // Select / Deselect All Companies
-  const handleToggleAllCompanies = () => {
-    const visibleCompanies = filteredCompanies.map((c) => c.CompanyID.trim());
-    const allSelected = visibleCompanies.every((id) => selectedCompanyIDs.has(id));
-
-    const updated = new Set(selectedCompanyIDs);
-    if (allSelected) {
-      visibleCompanies.forEach((id) => updated.delete(id));
-    } else {
-      visibleCompanies.forEach((id) => updated.add(id));
-    }
-    setSelectedCompanyIDs(updated);
-  };
-
-  // Toggle single Submodule (auto-enables parent module when selecting submodule; preserves parent module when unselecting)
+  // Toggle Submodule
   const toggleSubmodule = (moduleId: string, subId: string | number) => {
     const mId = moduleId.trim();
     const key = getSubKey(mId, subId);
@@ -324,34 +324,9 @@ export const UserAccessManagementPage: React.FC = () => {
       // Keep parent module granted independently even if this submodule is unchecked
     } else {
       updated.add(key);
-      // Automatically ensure parent module is also granted
+      // Automatically ensure parent module is granted
       updated.add(parentKey);
     }
-    setSelectedSubmoduleKeys(updated);
-  };
-
-  // Toggle Parent Module (allows selecting parent module independently without requiring submodules)
-  const toggleParentModule = (module: ModuleWithSubmodules) => {
-    const mId = module.ModuleMasterID.trim();
-    const parentKey = getSubKey(mId, 0);
-    const updated = new Set(selectedSubmoduleKeys);
-
-    const isParentSelected =
-      updated.has(parentKey) ||
-      Array.from(updated).some((k) => k.startsWith(`${mId}__`));
-
-    if (isParentSelected) {
-      // Uncheck parent: removes parent access and any submodules under it
-      Array.from(updated).forEach((k) => {
-        if (k.startsWith(`${mId}__`)) {
-          updated.delete(k);
-        }
-      });
-    } else {
-      // Check parent: grants module-level access (mId__0) without forcing submodules to be checked
-      updated.add(parentKey);
-    }
-
     setSelectedSubmoduleKeys(updated);
   };
 
@@ -365,10 +340,8 @@ export const UserAccessManagementPage: React.FC = () => {
     const updated = new Set(selectedSubmoduleKeys);
 
     if (allSubsSelected) {
-      // Unselect all submodules (keeps parent module mId__0 granted)
       subKeys.forEach((k) => updated.delete(k));
     } else {
-      // Select all submodules AND ensure parent module is also granted
       subKeys.forEach((k) => updated.add(k));
       updated.add(getSubKey(mId, 0));
     }
@@ -376,17 +349,15 @@ export const UserAccessManagementPage: React.FC = () => {
     setSelectedSubmoduleKeys(updated);
   };
 
-  // Select / Deselect All Modules & Submodules in system
+  // Select / Deselect All Modules in system
   const handleToggleAllModules = () => {
     const allTargetKeys: string[] = [];
     modules.forEach((mod) => {
       const mId = mod.ModuleMasterID.trim();
       allTargetKeys.push(getSubKey(mId, 0));
-      if (mod.submodules.length > 0) {
-        mod.submodules.forEach((sub) => {
-          allTargetKeys.push(getSubKey(mId, sub.ModuleMasterSubID));
-        });
-      }
+      mod.submodules.forEach((sub) => {
+        allTargetKeys.push(getSubKey(mId, sub.ModuleMasterSubID));
+      });
     });
 
     const allSelected =
@@ -402,19 +373,15 @@ export const UserAccessManagementPage: React.FC = () => {
     setSelectedSubmoduleKeys(updated);
   };
 
-  // Toggle Expand/Collapse single Module
+  // Toggle Expand / Collapse
   const toggleModuleExpand = (moduleId: string) => {
     const trimmed = moduleId.trim();
     const updated = new Set(expandedModules);
-    if (updated.has(trimmed)) {
-      updated.delete(trimmed);
-    } else {
-      updated.add(trimmed);
-    }
+    if (updated.has(trimmed)) updated.delete(trimmed);
+    else updated.add(trimmed);
     setExpandedModules(updated);
   };
 
-  // Expand / Collapse All
   const handleToggleExpandAll = () => {
     if (expandedModules.size === modules.length) {
       setExpandedModules(new Set());
@@ -423,55 +390,51 @@ export const UserAccessManagementPage: React.FC = () => {
     }
   };
 
-  // Handle Save
+  // Save changes for selected user at active company
   const handleSave = async () => {
-    if (!selectedUsername) return;
-
-    // Validation 1: Selecting companies requires at least 1 module
-    if (selectedCompanyIDs.size > 0 && effectivePayloadModules.length === 0) {
-      showToast(
-        'error',
-        'Validation Error: Please select at least one module. Selecting a company requires at least one module.'
-      );
+    if (!selectedUsername) {
+      showToast('error', 'Please select a user account.');
       return;
     }
 
-    // Validation 2: Selecting modules requires at least 1 company
-    if (effectivePayloadModules.length > 0 && selectedCompanyIDs.size === 0) {
-      showToast(
-        'error',
-        'Validation Error: Please select at least one company. Selecting a module requires at least one company.'
-      );
+    if (!selectedCompanyID) {
+      showToast('error', 'Please select a company.');
       return;
     }
 
     try {
       setIsSaving(true);
 
-      // Build payload matching UpdateUserModuleAccess.json format
       const payload: UpdateUserModuleAccessPayload = {
         UserID: selectedUsername,
-        CompanyIDs: Array.from(selectedCompanyIDs).map((id) => ({
-          CompanyID: id,
-        })),
+        CompanyIDs: [{ CompanyID: selectedCompanyID }],
         Modules: effectivePayloadModules,
       };
 
       await masterDataApi.updateUserModuleAccess(payload);
 
-      // Update original snapshot on success
-      setOriginalCompanyIDs(new Set(selectedCompanyIDs));
       setOriginalSubmoduleKeys(new Set(selectedSubmoduleKeys));
 
-      if (isRevokingAll) {
+      // Update assigned companies state
+      const updatedAssigned = new Set(assignedCompanyIDs);
+      if (effectivePayloadModules.length > 0) {
+        updatedAssigned.add(selectedCompanyID);
+      } else {
+        updatedAssigned.delete(selectedCompanyID);
+      }
+      setAssignedCompanyIDs(updatedAssigned);
+
+      const compLabel = activeCompany?.CompanyCode || activeCompany?.CompanyName || selectedCompanyID;
+
+      if (effectivePayloadModules.length === 0) {
         showToast(
           'success',
-          `All access permissions have been revoked for user "${selectedUsername}".`
+          `All permissions for company "${compLabel}" have been revoked for user "${selectedUsername}".`
         );
       } else {
         showToast(
           'success',
-          `Access permissions updated successfully for user "${selectedUsername}"!`
+          `Permissions updated successfully for user "${selectedUsername}" at company "${compLabel}"!`
         );
       }
     } catch (err: any) {
@@ -481,13 +444,6 @@ export const UserAccessManagementPage: React.FC = () => {
       setIsSaving(false);
     }
   };
-
-  // Filtered Users
-  const filteredUsers = useMemo(() => {
-    if (!userSearchText.trim()) return users;
-    const q = userSearchText.toLowerCase();
-    return users.filter((u) => u.userID.toLowerCase().includes(q));
-  }, [users, userSearchText]);
 
   // Filtered Companies
   const filteredCompanies = useMemo(() => {
@@ -517,12 +473,8 @@ export const UserAccessManagementPage: React.FC = () => {
             String(sub.ModuleMasterSubID).includes(q)
         );
 
-        if (matchParent) {
-          return mod;
-        }
-        if (matchedSubs.length > 0) {
-          return { ...mod, submodules: matchedSubs };
-        }
+        if (matchParent) return mod;
+        if (matchedSubs.length > 0) return { ...mod, submodules: matchedSubs };
         return null;
       })
       .filter(Boolean) as ModuleWithSubmodules[];
@@ -532,7 +484,7 @@ export const UserAccessManagementPage: React.FC = () => {
 
   if (isInitialLoading) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center min-h-[500px] gap-3">
+      <div className="flex-1 flex flex-col items-center justify-center min-h-[450px] gap-3">
         <Loader2 className="w-9 h-9 animate-spin text-blue-600" />
         <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
           Loading system permission data...
@@ -542,34 +494,23 @@ export const UserAccessManagementPage: React.FC = () => {
   }
 
   return (
-    <div className="flex-1 min-h-screen bg-slate-50/60 dark:bg-slate-950 p-4 md:p-6 lg:p-8 flex flex-col gap-6">
+    <div className="flex-1 min-h-screen bg-slate-50/60 dark:bg-slate-950 p-4 md:p-6 lg:p-8 flex flex-col gap-5">
       {/* Toast Alert */}
       {toast && (
         <div
-          className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border backdrop-blur-md transition-all duration-200 animate-in slide-in-from-top-2 ${
+          className={`fixed top-5 right-5 z-50 px-4 py-3 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2.5 transition-all animate-in fade-in slide-in-from-top-3 ${
             toast.type === 'success'
-              ? 'bg-emerald-50/95 dark:bg-emerald-950/90 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800 shadow-emerald-500/10'
-              : 'bg-rose-50/95 dark:bg-rose-950/90 text-rose-800 dark:text-rose-200 border-rose-200 dark:border-rose-800 shadow-rose-500/10'
+              ? 'bg-emerald-600 text-white shadow-emerald-500/20'
+              : 'bg-rose-600 text-white shadow-rose-500/20'
           }`}
         >
-          {toast.type === 'success' ? (
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-          ) : (
-            <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
-          )}
-          <span className="text-sm font-medium">{toast.message}</span>
-          <button
-            onClick={() => setToast(null)}
-            className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg text-slate-400 hover:text-slate-600 transition-colors ml-2 cursor-pointer"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          {toast.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <X className="w-4 h-4" />}
+          <span>{toast.message}</span>
         </div>
       )}
 
       {/* Header & Controls Panel */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-        {/* Left: Title & Subtitle */}
         <div className="flex items-center gap-3.5">
           <div className="w-11 h-11 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0">
             <ShieldCheck className="w-6 h-6" />
@@ -578,20 +519,19 @@ export const UserAccessManagementPage: React.FC = () => {
             <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
               User Access Management
               {hasUnsavedChanges && (
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 animate-pulse">
                   Unsaved changes
                 </span>
               )}
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Configure company access and module/submodule permissions for each user account.
+              Click a company to view and configure module/submodule access for each user account.
             </p>
           </div>
         </div>
 
-        {/* Right: User Select & Action Buttons */}
+        {/* User Selector & Actions */}
         <div className="flex flex-wrap items-center gap-3">
-          {/* User Selector */}
           <div className="relative min-w-[240px] sm:min-w-[280px]">
             <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
               Select User Account
@@ -614,7 +554,6 @@ export const UserAccessManagementPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Action buttons */}
           <div className="flex items-end gap-2 pt-5">
             {/* Reset Button */}
             <button
@@ -632,27 +571,14 @@ export const UserAccessManagementPage: React.FC = () => {
             <button
               type="button"
               onClick={handleSave}
-              disabled={!selectedUsername || isSaving || isLoadingUserAccess || hasValidationError}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-white text-xs font-semibold shadow-xs disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer ${
-                hasValidationError
-                  ? 'bg-amber-600 hover:bg-amber-700 active:bg-amber-800 shadow-amber-500/20'
-                  : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 shadow-blue-500/20'
-              }`}
-              title={
-                hasValidationError
-                  ? 'Validation error: Both company and module selections are required'
-                  : 'Save Changes'
-              }
+              disabled={!selectedUsername || !selectedCompanyID || isSaving || isLoadingUserAccess || isLoadingCompanyModules}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-semibold shadow-xs shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
+              title="Save Changes for active company"
             >
               {isSaving ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
                   <span>Saving...</span>
-                </>
-              ) : hasValidationError ? (
-                <>
-                  <AlertTriangle className="w-4 h-4" />
-                  <span>Save Changes</span>
                 </>
               ) : (
                 <>
@@ -682,50 +608,23 @@ export const UserAccessManagementPage: React.FC = () => {
 
           <div className="flex items-center gap-4 text-slate-500 dark:text-slate-400 font-medium">
             <span>
-              Assigned Companies: <strong className="text-slate-800 dark:text-slate-200">{selectedCompanyIDs.size}</strong>
+              Active Company:{' '}
+              <strong className="text-blue-600 dark:text-blue-400 font-semibold">
+                {activeCompany ? `[${activeCompany.CompanyCode || selectedCompanyID}] ${activeCompany.CompanyName || ''}` : selectedCompanyID || 'None'}
+              </strong>
             </span>
             <span>
-              Assigned Modules:{' '}
+              Authorized Companies:{' '}
+              <strong className="text-slate-800 dark:text-slate-200">
+                {assignedCompanyIDs.size} / {companies.length}
+              </strong>
+            </span>
+            <span>
+              Modules for Active Company:{' '}
               <strong className="text-slate-800 dark:text-slate-200">
                 {authorizedModulesCount} modules ({authorizedSubmodulesCount} submodules)
               </strong>
             </span>
-          </div>
-        </div>
-      )}
-
-      {/* Validation & Status Notices */}
-      {selectedUsername && isMissingModules && (
-        <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl p-3.5 flex items-center gap-3 text-amber-800 dark:text-amber-200 text-xs animate-in fade-in">
-          <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
-          <div className="flex-1">
-            <strong className="font-semibold">Module selection required:</strong> You have selected{' '}
-            <span className="font-bold">{selectedCompanyIDs.size}</span>{' '}
-            {selectedCompanyIDs.size === 1 ? 'company' : 'companies'}, but no modules or submodules are selected.
-            Saving changes requires selecting at least 1 module to associate with selected companies.
-          </div>
-        </div>
-      )}
-
-      {selectedUsername && isMissingCompanies && (
-        <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl p-3.5 flex items-center gap-3 text-amber-800 dark:text-amber-200 text-xs animate-in fade-in">
-          <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
-          <div className="flex-1">
-            <strong className="font-semibold">Company selection required:</strong> You have selected{' '}
-            <span className="font-bold">{authorizedModulesCount}</span>{' '}
-            {authorizedModulesCount === 1 ? 'module' : 'modules'}, but no companies are selected.
-            Please select at least 1 company to grant access.
-          </div>
-        </div>
-      )}
-
-      {selectedUsername && isRevokingAll && (
-        <div className="bg-slate-100 dark:bg-slate-850 border border-slate-200 dark:border-slate-750 rounded-xl p-3.5 flex items-center gap-3 text-slate-700 dark:text-slate-300 text-xs animate-in fade-in">
-          <Info className="w-5 h-5 text-slate-500 dark:text-slate-400 shrink-0" />
-          <div className="flex-1">
-            <strong className="font-semibold">Revoking all permissions:</strong> All companies and modules are unselected.
-            Saving changes will clear all access records for user{' '}
-            <span className="font-mono font-bold text-slate-900 dark:text-white">{selectedUsername}</span> from the database.
           </div>
         </div>
       )}
@@ -754,7 +653,7 @@ export const UserAccessManagementPage: React.FC = () => {
           {/* TABLE 1: COMPANIES ACCESS */}
           {/* ============================================================ */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden flex flex-col">
-            {/* Table Header & Controls */}
+            {/* Header */}
             <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
@@ -764,51 +663,39 @@ export const UserAccessManagementPage: React.FC = () => {
                   <div>
                     <h2 className="text-sm font-bold text-slate-900 dark:text-white">Company Access</h2>
                     <p className="text-[11px] text-slate-400 dark:text-slate-500">
-                      Select companies this user is authorized to access
+                      Click a company to view & configure authorized modules
                     </p>
                   </div>
                 </div>
 
                 <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60">
-                  {selectedCompanyIDs.size} / {companies.length} selected
+                  {assignedCompanyIDs.size} / {companies.length} authorized
                 </span>
               </div>
 
-              {/* Search & Select All Actions */}
-              <div className="flex items-center gap-2 pt-1">
-                <div className="relative flex-1">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    value={companySearchText}
-                    onChange={(e) => setCompanySearchText(e.target.value)}
-                    placeholder="Search company code or name..."
-                    className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-8.5 pr-3 py-1.5 text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                  {companySearchText && (
-                    <button
-                      onClick={() => setCompanySearchText('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleToggleAllCompanies}
-                  className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[11px] font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-750 transition-colors cursor-pointer shrink-0"
-                >
-                  {filteredCompanies.every((c) => selectedCompanyIDs.has(c.CompanyID.trim()))
-                    ? 'Deselect All'
-                    : 'Select All'}
-                </button>
+              {/* Search */}
+              <div className="relative pt-1">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pt-1" />
+                <input
+                  type="text"
+                  value={companySearchText}
+                  onChange={(e) => setCompanySearchText(e.target.value)}
+                  placeholder="Search company code or name..."
+                  className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-8.5 pr-8 py-1.5 text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+                {companySearchText && (
+                  <button
+                    onClick={() => setCompanySearchText('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 pt-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
             </div>
 
             {/* Companies List */}
-            <div className="max-h-[560px] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60">
+            <div className="max-h-[580px] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60">
               {filteredCompanies.length === 0 ? (
                 <div className="p-8 text-center text-xs text-slate-400">
                   No companies found matching your search
@@ -816,30 +703,31 @@ export const UserAccessManagementPage: React.FC = () => {
               ) : (
                 filteredCompanies.map((company) => {
                   const cId = company.CompanyID.trim();
-                  const isChecked = selectedCompanyIDs.has(cId);
+                  const isActive = cId === selectedCompanyID;
+                  const isAssigned = assignedCompanyIDs.has(cId);
 
                   return (
                     <div
                       key={cId}
-                      onClick={() => toggleCompany(cId)}
-                      className={`flex items-center gap-3.5 px-4 py-3 cursor-pointer transition-colors select-none ${
-                        isChecked
-                          ? 'bg-blue-50/40 dark:bg-blue-950/20 hover:bg-blue-50/70 dark:hover:bg-blue-950/30'
-                          : 'hover:bg-slate-50 dark:hover:bg-slate-800/40'
+                      onClick={() => handleSelectCompany(cId)}
+                      className={`flex items-center gap-3.5 px-4 py-3 cursor-pointer transition-all select-none border-l-4 ${
+                        isActive
+                          ? 'bg-blue-50/90 dark:bg-blue-950/50 border-l-blue-600 dark:border-l-blue-400 shadow-xs'
+                          : 'border-l-transparent hover:bg-slate-50 dark:hover:bg-slate-800/40'
                       }`}
                     >
                       <div className="shrink-0 text-slate-400">
-                        {isChecked ? (
-                          <CheckSquare className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        {isActive ? (
+                          <CheckCircle2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                         ) : (
-                          <Square className="w-5 h-5 text-slate-300 dark:text-slate-600" />
+                          <div className="w-5 h-5 rounded-full border-2 border-slate-300 dark:border-slate-600" />
                         )}
                       </div>
 
                       <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-xs text-slate-800 dark:text-slate-100 truncate">
+                            <span className={`text-xs truncate ${isActive ? 'font-bold text-blue-900 dark:text-blue-100' : 'font-semibold text-slate-800 dark:text-slate-100'}`}>
                               {company.CompanyName || company.CompanyCode || cId}
                             </span>
                             <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200/60 dark:border-slate-700/60">
@@ -854,11 +742,22 @@ export const UserAccessManagementPage: React.FC = () => {
                           )}
                           */}
                         </div>
-                        {isChecked && (
-                          <span className="shrink-0 text-[10px] font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1">
-                            <Check className="w-3 h-3" /> Authorized
-                          </span>
-                        )}
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          {isAssigned ? (
+                            <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <Check className="w-3 h-3" /> Authorized
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+                              No Access
+                            </span>
+                          )}
+
+                          {isActive && (
+                            <ChevronRight className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -871,7 +770,7 @@ export const UserAccessManagementPage: React.FC = () => {
           {/* TABLE 2: MODULES & SUBMODULES ACCESS */}
           {/* ============================================================ */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden flex flex-col">
-            {/* Table Header & Controls */}
+            {/* Header & Controls */}
             <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
@@ -881,13 +780,22 @@ export const UserAccessManagementPage: React.FC = () => {
                   <div>
                     <h2 className="text-sm font-bold text-slate-900 dark:text-white">Module & SubModule Access</h2>
                     <p className="text-[11px] text-slate-400 dark:text-slate-500">
-                      Select parent modules and specific submodules authorized for this user
+                      {activeCompany ? (
+                        <>
+                          Configuring for:{' '}
+                          <strong className="text-slate-700 dark:text-slate-200">
+                            [{activeCompany.CompanyCode || selectedCompanyID}] {activeCompany.CompanyName || ''}
+                          </strong>
+                        </>
+                      ) : (
+                        'Please select a company on the left to configure access'
+                      )}
                     </p>
                   </div>
                 </div>
 
                 <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/60">
-                  {selectedSubmoduleKeys.size} permissions selected
+                  {authorizedModulesCount} modules ({authorizedSubmodulesCount} submodules)
                 </span>
               </div>
 
@@ -900,12 +808,12 @@ export const UserAccessManagementPage: React.FC = () => {
                     value={moduleSearchText}
                     onChange={(e) => setModuleSearchText(e.target.value)}
                     placeholder="Search module or feature name..."
-                    className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-8.5 pr-3 py-1.5 text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-8.5 pr-8 py-1.5 text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                   {moduleSearchText && (
                     <button
                       onClick={() => setModuleSearchText('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -931,25 +839,30 @@ export const UserAccessManagementPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Tree View List */}
-            <div className="max-h-[560px] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60">
-              {filteredModules.length === 0 ? (
-                <div className="p-8 text-center text-xs text-slate-400">
-                  No modules found matching your search
-                </div>
-              ) : (
-                filteredModules.map((mod) => {
+            {/* Tree View List with Loading State */}
+            {isLoadingCompanyModules ? (
+              <div className="p-16 flex flex-col items-center justify-center gap-3 text-center">
+                <Loader2 className="w-7 h-7 animate-spin text-indigo-600 dark:text-indigo-400" />
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  Loading module permissions for {activeCompany?.CompanyCode || selectedCompanyID}...
+                </span>
+              </div>
+            ) : filteredModules.length === 0 ? (
+              <div className="p-12 text-center text-xs text-slate-400">
+                No modules found matching your search
+              </div>
+            ) : (
+              <div className="max-h-[580px] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60">
+                {filteredModules.map((mod) => {
                   const mId = mod.ModuleMasterID.trim();
                   const isExpanded = expandedModules.has(mId);
                   const hasSubmodules = mod.submodules.length > 0;
                   const parentKey = getSubKey(mId, 0);
 
-                  // Check if parent module is granted (independent of submodules)
                   const isParentChecked =
                     selectedSubmoduleKeys.has(parentKey) ||
                     Array.from(selectedSubmoduleKeys).some((k) => k.startsWith(`${mId}__`));
 
-                  // Submodule counts
                   const subKeys = mod.submodules.map((s) => getSubKey(mId, s.ModuleMasterSubID));
                   const selectedSubCount = subKeys.filter((k) => selectedSubmoduleKeys.has(k)).length;
                   const allSubsSelected = subKeys.length > 0 && selectedSubCount === subKeys.length;
@@ -959,9 +872,7 @@ export const UserAccessManagementPage: React.FC = () => {
                       {/* Parent Module Row */}
                       <div
                         onClick={() => {
-                          if (!hasSubmodules) {
-                            toggleParentModule(mod);
-                          }
+                          if (!hasSubmodules) toggleParentModule(mod);
                         }}
                         className={`flex items-center gap-2.5 px-4 py-3 transition-colors select-none ${
                           !hasSubmodules ? 'cursor-pointer' : ''
@@ -971,7 +882,7 @@ export const UserAccessManagementPage: React.FC = () => {
                             : 'bg-slate-50/60 dark:bg-slate-850/60 hover:bg-slate-100/60 dark:hover:bg-slate-800/60'
                         }`}
                       >
-                        {/* Expand / Collapse Chevron (only show when module has submodules) */}
+                        {/* Expand Chevron */}
                         {hasSubmodules ? (
                           <button
                             type="button"
@@ -993,7 +904,7 @@ export const UserAccessManagementPage: React.FC = () => {
                           </div>
                         )}
 
-                        {/* Parent Checkbox (controls parent module permission) */}
+                        {/* Parent Checkbox */}
                         <div
                           onClick={(e) => {
                             e.stopPropagation();
@@ -1012,9 +923,7 @@ export const UserAccessManagementPage: React.FC = () => {
                         {/* Parent Info */}
                         <div
                           onClick={() => {
-                            if (hasSubmodules) {
-                              toggleModuleExpand(mId);
-                            }
+                            if (hasSubmodules) toggleModuleExpand(mId);
                           }}
                           className="flex-1 min-w-0 flex items-center justify-between gap-2 cursor-pointer"
                         >
@@ -1095,7 +1004,7 @@ export const UserAccessManagementPage: React.FC = () => {
                                   </div>
 
                                   {isSubChecked && (
-                                    <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-0.5">
+                                    <span className="shrink-0 text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-0.5">
                                       <Check className="w-3 h-3" /> Granted
                                     </span>
                                   )}
@@ -1107,9 +1016,9 @@ export const UserAccessManagementPage: React.FC = () => {
                       )}
                     </div>
                   );
-                })
-              )}
-            </div>
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}

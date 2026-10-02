@@ -30,6 +30,10 @@ export const masterDataApi = {
         const raw = await apiFetch<UserModuleAccessResponse>(`/MasterData/manage_user/${encodeURIComponent(userID)}`);
         return raw;
     },
+    getUserCompanyModuleAccess: async (userID: string, companyID: string): Promise<UserModuleAccessResponse> => {
+        const raw = await apiFetch<UserModuleAccessResponse>(`/MasterData/manage_user/${encodeURIComponent(userID)}/${encodeURIComponent(companyID)}`);
+        return raw;
+    },
     updateUserModuleAccess: async (payload: UpdateUserModuleAccessPayload): Promise<{ success?: boolean }> => {
         const raw = await apiFetch<{ success?: boolean }>('/MasterData/manage_user', {
             method: 'POST',
