@@ -91,9 +91,9 @@ namespace Backend_LNT_Insight.Controllers
             var rawRows = result.ToList();
             // use C# LINQ to unbox and group agrregate data
 
-            var companyIDs = rawRows.Select(r => new {CompanyID = (string)r.CompanyID}).Distinct().ToList();
+            var companyIDs = rawRows.Select(r => new {CompanyID = ((string)r.CompanyID)?.Trim()}).Distinct().ToList();
             var modules = rawRows.Select(r => new {
-                ModuleMasterID = (string)r.ModuleMasterID,
+                ModuleMasterID = ((string)r.ModuleMasterID)?.Trim(),
                 ModuleMasterSubID = (int)r.ModuleMasterSubID
             }).Distinct().ToList();
 

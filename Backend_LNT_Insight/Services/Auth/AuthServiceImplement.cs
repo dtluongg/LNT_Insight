@@ -82,15 +82,19 @@ namespace Backend_LNT_Insight.Services.Auth
                             )).ToList();
 
             var userCompanies = rawPermissions
-                                .GroupBy(r => new {r.CompanyID, r.CompanyCode, r.CompanyName})
+                                .GroupBy(r => new {
+                                    CompanyID = ((string)r.CompanyID)?.Trim(),
+                                    CompanyCode = ((string)r.CompanyCode)?.Trim(),
+                                    CompanyName = ((string)r.CompanyName)?.Trim()
+                                })
                                 .Select(g => new UserAuthorizedCompanyModuleDto{
-                                    CompanyID = g.Key.CompanyID,
-                                    CompanyCode = g.Key.CompanyCode,
-                                    CompanyName = g.Key.CompanyName,
+                                    CompanyID = g.Key.CompanyID ?? "",
+                                    CompanyCode = g.Key.CompanyCode ?? "",
+                                    CompanyName = g.Key.CompanyName ?? "",
                                     AuthorizedListModules = g
                                         .Where(r => r.ModuleMasterID != null)
                                         .Select(r => new ModuleDto{
-                                            ModuleMasterID = (string)r.ModuleMasterID,
+                                            ModuleMasterID = ((string)r.ModuleMasterID)?.Trim() ?? "",
                                             ModuleMasterSubID = (int)r.ModuleMasterSubID 
                                         })
                                         .Distinct()
