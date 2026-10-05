@@ -5,6 +5,8 @@ import { useAuth } from '../app/providers/AuthProvider';
 import { useTheme } from '../app/providers/ThemeProvider';
 import { masterDataApi } from '../core/api/materData';
 import { createPortal } from 'react-dom';
+import type { CompanyInfo } from '../types';
+import { companiesApi } from '../core/api/companies';
 
 interface HeaderProps {
   title?: string;
@@ -14,14 +16,14 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
   const { user, logout, authorizedCompanies, selectedCompanyID, setSelectedCompanyID } = useAuth();
   const { theme, setTheme, isDark } = useTheme();
 
-  const [displayName, setDisplayName] = useState<string>(
-    user?.fullName || user?.username || 'User'
-  );
+  const [companies, setCompanies] = useState<CompanyInfo[]>([]);
+
+  const [displayName, setDisplayName] = useState<string>(user?.fullName || user?.username || 'User');
   // Quản lý việc đóng/mở của 3 dropdown menu
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCompanyDropdownOpen, setIsCompanyDropdownOpen] = useState(false);
   const [isThemeDropdownOpen, setIsThemeDropdownOpen] = useState(false);
-  
+
   const [avatarUrl] = useState<string | null>(null);
 
   // Ref tham chiếu đến DOM element để phát hiện click ra bên ngoài
@@ -35,17 +37,17 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
   // 3. TÍNH TOÁN TRỰC TIẾP TÊN CÔNG TY HIỂN THỊ (DERIVED VALUE)
   // Tuyệt đối không lưu tên vào useState để tránh lỗi vòng lặp render
   // =========================================================
-  const currentCompany = authorizedCompanies.find((comp) => {
+  const currentCompany = companies.find((comp) => {
     // Nếu comp là chuỗi thì so sánh trực tiếp, nếu là Object thì lấy thuộc tính companyID
-    const id = typeof comp === 'string' ? comp : comp.companyID;
+    const id = typeof comp === 'string' ? comp : comp.CompanyID;
     return id === selectedCompanyID;
   });
 
   // Ưu tiên: Tên công ty -> Mã code -> Mã ID -> Chữ mặc định 'Select Company'
   const selectedCompanyName = currentCompany
-    ? (typeof currentCompany === 'object'
-        ? currentCompany.companyName || currentCompany.companyCode || currentCompany.companyID
-        : currentCompany)
+    ? typeof currentCompany === 'object'
+      ? currentCompany.CompanyName
+      : currentCompany
     : selectedCompanyID || 'Select Company';
 
   // Fetch full name from user auth or masterData API
@@ -53,21 +55,42 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
     if (user?.fullName) {
       setDisplayName(user.fullName);
     } else if (user?.username) {
-      masterDataApi.getUsers().then(users => {
-        const found = users.find(
-          u => u.username.toLowerCase() === user.username.toLowerCase()
-        );
-        if (found?.fullName) {
-          setDisplayName(found.fullName);
-        } else {
+      masterDataApi
+        .getUsers()
+        .then((users) => {
+          const found = users.find((u) => u.username.toLowerCase() === user.username.toLowerCase());
+          if (found?.fullName) {
+            setDisplayName(found.fullName);
+          } else {
+            setDisplayName(user.username);
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to fetch user list:', err);
           setDisplayName(user.username);
-        }
-      }).catch(err => {
-        console.error('Failed to fetch user list:', err);
-        setDisplayName(user.username);
-      });
+        });
     }
   }, [user]);
+
+  useEffect(() => {
+    const loadCompanies = async () => {
+      const companiesList = await companiesApi.getCompanies().catch((err) => {
+        console.error('Failed to load companies list:', err);
+        return [] as CompanyInfo[];
+      });
+
+      setCompanies(companiesList);
+    };
+
+    loadCompanies();
+  }, []);
+
+  const isCompanyAuthorized = (companyID: string) => {
+    return authorizedCompanies.some((comp) => {
+      const id = typeof comp === 'string' ? comp : comp.companyID;
+      return id === companyID;
+    });
+  };
 
   // Click outside listener for all dropdowns
   useEffect(() => {
@@ -96,14 +119,10 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
     <header className="h-14 px-6 flex items-center justify-between shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800/80 transition-colors duration-200 select-none">
       {/* Left side: Title + Company selector */}
       <div className="flex items-center gap-4">
-        {title && (
-          <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight">
-            {title}
-          </h2>
-        )}
+        {title && <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight">{title}</h2>}
 
         {/* Company Combobox */}
-        {authorizedCompanies && authorizedCompanies.length > 0 && (
+        {companies && companies.length > 0 && (
           <div className="relative" ref={companyDropdownRef}>
             <button
               type="button"
@@ -116,9 +135,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
               {/* Lớp nền và nội dung hiển thị to, rõ ràng hơn */}
               <div className="relative flex items-center gap-2.5 px-4 py-2 rounded-[14px] bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 group-hover:border-transparent transition-colors">
                 <Building2 size={18} className="text-blue-600 dark:text-blue-400 shrink-0" />
-                <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase hidden sm:inline tracking-wider">
-                  Company:
-                </span>
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase hidden sm:inline tracking-wider">Company:</span>
                 <span className="text-sm font-bold text-slate-800 dark:text-slate-100 tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                   {selectedCompanyName}
                 </span>
@@ -135,39 +152,42 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
             {isCompanyDropdownOpen && (
               <div className="absolute left-0 top-full mt-2 w-52 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/60 dark:shadow-black/70 p-1.5 z-50">
                 <div className="px-2.5 py-1.5 border-b border-slate-100 dark:border-slate-800 mb-1 flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                    Select Company
-                  </span>
+                  <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Select Company</span>
                   <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400">
-                    {authorizedCompanies.length}
+                    {companies.length}
                   </span>
                 </div>
-                <div className="max-h-56 overflow-y-auto space-y-0.5">
-                  {authorizedCompanies.map((comp) => {
-                    const compID = typeof comp === 'string' ? comp : comp.companyID;
-                    const compName = typeof comp === 'object' ? (comp.companyName || comp.companyCode || comp.companyID) : comp;
+                <div className={`max-h-56 overflow-y-auto space-y-0.5 `}>
+                  {companies.map((comp) => {
+                    const compID = typeof comp === 'string' ? comp : comp.CompanyID;
+                    const compName = typeof comp === 'object' ? comp.CompanyName : comp;
                     // const compCode = typeof comp === 'object' && comp.companyCode ? comp.companyCode : null;
                     const isSelected = compID === selectedCompanyID;
-                    
+                    // check company:
+                    const isCompanyAuth = isCompanyAuthorized(compID);
                     return (
                       <button
                         key={compID}
                         type="button"
                         onClick={() => {
+                          if (!isCompanyAuth) return;
                           setSelectedCompanyID(compID);
                           setIsCompanyDropdownOpen(false);
                         }}
-                        className={`w-full flex items-center justify-between px-3 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 font-bold'
-                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
-                        }`}
+                        className={`w-full flex items-center justify-between px-3 py-2 text-xs font-bold rounded-xl transition-all
+                          ${!isCompanyAuth ? 'pointer-events-none opacity-40 text-blue-100/40' : 'cursor-pointer '}
+                          ${
+                            isSelected
+                              ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 font-bold'
+                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                          }`}
                       >
                         <div className="flex items-center gap-2">
                           <Building2 size={14} className={isSelected ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'} />
-                          <span>{compName}</span>
+                          <span>{compName} </span>
                         </div>
                         {isSelected && <Check size={14} className="text-blue-600 dark:text-blue-400 shrink-0" />}
+                        {!isCompanyAuth && ' 🔒'}
                       </button>
                     );
                   })}
@@ -281,11 +301,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
             {/* Avatar Circle */}
             <div className="w-8 h-8 rounded-full overflow-hidden bg-[#0f2747] text-white flex items-center justify-center shrink-0 shadow-xs ring-1 ring-slate-200 dark:ring-slate-700">
               {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt={displayName}
-                  className="w-full h-full object-cover"
-                />
+                <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
               ) : (
                 <UserIcon size={18} className="text-white" />
               )}
@@ -309,9 +325,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
           {isDropdownOpen && (
             <div className="absolute right-0 top-full mt-2 w-60 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/60 dark:shadow-black/70 p-2 z-50">
               <div className="p-3 border-b border-slate-100 dark:border-slate-800 mb-1">
-                <p className="text-sm font-bold text-slate-800 dark:text-slate-100 truncate">
-                  {displayName}
-                </p>
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-100 truncate">{displayName}</p>
                 {user?.email && (
                   <p className="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1.5 mt-1 truncate">
                     <Mail size={12} />
@@ -369,9 +383,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">Logout Confirm</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                    Are you sure you want to logout at this time?
-                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Are you sure you want to logout at this time?</p>
                 </div>
               </div>
 
@@ -396,7 +408,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
               </div>
             </div>
           </div>,
-          document.body
+          document.body,
         )}
     </header>
   );
