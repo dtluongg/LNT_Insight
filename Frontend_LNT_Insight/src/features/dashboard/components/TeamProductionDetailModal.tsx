@@ -11,7 +11,8 @@ import {
     ReferenceLine
 } from 'recharts';
 import { Ellipsis } from 'lucide-react';
-import { companiesApi } from '../../../core/api/companies';
+// import { companiesApi } from '../../../core/api/companies';
+import { md3smd2Api } from '../../../core/api/md3smd2';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
 import type { SewingTeamDetail, WorkshiftInfo, SewingTeamAnalysis, OverallDefectAnalysis } from '../../../types';
 import { SewingTeamTableModal } from './SewingTeamTableModal';
@@ -125,7 +126,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
             const fetchWorkshifts = async () => {
                 setLoadingShiftworks(true);
                 try {
-                    const shifts = await companiesApi.getWorkshiftList(
+                    const shifts = await md3smd2Api.getWorkshiftList(
                         filter.CompanyID,
                         filter.SiteID,
                         dateObj,
@@ -150,7 +151,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
             const fetchTeamDefects = async () => {
                 setLoadingDefects(true);
                 try {
-                    const defects = await companiesApi.getTeamDefectAnalysis(
+                    const defects = await md3smd2Api.getTeamDefectAnalysis(
                         filter.CompanyID,
                         filter.SiteID,
                         Number(production.SectionID),
@@ -180,7 +181,7 @@ export const TeamProductionDetailModal: React.FC<TeamProductionDetailModalProps>
                 setLoadingAnalysis(true);
                 try {
                     const dateObj = new Date(filter.Date);
-                    const analysis = await companiesApi.getDataSewingTeamAnalysis(
+                    const analysis = await md3smd2Api.getDataSewingTeamAnalysis(
                         filter.CompanyID,
                         filter.SiteID,
                         dateObj,

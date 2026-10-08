@@ -6,7 +6,7 @@ import { useTheme } from '../app/providers/ThemeProvider';
 import { masterDataApi } from '../core/api/materData';
 import { createPortal } from 'react-dom';
 import type { CompanyInfo } from '../types';
-import { companiesApi } from '../core/api/companies';
+// import { companiesApi } from '../core/api/companies';
 
 interface HeaderProps {
   title?: string;
@@ -74,7 +74,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
 
   useEffect(() => {
     const loadCompanies = async () => {
-      const companiesList = await companiesApi.getCompanies().catch((err) => {
+      const companiesList = await masterDataApi.getCompanies().catch((err) => {
         console.error('Failed to load companies list:', err);
         return [] as CompanyInfo[];
       });

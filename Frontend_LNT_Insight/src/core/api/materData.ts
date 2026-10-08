@@ -2,6 +2,7 @@ import { apiFetch } from '../../core/api/httpClient';
 import type {
     MastUserInfo,
     UserWorkingInfo,
+    CompanyInfo,
     ModuleMasterInfo,
     SubModuleInfo,
     UserModuleAccessResponse,
@@ -18,6 +19,10 @@ export const masterDataApi = {
         const raw = await apiFetch<any[]>('/MasterData/users');
         return raw;
     },
+    getCompanies: async (): Promise<CompanyInfo[]> => {
+            const raw = await apiFetch<any[]>('/MasterData/companies');
+            return raw;
+        },
     getModules: async (): Promise<ModuleMasterInfo[]> => {
         const raw = await apiFetch<any[]>('/MasterData/modules');
         return raw;

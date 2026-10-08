@@ -28,6 +28,7 @@ import {
 } from 'recharts';
 import { StatCard } from '../../../components/ui/StatCard';
 import { companiesApi } from '../../../core/api/companies';
+import { md3smd2Api } from '../../../core/api/md3smd2';
 import { comparisonTrendResult } from '../utils/compareUtils';
 import type { SewingTeamSummay, SewingTeamDetail } from '../../../types';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
@@ -89,14 +90,14 @@ export const DashboardPage: React.FC = () => {
       setLoading(true);
       try {
         const dateObj = new Date(filter.Date);
-        const prevDateStr = await companiesApi.getPreviousWorkingDay(filter.CompanyID, filter.SiteID, filter.Date);
+        const prevDateStr = await md3smd2Api.getPreviousWorkingDay(filter.CompanyID, filter.SiteID, filter.Date);
         const prevDateObj = new Date(prevDateStr);
 
         const [prodResult, summaryResult, prevSummaryResult, prodResultForOverview] = await Promise.all([
-          companiesApi.getTeamSewingDetail(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj),
-          companiesApi.getTeamSewingSummary(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj),
-          companiesApi.getTeamSewingSummary(filter.CompanyID, filter.SiteID, Number(filter.SectionID), prevDateObj),
-          companiesApi.getTeamSewingDetail(filter.CompanyID, filter.SiteID, 0, dateObj),
+          md3smd2Api.getTeamSewingDetail(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj),
+          md3smd2Api.getTeamSewingSummary(filter.CompanyID, filter.SiteID, Number(filter.SectionID), dateObj),
+          md3smd2Api.getTeamSewingSummary(filter.CompanyID, filter.SiteID, Number(filter.SectionID), prevDateObj),
+          md3smd2Api.getTeamSewingDetail(filter.CompanyID, filter.SiteID, 0, dateObj),
         ]);
         setProductionData(prodResult);
         setDataSewingTeamSummary(summaryResult);

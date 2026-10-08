@@ -38,20 +38,20 @@ namespace Backend_LNT_Insight.Controllers
             return Content(jsonString, "application/json");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetCompanies()
-        {
-            if (_useLocalMockData)
-            {
-                return GetMockData("GetCompanies.json");
-            }
+        // [HttpGet]
+        // public async Task<IActionResult> GetCompanies()
+        // {
+        //     if (_useLocalMockData)
+        //     {
+        //         return GetMockData("GetCompanies.json");
+        //     }
 
-            using var db = CreateConnection();
-            // string sql = "SELECT CompanyID, CompanyCode, CompanyName FROM [lntdev-db01].[FXPRO].[dbo].[tblCompanyInformation] WHERE CompanyTypeCode = 'MUF' AND ActiveFlag = 1";
-            var sql = "USP_FXPRO_Insight_GetCompanies";
-            var result = (await db.QueryAsync<dynamic>(sql, commandType:CommandType.StoredProcedure)).ToList();
-            return Ok(result);
-        }
+        //     using var db = CreateConnection();
+        //     // string sql = "SELECT CompanyID, CompanyCode, CompanyName FROM [lntdev-db01].[FXPRO].[dbo].[tblCompanyInformation] WHERE CompanyTypeCode = 'MUF' AND ActiveFlag = 1";
+        //     var sql = "USP_FXPRO_Insight_GetCompanies";
+        //     var result = (await db.QueryAsync<dynamic>(sql, commandType:CommandType.StoredProcedure)).ToList();
+        //     return Ok(result);
+        // }
 
         [HttpGet("{companyID}/sites")]
         public async Task<IActionResult> GetSites(string companyID)

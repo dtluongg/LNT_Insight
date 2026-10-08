@@ -13,15 +13,44 @@ namespace Backend_LNT_Insight.Controllers
     public class MasterDataController : ControllerBase
     {
         private readonly string _connectionString;
+        private readonly bool _useLocalMockData;
+        private readonly IWebHostEnvironment _env;
 
-        public MasterDataController(IConfiguration configuration)
+        public MasterDataController(IConfiguration configuration, IWebHostEnvironment env)
         {
+            _useLocalMockData = configuration.GetValue<bool>("UseLocalMockData", false);
+            _env = env;
             _connectionString = configuration.GetConnectionString("DefaultConnection")
                 ?? throw new ArgumentNullException("Connection string 'DefaultConnection' is missing!");
         }
 
         private IDbConnection CreateConnection() => new SqlConnection(_connectionString);
 
+        private IActionResult GetMockData(string fileName)
+        {
+            var filePath = Path.Combine(_env.ContentRootPath, "SSMS", "Data", "DataCompaniesController", fileName);
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound(new { Message = $"Mock data file '{fileName}' not found." });
+            }
+            var jsonString = System.IO.File.ReadAllText(filePath);
+            return Content(jsonString, "application/json");
+        }
+
+        [HttpGet("companies")]
+        public async Task<IActionResult> GetCompanies()
+        {
+            if (_useLocalMockData)
+            {
+                return GetMockData("GetCompanies.json");
+            }
+
+            using var db = CreateConnection();
+            // string sql = "SELECT CompanyID, CompanyCode, CompanyName FROM [lntdev-db01].[FXPRO].[dbo].[tblCompanyInformation] WHERE CompanyTypeCode = 'MUF' AND ActiveFlag = 1";
+            var sql = "USP_FXPRO_Insight_GetCompanies";
+            var result = (await db.QueryAsync<dynamic>(sql, commandType:CommandType.StoredProcedure)).ToList();
+            return Ok(result);
+        }
 
         [HttpGet("modules")]
         public async Task<IActionResult> GetModules()

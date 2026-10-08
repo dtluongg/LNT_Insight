@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Treemap, Tooltip, ResponsiveContainer } from 'recharts';
 import { companiesApi } from '../../../core/api/companies';
+import { md3smd2Api } from '../../../core/api/md3smd2';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
 import type { OverallDefectAnalysis } from '../../../types';
 import { EndlineDefectAnalysisTableModal } from './EndlineDefectAnalysisTableModal';
@@ -104,7 +105,7 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
                 setLoading(true);
                 try {
                     const dateObj = new Date(filter.Date);
-                    const data = await companiesApi.getOverallDefectAnalysis(
+                    const data = await md3smd2Api.getOverallDefectAnalysis(
                         filter.CompanyID,
                         filter.SiteID,
                         Number(filter.SectionID),

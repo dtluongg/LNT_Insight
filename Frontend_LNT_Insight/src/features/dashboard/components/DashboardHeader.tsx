@@ -3,6 +3,7 @@ import { Calendar, RefreshCw, ChevronDown, MapPin, Layers, ChevronLeft, ChevronR
 // import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../../app/providers/AuthProvider';
 import { companiesApi } from '../../../core/api/companies';
+import { md3smd2Api } from '../../../core/api/md3smd2';
 // import { getPreviousWorkingDayClient } from '../../../utils/dateUtils';
 import { getNextWorkingDay, getPreviousWorkingDay } from '../utils/dateUtils';
 import type { SiteInfo, SectionInfo } from '../../../types';
@@ -62,7 +63,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
 
         const fetchSites = async () => {
             try {
-                const data = await companiesApi.getSites(companyID);
+                const data = await md3smd2Api.getSites(companyID);
                 setSites(data);
 
                 if (data.length > 0) {
@@ -110,7 +111,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ filter, onAppl
         if (!companyID || !draftFilter.SiteID) return;
         const fetchSections = async () => {
             try {
-                const data = await companiesApi.getSections(companyID, draftFilter.SiteID);
+                const data = await md3smd2Api.getSections(companyID, draftFilter.SiteID);
                 setSections(data);
 
                 // Nếu SectionID đang là '0', giữ nguyên trạng thái ô trắng

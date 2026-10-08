@@ -10,10 +10,10 @@ export const companiesApi = {
         // return findPreviousWorkingDay(workingDays, dateDayStr);
         return getPreviousWorkingDay(dateDayStr);
     },
-    getCompanies: async (): Promise<CompanyInfo[]> => {
-        const raw = await apiFetch<any[]>('/companies');
-        return raw;
-    },
+    // getCompanies: async (): Promise<CompanyInfo[]> => {
+    //     const raw = await apiFetch<any[]>('/companies');
+    //     return raw;
+    // },
     getSites: async (companyID: string): Promise<SiteInfo[]> => {
         const raw = await apiFetch<any[]>(`/companies/${companyID}/sites`);
         return raw;
