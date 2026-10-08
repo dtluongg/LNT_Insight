@@ -86,7 +86,7 @@ export const UserAccessManagementPage: React.FC = () => {
             console.error('Failed to load user working list:', err);
             return [];
           }),
-          companiesApi.getCompanies().catch((err) => {
+          masterDataApi.getCompanies().catch((err) => {
             console.error('Failed to load companies list:', err);
             return [] as CompanyInfo[];
           }),

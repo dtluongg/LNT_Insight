@@ -50,7 +50,7 @@ export const md3smd2Api = {
     },
     getTeamDefectAnalysis: async (companyID: string, siteID: string, sectionID: number, dateDay: Date, teamID: number): Promise<OverallDefectAnalysis[]> => {
         const formattedDate = dateDay.toISOString().split('T')[0];
-        const raw = await apiFetch<any[]>(`/md3smd2/com/${companyID}/si/${siteID}/se/${sectionID}/date/${formattedDate}/team/${teamID}/team_defect_analysis`);
+        const raw = await apiFetch<any[]>(`/md3smd2/com/${companyID}/si/${siteID}/se/${sectionID}/date/${formattedDate}/team/${teamID}/team_sewing_defect_analysis`);
         return raw;
     }
 };

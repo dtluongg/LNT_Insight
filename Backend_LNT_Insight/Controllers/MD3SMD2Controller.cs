@@ -147,7 +147,7 @@ namespace Backend_LNT_Insight.Controllers
         }
 
         // get list workshiftID
-        [HttpGet("com/{comID}/si/{siID}/se/{seID}/date/{dateDay}/workshift")]
+        [HttpGet("com/{comID}/si/{siID}/date/{dateDay}/se/{seID}/workshift")]
         public async Task<IActionResult> GetWorkshiftList(string comID, string siID, int seID, DateTime dateDay)
         {
             if (_useLocalMockData)
