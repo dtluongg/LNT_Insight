@@ -2,7 +2,6 @@
 **/.vs/
 **/bin/
 **/obj/
-**/backend_lnt_insight/
 **/package-lock.json
 
 **/appsettings.json
