@@ -315,9 +315,9 @@ Write the report in clean Markdown in English.";
                 return fallbackMarkdown + "\n\n---\n> ⚙️ **AI Engine**: *Offline Rule-Based Fallback (Configure API Key in appsettings.json)*";
             }
 
-            // List of candidate models to try in case of 404 (model not found / deprecated)
-            string configuredModel = _config["GeminiSettings:Model"] ?? "gemini-1.5-flash";
-            string[] candidateModels = new[] { configuredModel, "gemini-1.5-flash", "gemini-2.0-flash-exp", "gemini-1.5-pro", "gemini-2.0-flash" }
+            // List of candidate models to try (Google API specifically recommends gemini-3.8-flash)
+            string configuredModel = _config["GeminiSettings:Model"] ?? "gemini-3.8-flash";
+            string[] candidateModels = new[] { configuredModel, "gemini-3.8-flash", "gemini-2.5-flash", "gemini-1.5-flash-8b", "gemini-1.5-flash", "gemini-2.0-flash" }
                 .Distinct()
                 .ToArray();
 
