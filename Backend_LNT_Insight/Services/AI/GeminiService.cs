@@ -315,55 +315,65 @@ Write the report in clean Markdown in English.";
                 return fallbackMarkdown + "\n\n---\n> ⚙️ **AI Engine**: *Offline Rule-Based Fallback (Configure API Key in appsettings.json)*";
             }
 
-            try
+            // List of candidate models to try in case of 404 (model not found / deprecated)
+            string configuredModel = _config["GeminiSettings:Model"] ?? "gemini-1.5-flash";
+            string[] candidateModels = new[] { configuredModel, "gemini-1.5-flash", "gemini-2.0-flash-exp", "gemini-1.5-pro", "gemini-2.0-flash" }
+                .Distinct()
+                .ToArray();
+
+            foreach (var modelName in candidateModels)
             {
-                string apiUrl = $"{_config["GeminiSettings:ApiUrl"]}?key={apiKey}";
-                var requestBody = new
+                try
                 {
-                    contents = new[]
+                    string apiUrl = $"https://generativelanguage.googleapis.com/v1beta/models/{modelName}:generateContent?key={apiKey}";
+                    var requestBody = new
                     {
-                        new
+                        contents = new[]
                         {
-                            parts = new[]
+                            new
                             {
-                                new { text = prompt }
+                                parts = new[]
+                                {
+                                    new { text = prompt }
+                                }
                             }
                         }
-                    }
-                };
+                    };
 
-                var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync(apiUrl, content);
+                    var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
+                    var response = await _httpClient.PostAsync(apiUrl, content);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    string jsonResponse = await response.Content.ReadAsStringAsync();
-                    using var doc = JsonDocument.Parse(jsonResponse);
-                    var text = doc.RootElement
-                        .GetProperty("candidates")[0]
-                        .GetProperty("content")
-                        .GetProperty("parts")[0]
-                        .GetProperty("text")
-                        .GetString();
-
-                    if (!string.IsNullOrWhiteSpace(text))
+                    if (response.IsSuccessStatusCode)
                     {
-                        Console.WriteLine($"\n[LNT AI ENGINE SUCCESS] Gemini API responded successfully ({text.Length} chars).");
-                        return text + "\n\n---\n> 🤖 **AI Engine**: *Gemini 2.0 Flash (Live API Response)*";
+                        string jsonResponse = await response.Content.ReadAsStringAsync();
+                        using var doc = JsonDocument.Parse(jsonResponse);
+                        var text = doc.RootElement
+                            .GetProperty("candidates")[0]
+                            .GetProperty("content")
+                            .GetProperty("parts")[0]
+                            .GetProperty("text")
+                            .GetString();
+
+                        if (!string.IsNullOrWhiteSpace(text))
+                        {
+                            Console.WriteLine($"\n[LNT AI ENGINE SUCCESS] Model '{modelName}' responded successfully ({text.Length} chars).");
+                            return text + $"\n\n---\n> 🤖 **AI Engine**: *Google Gemini API ({modelName} - Live Response)*";
+                        }
+                    }
+                    else
+                    {
+                        string errorStr = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine($"\n[LNT AI ENGINE API WARN] Model '{modelName}' returned StatusCode: {response.StatusCode}. Details: {errorStr}");
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    string errorStr = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"\n[LNT AI ENGINE API ERROR] StatusCode: {response.StatusCode}, Error: {errorStr}");
+                    Console.WriteLine($"\n[LNT AI ENGINE EXCEPTION] Model '{modelName}' Call Failed: {ex.Message}");
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"\n[LNT AI ENGINE EXCEPTION] Gemini API Call Failed: {ex.Message}");
-            }
 
-            return fallbackMarkdown + "\n\n---\n> ⚙️ **AI Engine**: *Offline Rule-Based Fallback (API Key / Network Issue)*";
+            Console.WriteLine("\n[LNT AI ENGINE FALLBACK] All candidate Gemini models failed or returned 404. Falling back to local offline engine.");
+            return fallbackMarkdown + "\n\n---\n> ⚙️ **AI Engine**: *Offline Rule-Based Fallback (Check API Key permissions in Google AI Studio)*";
         }
 
         private string GetDefaultOverviewMarkdown(DateTime date)
