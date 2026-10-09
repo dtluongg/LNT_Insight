@@ -312,7 +312,7 @@ Write the report in clean Markdown in English.";
         {
             if (string.IsNullOrWhiteSpace(apiKey))
             {
-                return fallbackMarkdown;
+                return fallbackMarkdown + "\n\n---\n> ⚙️ **AI Engine**: *Offline Rule-Based Fallback (Configure API Key in appsettings.json)*";
             }
 
             try
@@ -346,15 +346,24 @@ Write the report in clean Markdown in English.";
                         .GetProperty("text")
                         .GetString();
 
-                    return text ?? fallbackMarkdown;
+                    if (!string.IsNullOrWhiteSpace(text))
+                    {
+                        Console.WriteLine($"\n[LNT AI ENGINE SUCCESS] Gemini API responded successfully ({text.Length} chars).");
+                        return text + "\n\n---\n> 🤖 **AI Engine**: *Gemini 2.0 Flash (Live API Response)*";
+                    }
+                }
+                else
+                {
+                    string errorStr = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"\n[LNT AI ENGINE API ERROR] StatusCode: {response.StatusCode}, Error: {errorStr}");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Fallback on network or API key issues
+                Console.WriteLine($"\n[LNT AI ENGINE EXCEPTION] Gemini API Call Failed: {ex.Message}");
             }
 
-            return fallbackMarkdown;
+            return fallbackMarkdown + "\n\n---\n> ⚙️ **AI Engine**: *Offline Rule-Based Fallback (API Key / Network Issue)*";
         }
 
         private string GetDefaultOverviewMarkdown(DateTime date)
