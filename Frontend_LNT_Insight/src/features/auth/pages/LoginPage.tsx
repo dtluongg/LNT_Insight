@@ -66,7 +66,7 @@ export const LoginPage: React.FC = () => {
 
       // Delay nhẹ 600ms để người dùng kịp quan sát thông báo thành công từ server
       setTimeout(() => {
-        navigate('/dashboard');
+        navigate('/home');
       }, 600);
     } catch (err: any) {
       setError(err.message || 'An error occurred during login. Please check your credentials.');

@@ -1,6 +1,7 @@
-﻿using Backend_LNT_Insight.DataConfig;
+using Backend_LNT_Insight.DataConfig;
 using Backend_LNT_Insight.Helpers;
 using Backend_LNT_Insight.Services.Auth;
+using Backend_LNT_Insight.Services.AI;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
@@ -37,7 +38,9 @@ builder.Services.AddOpenApi();
 
 
 builder.Services.AddScoped<IAuthService, AuthServiceImplement>();
-
+builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient<IGeminiService, GeminiService>();
+builder.Services.AddScoped<IGeminiService, GeminiService>();
 
 builder.Services.AddScoped<ProtectByJWT>();
 

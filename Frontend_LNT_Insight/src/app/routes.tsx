@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { PermissionGuard } from './PermissionGuard';
 import { useAuth } from './providers/AuthProvider';
 import { LoginPage } from '../features/auth/pages/LoginPage';
+import { HomePage } from '../features/home/pages/HomePage';
 import { DashboardPage } from '../features/dashboard/pages/DashboardPage';
 import { MainLayout } from '../layouts/MainLayout';
 import { BlankPage } from '../features/default/BlankPage';
@@ -41,7 +42,7 @@ const PublicRoute: React.FC<{ children: React.ReactElement }> = ({ children }) =
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/blankpage" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   return children;
@@ -59,7 +60,11 @@ export const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/blankpage" replace />} />
+        <Route index element={<Navigate to="/home" replace />} />
+        <Route
+          path="home"
+          element={<HomePage />}
+        />
         <Route
           path="coming-soon"
           element={<DefaultPage />}
