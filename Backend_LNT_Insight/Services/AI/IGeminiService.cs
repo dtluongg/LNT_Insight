@@ -5,7 +5,6 @@ namespace Backend_LNT_Insight.Services.AI
 {
     public interface IGeminiService
     {
-        Task<AiOverviewResponseDto> GetOverviewSummaryAsync(AiOverviewRequestDto request);
-        Task<AiDrillDownResponseDto> GetDrillDownAnalysisAsync(AiDrillDownRequestDto request);
+        Task<AiBatchResponseDto> ExecuteBatchAnalysisAsync(AiBatchRequestDto request);
     }
 }

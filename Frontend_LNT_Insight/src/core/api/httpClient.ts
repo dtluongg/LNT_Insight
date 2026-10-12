@@ -132,7 +132,7 @@ async function getErrorMessage(res: Response): Promise<string> {
     let errorMessage = `API Error ${res.status}`;
     try {
         const errorJson = JSON.parse(errorText);
-        errorMessage = errorJson.errMessage || errorMessage;
+        errorMessage = errorJson.errorMessage || errorJson.errMessage || errorJson.message || errorMessage;
     } catch {
         errorMessage = errorText || errorMessage;
     }

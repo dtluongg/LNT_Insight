@@ -1,62 +1,27 @@
-export interface DrillDownOption {
-    optionId: string;
-    optionLabel: string;
-    subModuleCode: string;
-    params?: Record<string, any>;
+export type AiSeverity = 'SUCCESS' | 'WARNING' | 'DANGER' | 'INFO';
+
+export interface AiCardItem {
+    id: string;        // e.g. "card_production", "card_defect", "card_shift"
+    prompt?: string;   // Optional override instruction; if omitted, backend reads from appsettings.json
+    data?: any;        // Real SP query data passed by user
 }
 
-export interface AiInsightCard {
-    insightId: string;
-    title: string;
-    summaryText: string;
-    severity: 'INFO' | 'SUCCESS' | 'WARNING' | 'DANGER';
-    moduleCode: string;
-    subModuleCode: string;
-    drillDownTarget?: DrillDownOption;
-}
-
-export interface AiOverviewRequest {
-    pageCode?: string;
-    companyId?: string;
-    siteId?: string;
-    sectionId?: number;
-    filterDate?: string;
+export interface AiBatchRequest {
+    cacheKey?: string;
     forceRefresh?: boolean;
+    items: AiCardItem[];
 }
 
-export interface AiOverviewResponse {
-    success: boolean;
-    pageCode: string;
-    overviewTitle: string;
-    rawMarkdown: string;
-    insights: AiInsightCard[];
-    availableOptions: DrillDownOption[];
-    isCached: boolean;
-    generatedAt: string;
-}
-
-export interface AiDrillDownRequest {
-    subModuleCode: string;
-    optionId: string;
-    companyId?: string;
-    siteId?: string;
-    sectionId?: number;
-    teamId?: number;
-    shiftWorkId?: number;
-    filterDate?: string;
-    forceRefresh?: boolean;
-}
-
-export interface AiDrillDownResponse {
-    success: boolean;
-    subModuleCode: string;
-    optionId: string;
+export interface AiCardResult {
     title: string;
-    rootCauseAnalysis: string;
-    keyHighlights: string[];
-    warnings: string[];
-    actionItems: string[];
-    rawMarkdown: string;
+    summary: string;
+    severity: AiSeverity;
+}
+
+export interface AiBatchResponse {
+    success: boolean;
+    errorMessage?: string;
+    results: Record<string, AiCardResult>;
     isCached: boolean;
     generatedAt: string;
 }

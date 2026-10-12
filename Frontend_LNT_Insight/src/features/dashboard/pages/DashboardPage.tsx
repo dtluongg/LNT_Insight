@@ -90,7 +90,7 @@ export const DashboardPage: React.FC = () => {
       setLoading(true);
       try {
         const dateObj = new Date(filter.Date);
-        const prevDateStr = await md3smd2Api.getPreviousWorkingDay(filter.CompanyID, filter.SiteID, filter.Date);
+        const prevDateStr = await md3smd2Api.getPreviousWorkingDay(filter.Date);
         const prevDateObj = new Date(prevDateStr);
 
         const [prodResult, summaryResult, prevSummaryResult, prodResultForOverview] = await Promise.all([

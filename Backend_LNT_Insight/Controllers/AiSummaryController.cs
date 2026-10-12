@@ -17,32 +17,27 @@ namespace Backend_LNT_Insight.Controllers
         }
 
         /// <summary>
-        /// Stage 1: Get Macro Executive Overview Briefing & Available Drill-Down Options
+        /// Execute Batch AI Analysis for multiple cards in 1 single request.
+        /// Each card has its own Id, Prompt, and SP Query Data.
         /// </summary>
-        [HttpPost("overview")]
-        public async Task<IActionResult> GetOverview([FromBody] AiOverviewRequestDto request)
+        [HttpPost("batch-generate")]
+        public async Task<IActionResult> BatchGenerate([FromBody] AiBatchRequestDto request)
         {
-            if (request == null)
+            if (request == null || request.Items == null || request.Items.Count == 0)
             {
-                request = new AiOverviewRequestDto();
+                return BadRequest(new AiBatchResponseDto
+                {
+                    Success = false,
+                    ErrorMessage = "Request payload must contain at least one analysis item."
+                });
             }
 
-            var result = await _geminiService.GetOverviewSummaryAsync(request);
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// Stage 2: Get Deep-Dive Root Cause Analysis for a selected option
-        /// </summary>
-        [HttpPost("drill-down")]
-        public async Task<IActionResult> GetDrillDown([FromBody] AiDrillDownRequestDto request)
-        {
-            if (request == null)
+            var result = await _geminiService.ExecuteBatchAnalysisAsync(request);
+            if (!result.Success)
             {
-                return BadRequest(new { Message = "Drill-down request parameters are required." });
+                return StatusCode(502, result);
             }
 
-            var result = await _geminiService.GetDrillDownAnalysisAsync(request);
             return Ok(result);
         }
     }

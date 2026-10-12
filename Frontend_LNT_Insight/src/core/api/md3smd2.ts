@@ -3,7 +3,7 @@ import type { CompanyInfo, SiteInfo, SectionInfo, SewingTeamSummay, SewingTeamDe
 import { getPreviousWorkingDay } from '../../features/dashboard/utils/dateUtils';
 
 export const md3smd2Api = {
-    getPreviousWorkingDay: async (_companyID: string, _siteID: string, dateDayStr: string): Promise<string> => {
+    getPreviousWorkingDay: async (dateDayStr: string): Promise<string> => {
         // Architecture abstraction: Currently uses client-side calculation.
         // In the future, this can be switched to fetch from backend API endpoint:
         // const workingDays = await apiFetch<string[]>(`/companies/${_companyID}/sites/${_siteID}/working-days`);
