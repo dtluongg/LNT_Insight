@@ -1,0 +1,42 @@
+{
+    "userID": "lntsoft1",
+    "companyIDs": [
+        {
+            "companyID": "COM01"
+        }
+    ],
+    "modules": [
+        {
+            "moduleMasterID": "MD001",
+            "moduleMasterSubID": 0
+        },
+        {
+            "moduleMasterID": "MD002",
+            "moduleMasterSubID": 0
+        },
+        {
+            "moduleMasterID": "MD003",
+            "moduleMasterSubID": 1
+        },
+        {
+            "moduleMasterID": "MD003",
+            "moduleMasterSubID": 2
+        },
+        {
+            "moduleMasterID": "MD004",
+            "moduleMasterSubID": 0
+        },
+        {
+            "moduleMasterID": "MD005",
+            "moduleMasterSubID": 0
+        },
+        {
+            "moduleMasterID": "MD006",
+            "moduleMasterSubID": 0
+        },
+        {
+            "moduleMasterID": "MD007",
+            "moduleMasterSubID": 0
+        }
+    ]
+}

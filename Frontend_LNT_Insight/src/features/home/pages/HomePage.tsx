@@ -10,6 +10,8 @@ export const HomePage: React.FC = () => {
     
     // Live Running Clock State
     const [currentTime, setCurrentTime] = useState<Date>(new Date());
+    // AI Language Switcher (VI - EN - SI)
+    const [aiLanguage, setAiLanguage] = useState<'vi' | 'en' | 'si'>('vi');
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -52,7 +54,7 @@ export const HomePage: React.FC = () => {
                     </p>
                 </div>
 
-                {/* Real-time Running Clock & Company Info */}
+                {/* Real-time Running Clock & Company Info & Language Selector */}
                 <div className="relative z-10 flex flex-wrap items-center gap-3">
                     
                     {/* Live Clock Badge */}
@@ -62,6 +64,49 @@ export const HomePage: React.FC = () => {
                             {timeFormatted}
                         </span>
                         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping ml-0.5" title="Live Clock Active" />
+                    </div>
+
+                    {/* Language Switcher for AI Insights (Placed next to Clock) */}
+                    <div className="flex items-center p-1 bg-white dark:bg-slate-800/90 rounded-xl border border-sky-200 dark:border-sky-800 shadow-xs">
+                        <button
+                            type="button"
+                            onClick={() => setAiLanguage('vi')}
+                            className={`flex items-center gap-1 px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                aiLanguage === 'vi'
+                                    ? 'bg-sky-500 text-white font-bold shadow-xs'
+                                    : 'text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400'
+                            }`}
+                            title="Tiếng Việt (Vietnamese)"
+                        >
+                            <span>🇻🇳</span>
+                            <span className="text-[11px] font-bold">VI</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setAiLanguage('en')}
+                            className={`flex items-center gap-1 px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                aiLanguage === 'en'
+                                    ? 'bg-sky-500 text-white font-bold shadow-xs'
+                                    : 'text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400'
+                            }`}
+                            title="English"
+                        >
+                            <span>🇬🇧</span>
+                            <span className="text-[11px] font-bold">EN</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setAiLanguage('si')}
+                            className={`flex items-center gap-1 px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                                aiLanguage === 'si'
+                                    ? 'bg-sky-500 text-white font-bold shadow-xs'
+                                    : 'text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400'
+                            }`}
+                            title="Sinhala (සිංහල - Sri Lanka)"
+                        >
+                            <span>🇱🇰</span>
+                            <span className="text-[11px] font-bold">SI</span>
+                        </button>
                     </div>
 
                     {/* Company & Date Info Badge */}
@@ -84,6 +129,7 @@ export const HomePage: React.FC = () => {
                 pageCode="HOME_BRIEFING"
                 companyId={selectedCompanyID || 'COM01'}
                 filterDate={todayStr}
+                language={aiLanguage}
             />
 
             {/* Quick Access Submodules Section */}

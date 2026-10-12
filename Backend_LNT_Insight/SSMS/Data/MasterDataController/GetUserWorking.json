@@ -1,0 +1,37 @@
+[
+    {
+        "UserID": "Administrator",
+        "ActiveFlag": true,
+        "AdminUser": true,
+        "RefreshToken": null,
+        "RefreshTokenExpiryTime": null
+    },
+    {
+        "UserID": "LNTSOFT1",
+        "ActiveFlag": true,
+        "AdminUser": true,
+        "RefreshToken": "bDapBS72yp1nYWnW34WEj5iKMJR1+A/DbN4iNUmpA4jbZQieFsKs2JFyuCmrxPaRjBKZAAHiXs0gEv2IQmFNRg==",
+        "RefreshTokenExpiryTime": "10/1/2026 1:54:02 PM"
+    },
+    {
+        "UserID": "LNTSOFT2",
+        "ActiveFlag": true,
+        "AdminUser": false,
+        "RefreshToken": null,
+        "RefreshTokenExpiryTime": null
+    },
+    {
+        "UserID": "LNTSOFT3",
+        "ActiveFlag": true,
+        "AdminUser": true,
+        "RefreshToken": null,
+        "RefreshTokenExpiryTime": null
+    },
+    {
+        "UserID": "LNTSOFT4",
+        "ActiveFlag": true,
+        "AdminUser": false,
+        "RefreshToken": null,
+        "RefreshTokenExpiryTime": null
+    }
+]

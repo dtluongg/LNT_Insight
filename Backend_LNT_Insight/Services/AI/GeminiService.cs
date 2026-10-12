@@ -35,7 +35,7 @@ namespace Backend_LNT_Insight.Services.AI
                 return response;
             }
 
-            // 1. Kiểm tra Cache
+            // 1. Kiểm tra Cache (1 cache duy nhất chứa cả 3 ngôn ngữ)
             if (!request.ForceRefresh && !string.IsNullOrWhiteSpace(request.CacheKey))
             {
                 if (_cache.TryGetValue(request.CacheKey, out AiBatchResponseDto? cached) && cached != null)
@@ -53,16 +53,41 @@ namespace Backend_LNT_Insight.Services.AI
                 return response;
             }
 
-            // 2. Tạo Prompt: Yêu cầu Gemini trả về đúng khuôn mẫu JSON cho từng Card
-            var promptBuilder = new StringBuilder("""
-            You are an Executive Business & Operations AI Advisor for LNT Insight.
-            Analyze the following items based on their individual instruction and data.
-            You MUST return a valid JSON object matching this schema:
+            // 2. Tạo Prompt: Yêu cầu Gemini trả về cả 3 ngôn ngữ (VI, EN, SI) trong cùng 1 lần gọi
+            var promptBuilder = new StringBuilder();
+            promptBuilder.AppendLine("You are an Executive Business & Operations AI Advisor for LNT Insight, an apparel manufacturing intelligence system.");
+            promptBuilder.AppendLine("""
+
+            CRITICAL MULTI-LANGUAGE REQUIREMENT:
+            For EVERY analyzed item, you MUST generate the Title and Summary in THREE languages simultaneously inside the "translations" object:
+            1. "vi" (Vietnamese): Fluent, natural Vietnamese using accurate apparel manufacturing terms (Chuyền may, Kế hoạch MO, Sản lượng thực tế, Tỷ lệ lỗi, Nhịp độ ra hàng).
+            2. "en" (English): Fluent, professional English using standard industry terms (Sewing Line, MO Target, Actual Output, Defect Rate, Run-rate, End-of-shift projection).
+            3. "si" (Sinhala - Sri Lanka): Fluent, professional Sinhala (සිංහල) for Sri Lankan garment managers (මැහුම් කණ්ඩායම/පෙළ, MO ඉලක්කය, නිමි ඇඳුම් ප්‍රමාණය, දෝෂ අනුපාතය, වැඩ මුරයේ නිමාව).
+
+            Strict Operational Rules:
+            1. Keep outputs concise, deterministic, and high-signal (maximum 2-3 sentences per summary).
+            2. For production forecasting (shift 07:30 to 17:00): compare actual run-rate vs remaining shift time to project end-of-shift output against MO target.
+            3. For defect analysis: focus strictly on top Pareto defect items from the data. Do NOT invent machine or fabric causes that are not in the data.
+            4. You MUST return ONLY a valid JSON object matching this exact schema:
             {
               "<item_id>": {
-                "title": "Short descriptive title",
-                "summary": "2-3 sentence executive insight based on data",
-                "severity": "SUCCESS" | "WARNING" | "DANGER" | "INFO"
+                "title": "Short descriptive title (Vietnamese)",
+                "summary": "2-3 sentence executive insight based on actual query data (Vietnamese)",
+                "severity": "SUCCESS" | "WARNING" | "DANGER" | "INFO",
+                "translations": {
+                  "vi": {
+                    "title": "Tiêu đề tiếng Việt ngắn gọn",
+                    "summary": "Tóm tắt điều hành bằng tiếng Việt..."
+                  },
+                  "en": {
+                    "title": "Short English title",
+                    "summary": "Executive summary in English..."
+                  },
+                  "si": {
+                    "title": "සිංහල කෙටි මාතෘකාව",
+                    "summary": "සිංහලෙන් විධායක සාරාංශය..."
+                  }
+                }
               }
             }
 
@@ -101,11 +126,15 @@ namespace Backend_LNT_Insight.Services.AI
                 var requestBody = new
                 {
                     contents = new[] { new { parts = new[] { new { text = promptBuilder.ToString() } } } },
-                    generationConfig = new { responseMimeType = "application/json" }
+                    generationConfig = new 
+                    { 
+                        responseMimeType = "application/json",
+                        temperature = 0.1 
+                    }
                 };
 
                 var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
-                Console.WriteLine($"[LNT AI ENGINE] Calling Gemini model '{model}' for {request.Items.Count} items...");
+                Console.WriteLine($"[LNT AI ENGINE] Calling Gemini model '{model}' for {request.Items.Count} items (Tri-lingual: VI, EN, SI)...");
 
                 var httpResponse = await _httpClient.PostAsync(apiUrl, content);
 
@@ -133,6 +162,19 @@ namespace Backend_LNT_Insight.Services.AI
                 {
                     PropertyNameCaseInsensitive = true
                 });
+
+                if (parsedResults != null)
+                {
+                    foreach (var (cardKey, card) in parsedResults)
+                    {
+                        // Fallback an toàn nếu Gemini chỉ điền Translations mà bỏ trống Title/Summary cấp ngoài
+                        if (card.Translations != null && card.Translations.TryGetValue("vi", out var viContent))
+                        {
+                            if (string.IsNullOrWhiteSpace(card.Title)) card.Title = viContent.Title;
+                            if (string.IsNullOrWhiteSpace(card.Summary)) card.Summary = viContent.Summary;
+                        }
+                    }
+                }
 
                 response.Success = true;
                 response.Results = parsedResults ?? new();

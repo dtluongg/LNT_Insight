@@ -6,15 +6,18 @@ import type { AiBatchResponse, AiCardResult, AiSeverity } from '../../types/aiSu
 import { md3smd2Api } from '../../core/api/md3smd2';
 
 interface AiExecutiveBriefingCardProps {
+    pageCode?: string;
     companyId?: string;
     siteId?: string;
     filterDate?: string;
+    language?: 'vi' | 'en' | 'si';
 }
 
 export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = ({
     companyId = 'COM01',
     siteId = 'SITE1',
-    filterDate
+    filterDate,
+    language = 'vi'
 }) => {
     const [loading, setLoading] = useState<boolean>(true);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -23,7 +26,7 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
         summary_five_statcarts: any;
         summary_production_output_status: any;
         summary_defect_gmt_overall: any;
-    }>({ summary_five_statcarts: null, summary_production_output_status:null, summary_defect_gmt_overall: null});
+    }>({ summary_five_statcarts: null, summary_production_output_status: null, summary_defect_gmt_overall: null });
 
     const isFetchingRef = useRef<boolean>(false);
 
@@ -33,7 +36,6 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
     const [deepDiveResult, setDeepDiveResult] = useState<any | null>(null);
 
     const todayDate = filterDate ? new Date(filterDate) : new Date();
-    
 
     const fetchAnalysis = async (forceRefresh: boolean = false) => {
         if (isFetchingRef.current) return;
@@ -46,39 +48,65 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
             const prevDateStr = await md3smd2Api.getPreviousWorkingDay(effectiveDateStr).catch(() => '');
             const yesterdayDate = prevDateStr ? new Date(prevDateStr) : new Date(Date.now() - 86400000);
 
-            // 1. Fetch real data from SPs (or pass whatever data you want)
+            // 1. Fetch real data from SPs
             const [summaryDataYesterday, summaryDataToday, summary_production_output_status, summary_defect_gmt_overall] = await Promise.all([
                 md3smd2Api.getTeamSewingSummary(companyId, siteId, 0, yesterdayDate).catch(() => null),
                 md3smd2Api.getTeamSewingSummary(companyId, siteId, 0, todayDate).catch(() => null),
                 md3smd2Api.getTeamSewingDetail(companyId, siteId, 0, todayDate).catch(() => null),
                 md3smd2Api.getOverallDefectAnalysis(companyId, siteId, 0, todayDate).catch(() => null),
-                // md3smd2Api.getWorkshiftList(companyId, siteId, todayDate, 0).catch(() => null)
             ]);
-            const summary_five_statcarts = [
-                ...(Array.isArray(summaryDataYesterday) ? summaryDataYesterday : []),
-                ...(Array.isArray(summaryDataToday) ? summaryDataToday : [])
-            ];
 
-            setRawDatasets({ summary_five_statcarts, summary_production_output_status, summary_defect_gmt_overall });
+            // Live Time for Shift 07:30 - 17:00 run-rate forecast
+            const now = new Date();
+            const currentTimeStr = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
 
-            // 2. Prepare 3 items with card IDs & query data (Prompts are centrally loaded from backend appsettings.json)
+            // Card 1: Gán nhãn hôm qua vs hôm nay rõ ràng
+            const card1Payload = {
+                yesterday: Array.isArray(summaryDataYesterday) && summaryDataYesterday.length > 0 ? summaryDataYesterday[0] : null,
+                today: Array.isArray(summaryDataToday) && summaryDataToday.length > 0 ? summaryDataToday[0] : null
+            };
+
+            // Card 2: Áp cứng ca làm việc 07:30 - 17:00 và truyền currentTime
+            const card2Payload = {
+                currentTime: currentTimeStr,
+                shiftSchedule: {
+                    startTime: "07:30",
+                    endTime: "17:00",
+                    breakMinutes: 90,
+                    standardWorkHours: 8.0
+                },
+                teams: summary_production_output_status
+            };
+
+            // Card 3: Danh sách lỗi tổng quan
+            const card3Payload = {
+                defects: summary_defect_gmt_overall
+            };
+
+            setRawDatasets({
+                summary_five_statcarts: card1Payload,
+                summary_production_output_status: card2Payload,
+                summary_defect_gmt_overall: card3Payload
+            });
+
+            // 2. Prepare 3 items with card IDs & structured data
             const items = [
                 {
                     id: 'summary_five_statcarts',
-                    data: summary_five_statcarts
+                    data: card1Payload
                 },
                 {
                     id: 'summary_production_output_status',
-                    data: summary_production_output_status
+                    data: card2Payload
                 },
                 {
                     id: 'summary_defect_gmt_overall',
-                    data: summary_defect_gmt_overall
-                },
-                // {
-                //     id: 'card_shift',
-                //     data: shiftData
-                // }
+                    data: card3Payload
+                }
             ];
 
             const cacheKey = `HOME_3_CARDS_${companyId}_${siteId}_${filterDate || 'TODAY'}`;
@@ -87,6 +115,7 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
             const res = await batchGenerate({
                 cacheKey,
                 forceRefresh,
+                language,
                 items
             });
 
@@ -191,10 +220,46 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
         }
     };
 
+    const t = {
+        vi: {
+            title: "Bản tin Điều hành Executive (LNTBOOST AI Engine)",
+            subTitle: "Phân tích AI thời gian thực theo dữ liệu sản xuất • Ca làm việc: 07:30 - 17:00",
+            analyzingHeader: "AI đang phân tích 3 chỉ số vận hành theo ca 07:30 - 17:00...",
+            refreshBtn: "Làm mới AI",
+            analyzingBtn: "Đang phân tích...",
+            deepDiveBtn: "🔍 Phân tích chi tiết",
+            updatedAt: "Cập nhật lúc:",
+            cached: "Đã lưu đệm",
+            noData: "Chưa có dữ liệu phân tích AI."
+        },
+        en: {
+            title: "Executive Daily Briefing (LNTBOOST AI Engine)",
+            subTitle: "Real-time AI analysis based on actual query data • Shift: 07:30 - 17:00",
+            analyzingHeader: "AI is analyzing operational metrics for shift 07:30 - 17:00...",
+            refreshBtn: "Refresh AI",
+            analyzingBtn: "Analyzing...",
+            deepDiveBtn: "🔍 Deep-Dive Analysis",
+            updatedAt: "Updated at:",
+            cached: "Cached",
+            noData: "No AI analysis available."
+        },
+        si: {
+            title: "විධායක දෛනික සාරාංශය (LNTBOOST AI Engine)",
+            subTitle: "සැබෑ නිෂ්පාදන දත්ත මත පදනම් වූ AI විශ්ලේෂණය • වැඩ මුරය: 07:30 - 17:00",
+            analyzingHeader: "AI 07:30 - 17:00 වැඩ මුරයේ දත්ත විශ්ලේෂණය කරයි...",
+            refreshBtn: "යාවත්කාලීන කරන්න",
+            analyzingBtn: "විශ්ලේෂණය කරමින්...",
+            deepDiveBtn: "🔍 ගැඹුරු විශ්ලේෂණය",
+            updatedAt: "යාවත්කාලීන වේලාව:",
+            cached: "කැචය",
+            noData: "AI විශ්ලේෂණයක් නොමැත."
+        }
+    }[language];
+
     return (
         <>
             <div className="w-full bg-gradient-to-br from-slate-900 via-sky-950 to-blue-950 rounded-2xl p-6 text-white shadow-2xl shadow-sky-950/30 border border-sky-500/30 relative overflow-hidden mb-6">
-                
+
                 {/* Background Ambient Glow */}
                 <div className="absolute -top-24 -right-24 w-72 h-72 bg-cyan-400/15 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-sky-400/15 rounded-full blur-3xl pointer-events-none" />
@@ -207,15 +272,15 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
                         </div>
                         <div>
                             <h2 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
-                                Executive Daily Briefing (LNT AI Engine)
+                                {t.title}
                                 {batchData?.isCached && (
                                     <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                        Cached
+                                        {t.cached}
                                     </span>
                                 )}
                             </h2>
                             <p className="text-xs text-sky-200/80">
-                                Real-time AI analysis based on actual query data • Updated: {batchData ? new Date(batchData.generatedAt).toLocaleTimeString() : '---'}
+                                {t.subTitle} • {t.updatedAt} {batchData ? new Date(batchData.generatedAt).toLocaleTimeString() : '---'}
                             </p>
                         </div>
                     </div>
@@ -226,7 +291,7 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
                         className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/30 text-sky-200 transition-colors disabled:opacity-50 cursor-pointer"
                     >
                         <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-                        <span>{loading ? 'Analyzing...' : 'Refresh AI'}</span>
+                        <span>{loading ? t.analyzingBtn : t.refreshBtn}</span>
                     </button>
                 </div>
 
@@ -235,7 +300,7 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
                     <div className="space-y-4 py-4">
                         <div className="flex items-center gap-2 text-sky-300 text-sm font-medium">
                             <Sparkles className="w-4 h-4 animate-spin text-cyan-400" />
-                            <span>AI is analyzing your 3 queries simultaneously...</span>
+                            <span>{t.analyzingHeader}</span>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="h-36 bg-white/5 rounded-xl animate-pulse border border-white/10" />
@@ -267,6 +332,9 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
                             if (!cardResult) return null;
 
                             const badge = getSeverityBadge(cardResult.severity);
+                            const translated = cardResult.translations?.[language];
+                            const currentTitle = translated?.title || cardResult.title;
+                            const currentSummary = translated?.summary || cardResult.summary;
 
                             return (
                                 <div
@@ -285,23 +353,23 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
                                             </span>
                                         </div>
 
-                                        {/* Card Title (Generated by Gemini) */}
+                                        {/* Card Title (Instant translated) */}
                                         <h3 className="text-sm font-bold text-white mb-2 leading-snug">
-                                            {cardResult.title}
+                                            {currentTitle}
                                         </h3>
 
-                                        {/* Card Summary (Generated by Gemini based on real query data) */}
+                                        {/* Card Summary (Instant translated) */}
                                         <p className="text-xs text-slate-300 leading-relaxed font-medium">
-                                            {cardResult.summary}
+                                            {currentSummary}
                                         </p>
                                     </div>
 
                                     {/* 1-Click Deep Dive Action */}
                                     <button
-                                        onClick={() => handleOpenDeepDive(cardId, cardResult.title)}
+                                        onClick={() => handleOpenDeepDive(cardId, currentTitle)}
                                         className="mt-4 pt-3 border-t border-white/10 text-xs font-semibold text-cyan-300 hover:text-cyan-200 flex items-center justify-between group transition-colors cursor-pointer"
                                     >
-                                        <span>🔍 Deep-Dive Analysis</span>
+                                        <span>{t.deepDiveBtn}</span>
                                         <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                     </button>
                                 </div>
@@ -310,7 +378,7 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
                     </div>
                 ) : (
                     <div className="text-center py-6 text-slate-400 text-xs">
-                        No AI analysis available.
+                        {t.noData}
                     </div>
                 )}
             </div>

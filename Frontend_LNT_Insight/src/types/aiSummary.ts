@@ -6,16 +6,25 @@ export interface AiCardItem {
     data?: any;        // Real SP query data passed by user
 }
 
+export type AiLanguage = 'vi' | 'en' | 'si';
+
 export interface AiBatchRequest {
     cacheKey?: string;
     forceRefresh?: boolean;
+    language?: AiLanguage;
     items: AiCardItem[];
+}
+
+export interface AiCardTranslation {
+    title: string;
+    summary: string;
 }
 
 export interface AiCardResult {
     title: string;
     summary: string;
     severity: AiSeverity;
+    translations?: Record<string, AiCardTranslation>;
 }
 
 export interface AiBatchResponse {

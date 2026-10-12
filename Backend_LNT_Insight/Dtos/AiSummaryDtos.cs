@@ -14,7 +14,14 @@ namespace Backend_LNT_Insight.Dtos
     {
         public string? CacheKey { get; set; }              // e.g. "HOME_CARDS_COM01_20261012"
         public bool ForceRefresh { get; set; } = false;
+        public string Language { get; set; } = "vi";       // Supported: "vi" (Vietnamese), "en" (English), "si" (Sinhala)
         public List<AiCardItemDto> Items { get; set; } = new();
+    }
+
+    public class AiCardTranslationDto
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Summary { get; set; } = string.Empty;
     }
 
     public class AiCardResultDto
@@ -22,6 +29,7 @@ namespace Backend_LNT_Insight.Dtos
         public string Title { get; set; } = string.Empty;
         public string Summary { get; set; } = string.Empty;
         public string Severity { get; set; } = "INFO"; // "SUCCESS", "WARNING", "DANGER", "INFO"
+        public Dictionary<string, AiCardTranslationDto>? Translations { get; set; }
     }
 
     public class AiBatchResponseDto

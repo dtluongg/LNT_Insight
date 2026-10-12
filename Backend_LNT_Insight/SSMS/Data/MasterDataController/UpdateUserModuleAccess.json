@@ -1,0 +1,28 @@
+{
+    "UserID": "lntsoft4",
+    "CompanyIDs": [
+        {
+            "CompanyID": "COM02"
+        },
+        {
+            "CompanyID": "COM08"
+        },
+        {
+            "CompanyID": "COM09"
+        }
+    ],
+    "Modules": [
+        {
+            "ModuleMasterID": "MD002",
+            "ModuleMasterSubID": 1
+        },
+        {
+            "ModuleMasterID": "MD004",
+            "ModuleMasterSubID": 1
+        },
+        {
+            "ModuleMasterID": "MD004",
+            "ModuleMasterSubID": 2
+        }
+    ]
+}
