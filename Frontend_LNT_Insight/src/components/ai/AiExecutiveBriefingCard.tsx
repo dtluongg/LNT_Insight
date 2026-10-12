@@ -36,13 +36,15 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
     
 
     const fetchAnalysis = async (forceRefresh: boolean = false) => {
-        const prevDateStr = await md3smd2Api.getPreviousWorkingDay(filterDate);
-        const yesterdayDate = new Date(prevDateStr);
         if (isFetchingRef.current) return;
         isFetchingRef.current = true;
         try {
             setLoading(true);
             setErrorMsg(null);
+
+            const effectiveDateStr = filterDate || new Date().toISOString().split('T')[0];
+            const prevDateStr = await md3smd2Api.getPreviousWorkingDay(effectiveDateStr).catch(() => '');
+            const yesterdayDate = prevDateStr ? new Date(prevDateStr) : new Date(Date.now() - 86400000);
 
             // 1. Fetch real data from SPs (or pass whatever data you want)
             const [summaryDataYesterday, summaryDataToday, summary_production_output_status, summary_defect_gmt_overall] = await Promise.all([
@@ -52,8 +54,10 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
                 md3smd2Api.getOverallDefectAnalysis(companyId, siteId, 0, todayDate).catch(() => null),
                 // md3smd2Api.getWorkshiftList(companyId, siteId, todayDate, 0).catch(() => null)
             ]);
-            const summary_five_statcarts = [...summaryDataYesterday, ...summaryDataToday];
-        
+            const summary_five_statcarts = [
+                ...(Array.isArray(summaryDataYesterday) ? summaryDataYesterday : []),
+                ...(Array.isArray(summaryDataToday) ? summaryDataToday : [])
+            ];
 
             setRawDatasets({ summary_five_statcarts, summary_production_output_status, summary_defect_gmt_overall });
 
@@ -258,7 +262,7 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
                 ) : batchData?.results ? (
                     /* Render 3 Dynamic AI Cards */
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {['card_production', 'card_defect'].map((cardId) => {
+                        {['summary_five_statcarts', 'summary_production_output_status', 'summary_defect_gmt_overall'].map((cardId) => {
                             const cardResult: AiCardResult | undefined = batchData.results[cardId];
                             if (!cardResult) return null;
 
