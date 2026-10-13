@@ -65,27 +65,31 @@ namespace Backend_LNT_Insight.Services.AI
             3. "si" (Sinhala - Sri Lanka): Fluent, professional Sinhala (සිංහල) for Sri Lankan garment managers (මැහුම් කණ්ඩායම/පෙළ, MO ඉලක්කය, නිමි ඇඳුම් ප්‍රමාණය, දෝෂ අනුපාතය, වැඩ මුරයේ නිමාව).
 
             Strict Operational Rules:
-            1. Keep outputs concise, deterministic, and high-signal (strictly follow formatting and bullet points requested in each item instruction; for deep-dive provide structured executive sections).
-            2. For production forecasting (shift 07:30 to 17:00): compare actual run-rate vs remaining shift time to project end-of-shift output against MO target.
-            3. For defect analysis: focus strictly on top Pareto defect items from the data. Do NOT invent machine or fabric causes that are not in the data.
-            4. You MUST return ONLY a valid JSON object matching this exact schema:
+            1. High-Value Analytical Rigor: Do NOT generate rigid, robotic or fill-in-the-blank canned text. Deeply evaluate the numbers, explain what they mean for factory momentum (expansion vs decline, line balance, plan vs actual mismatch, defect containment), and provide actionable executive insights.
+            2. Bullet Formatting & Headings:
+               - For dashboard briefing cards: Provide rich, multi-sentence operational evaluations using bold sub-labels (e.g. "• Hiệu suất: [detailed analysis]", "• Điểm nhấn vận hành: [operational insight]").
+               - For deep-dive diagnostic reports: Provide in-depth executive diagnostic sections with numbered headers (e.g. "1. SECTION TITLE") and thorough analytical bullets with bold sub-labels (e.g. "• Sub-label: [deep metric interpretation]").
+               - Always use line breaks (\n) between sections and bullets for clean UI rendering.
+            3. For production forecasting (shift 07:30 to 17:00): compare actual run-rate vs remaining shift time to project end-of-shift output against MO target.
+            4. For defect analysis: focus strictly on top Pareto defect items from the data. Do NOT invent machine or fabric causes that are not in the data.
+            5. You MUST return ONLY a valid JSON object matching this exact schema:
             {
               "<item_id>": {
                 "title": "Short descriptive title (Vietnamese)",
-                "summary": "2-3 sentence executive insight based on actual query data (Vietnamese)",
+                "summary": "Detailed executive analytical report with line breaks following the item instruction (Vietnamese)",
                 "severity": "SUCCESS" | "WARNING" | "DANGER" | "INFO",
                 "translations": {
                   "vi": {
-                    "title": "Tiêu đề tiếng Việt ngắn gọn",
-                    "summary": "Tóm tắt điều hành bằng tiếng Việt..."
+                    "title": "Tiêu đề tiếng Việt",
+                    "summary": "Báo cáo phân tích chi tiết bằng tiếng Việt..."
                   },
                   "en": {
-                    "title": "Short English title",
-                    "summary": "Executive summary in English..."
+                    "title": "English title",
+                    "summary": "Detailed executive analytical report in English..."
                   },
                   "si": {
-                    "title": "සිංහල කෙටි මාතෘකාව",
-                    "summary": "සිංහලෙන් විධායක සාරාංශය..."
+                    "title": "සිංහල මාතෘකාව",
+                    "summary": "සිංහලෙන් විස්තරාත්මක විධායක විශ්ලේෂණ වාර්තාව..."
                   }
                 }
               }

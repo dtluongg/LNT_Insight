@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Sparkles, AlertTriangle, CheckCircle2, Copy, Check, RefreshCw, Zap } from 'lucide-react';
 import type { AiDrillDownResponse } from '../../types/aiSummary';
+import { AiFormattedText } from './AiFormattedText';
 
 interface AiInsightDrawerProps {
     isOpen: boolean;
@@ -189,14 +190,17 @@ export const AiInsightDrawer: React.FC<AiInsightDrawerProps> = ({
                                 </div>
 
                                 {/* Main Diagnostic & Root Cause Report Card */}
-                                <div className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200/80 rounded-xl dark:from-slate-900 dark:to-amber-950/20 dark:border-amber-900/40">
-                                    <div className="flex items-center gap-2 text-amber-800 dark:text-amber-400 font-bold mb-2">
-                                        <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                                <div className="p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs">
+                                    <div className="flex items-center gap-2 text-indigo-700 dark:text-cyan-400 font-bold mb-3 pb-2 border-b border-slate-100 dark:border-slate-800">
+                                        <Sparkles className="w-4 h-4 text-indigo-600 dark:text-cyan-400" />
                                         {t.diagnosticTitle}
                                     </div>
-                                    <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium whitespace-pre-line">
-                                        {data.rootCauseAnalysis}
-                                    </p>
+                                    <AiFormattedText
+                                        content={data.rootCauseAnalysis}
+                                        isDeepDive={true}
+                                        theme="auto"
+                                        className="text-xs leading-relaxed"
+                                    />
                                 </div>
 
                                 {/* Key Highlights & Warnings Grid (if available) */}
