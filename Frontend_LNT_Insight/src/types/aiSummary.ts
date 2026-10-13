@@ -34,3 +34,16 @@ export interface AiBatchResponse {
     isCached: boolean;
     generatedAt: string;
 }
+
+export interface AiDrillDownResponse {
+    title: string;
+    rootCauseAnalysis: string;
+    keyHighlights?: string[];
+    warnings?: string[];
+    actionItems?: string[];
+    rawMarkdown: string;
+    subModuleCode: string;
+    generatedAt: string;
+    isCached: boolean;
+    parentSummary?: string;
+}

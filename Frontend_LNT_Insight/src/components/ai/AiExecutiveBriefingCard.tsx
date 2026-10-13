@@ -143,42 +143,54 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
             setDrawerOpen(true);
             setDeepDiveLoading(true);
 
-            // 1. Lấy data tổng của chính card đó
-            let overviewData = null;
-            if (cardId === 'summary_five_statcarts') overviewData = rawDatasets.summary_five_statcarts;
-            else if (cardId === 'summary_production_output_status') overviewData = rawDatasets.summary_production_output_status;
-            else if (cardId === 'summary_defect_gmt_overall') overviewData = rawDatasets.summary_defect_gmt_overall;
+            // 1. Lấy data của chính thẻ cha
+            let targetCardData = null;
+            if (cardId === 'summary_five_statcarts') targetCardData = rawDatasets.summary_five_statcarts;
+            else if (cardId === 'summary_production_output_status') targetCardData = rawDatasets.summary_production_output_status;
+            else if (cardId === 'summary_defect_gmt_overall') targetCardData = rawDatasets.summary_defect_gmt_overall;
 
-            // 2. Fetch detailed SP data on-demand (có thể tùy chỉnh SP/tham số cứng)
-            const deepData = await md3smd2Api.getOverallDefectAnalysis(companyId, siteId, 0, todayDate).catch(() => null);
+            // 2. Map ID riêng biệt tương ứng với thẻ cha
+            const deepDiveItemId = `deep_dive_${cardId}`;
+
+            // 3. Cache key gắn kèm language để không bị lẫn lộn giữa các thứ tiếng
+            const cacheKey = `DEEP_DIVE_${cardId}_${companyId}_${siteId}_${filterDate || 'TODAY'}_${language}`;
 
             const res = await batchGenerate({
-                cacheKey: `DEEP_DIVE_${cardId}_${companyId}_${filterDate || 'TODAY'}`,
+                cacheKey,
                 forceRefresh: false,
+                language,
                 items: [
                     {
-                        id: 'deep_dive_detail',
+                        id: deepDiveItemId,
                         data: {
-                            overview: overviewData, // Data tổng
-                            detail: deepData       // Data chi tiết từ SP
+                            targetCardId: cardId,
+                            targetData: targetCardData,        // Dữ liệu trọng tâm của thẻ cha
+                            allSummaryData: rawDatasets        // Dữ liệu tổng hợp cả 3 SP làm ngữ cảnh toàn cảnh
                         }
                     }
                 ]
             });
 
-            if (res.success && res.results['deep_dive_detail']) {
-                const item = res.results['deep_dive_detail'];
-                setDeepDiveResult({
-                    title: item.title || `Deep-Dive Analysis: ${cardTitle}`,
-                    rootCauseAnalysis: item.summary,
-                    keyHighlights: ['Automated defect correlation verified', 'Fast root-cause identification'],
-                    warnings: [item.summary],
-                    actionItems: ['Review machine settings on affected line', 'Schedule technical inspection before next shift'],
-                    rawMarkdown: item.summary,
-                    subModuleCode: 'MD3SMD2',
-                    generatedAt: res.generatedAt,
-                    isCached: res.isCached
-                });
+            if (res.success && res.results) {
+                const item = res.results[deepDiveItemId] || Object.values(res.results)[0];
+                if (item) {
+                    // Lấy chính xác ngôn ngữ đang chọn từ translations
+                    const translated = item.translations?.[language];
+                    const currentTitle = translated?.title || item.title || cardTitle;
+                    const currentSummary = translated?.summary || item.summary || '';
+
+                    setDeepDiveResult({
+                        title: currentTitle,
+                        rootCauseAnalysis: currentSummary,
+                        keyHighlights: [],
+                        warnings: [],
+                        actionItems: [],
+                        rawMarkdown: currentSummary,
+                        subModuleCode: 'MD3SMD2',
+                        generatedAt: res.generatedAt,
+                        isCached: res.isCached
+                    });
+                }
             }
         } catch (err) {
             console.error('Deep-dive error:', err);
@@ -359,7 +371,7 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
                                         </h3>
 
                                         {/* Card Summary (Instant translated) */}
-                                        <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                                        <p className="text-xs text-slate-300 leading-relaxed font-medium whitespace-pre-line">
                                             {currentSummary}
                                         </p>
                                     </div>
@@ -389,6 +401,7 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
                 onClose={() => setDrawerOpen(false)}
                 isLoading={deepDiveLoading}
                 data={deepDiveResult}
+                language={language}
             />
         </>
     );

@@ -65,7 +65,7 @@ namespace Backend_LNT_Insight.Services.AI
             3. "si" (Sinhala - Sri Lanka): Fluent, professional Sinhala (සිංහල) for Sri Lankan garment managers (මැහුම් කණ්ඩායම/පෙළ, MO ඉලක්කය, නිමි ඇඳුම් ප්‍රමාණය, දෝෂ අනුපාතය, වැඩ මුරයේ නිමාව).
 
             Strict Operational Rules:
-            1. Keep outputs concise, deterministic, and high-signal (maximum 2-3 sentences per summary).
+            1. Keep outputs concise, deterministic, and high-signal (strictly follow formatting and bullet points requested in each item instruction; for deep-dive provide structured executive sections).
             2. For production forecasting (shift 07:30 to 17:00): compare actual run-rate vs remaining shift time to project end-of-shift output against MO target.
             3. For defect analysis: focus strictly on top Pareto defect items from the data. Do NOT invent machine or fabric causes that are not in the data.
             4. You MUST return ONLY a valid JSON object matching this exact schema:
