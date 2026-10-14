@@ -70,7 +70,7 @@ namespace Backend_LNT_Insight.Services.AI
                - For dashboard briefing cards: Provide rich, multi-sentence operational evaluations using bold sub-labels (e.g. "• Hiệu suất: [detailed analysis]", "• Điểm nhấn vận hành: [operational insight]").
                - For deep-dive diagnostic reports: Provide in-depth executive diagnostic sections with numbered headers (e.g. "1. SECTION TITLE") and thorough analytical bullets with bold sub-labels (e.g. "• Sub-label: [deep metric interpretation]").
                - Always use line breaks (\n) between sections and bullets for clean UI rendering.
-            3. For production forecasting (shift 07:30 to 17:00): compare actual run-rate vs remaining shift time to project end-of-shift output against MO target.
+            3. For production forecasting (shift 07:15 AM to 4:15 PM): compare actual run-rate vs remaining shift time to project end-of-shift output against MO target.
             4. For defect analysis: focus strictly on top Pareto defect items from the data. Do NOT invent machine or fabric causes that are not in the data.
             5. You MUST return ONLY a valid JSON object matching this exact schema:
             {

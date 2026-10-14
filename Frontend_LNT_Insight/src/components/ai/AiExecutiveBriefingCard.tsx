@@ -57,7 +57,7 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
                 md3smd2Api.getOverallDefectAnalysis(companyId, siteId, 0, todayDate).catch(() => null),
             ]);
 
-            // Live Time for Shift 07:30 - 17:00 run-rate forecast
+            // Live Time for Shift 07:15 - 16:15 run-rate forecast
             const now = new Date();
             const currentTimeStr = now.toLocaleTimeString('en-US', {
                 hour: '2-digit',
@@ -71,12 +71,12 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
                 today: Array.isArray(summaryDataToday) && summaryDataToday.length > 0 ? summaryDataToday[0] : null
             };
 
-            // Card 2: Áp cứng ca làm việc 07:30 - 17:00 và truyền currentTime
+            // Card 2: Áp cứng ca làm việc 07:15 - 16:15 và truyền currentTime
             const card2Payload = {
                 currentTime: currentTimeStr,
                 shiftSchedule: {
-                    startTime: "07:30",
-                    endTime: "17:00",
+                    startTime: "07:15",
+                    endTime: "16:15",
                     breakMinutes: 90,
                     standardWorkHours: 8.0
                 },
@@ -236,8 +236,8 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
     const t = {
         vi: {
             title: "Bản tin Điều hành Executive (LNTBOOST AI Engine)",
-            subTitle: "Phân tích AI thời gian thực theo dữ liệu sản xuất • Ca làm việc: 07:30 - 17:00",
-            analyzingHeader: "AI đang phân tích 3 chỉ số vận hành theo ca 07:30 - 17:00...",
+            subTitle: "Phân tích AI thời gian thực theo dữ liệu sản xuất • Ca làm việc: 07:15 - 16:15",
+            analyzingHeader: "AI đang phân tích 3 chỉ số vận hành theo ca 07:15 - 16:15...",
             refreshBtn: "Làm mới AI",
             analyzingBtn: "Đang phân tích...",
             deepDiveBtn: "🔍 Phân tích chi tiết",
@@ -247,8 +247,8 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
         },
         en: {
             title: "Executive Daily Briefing (LNTBOOST AI Engine)",
-            subTitle: "Real-time AI analysis based on actual query data • Shift: 07:30 - 17:00",
-            analyzingHeader: "AI is analyzing operational metrics for shift 07:30 - 17:00...",
+            subTitle: "Real-time AI analysis based on actual query data • Shift: 07:15 - 16:15",
+            analyzingHeader: "AI is analyzing operational metrics for shift 07:15 - 16:15...",
             refreshBtn: "Refresh AI",
             analyzingBtn: "Analyzing...",
             deepDiveBtn: "🔍 Deep-Dive Analysis",
@@ -258,8 +258,8 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
         },
         si: {
             title: "විධායක දෛනික සාරාංශය (LNTBOOST AI Engine)",
-            subTitle: "සැබෑ නිෂ්පාදන දත්ත මත පදනම් වූ AI විශ්ලේෂණය • වැඩ මුරය: 07:30 - 17:00",
-            analyzingHeader: "AI 07:30 - 17:00 වැඩ මුරයේ දත්ත විශ්ලේෂණය කරයි...",
+            subTitle: "සැබෑ නිෂ්පාදන දත්ත මත පදනම් වූ AI විශ්ලේෂණය • වැඩ මුරය: 07:15 - 16:15",
+            analyzingHeader: "AI 07:15 - 16:15 වැඩ මුරයේ දත්ත විශ්ලේෂණය කරයි...",
             refreshBtn: "යාවත්කාලීන කරන්න",
             analyzingBtn: "විශ්ලේෂණය කරමින්...",
             deepDiveBtn: "🔍 ගැඹුරු විශ්ලේෂණය",
