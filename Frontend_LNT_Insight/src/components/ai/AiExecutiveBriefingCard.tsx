@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Sparkles, RefreshCw, AlertTriangle, CheckCircle2, Info, ArrowUpRight, AlertOctagon, XCircle } from 'lucide-react';
 import { batchGenerate } from '../../core/api/aiSummary';
 import { AiInsightDrawer } from './AiInsightDrawer';
-import { AiFormattedText } from './AiFormattedText';
+// import { AiFormattedText } from './AiFormattedText';
+import AIFormatText from './AIFormatText';
 import type { AiBatchResponse, AiCardResult, AiSeverity } from '../../types/aiSummary';
 import { md3smd2Api } from '../../core/api/md3smd2';
 
@@ -372,9 +373,8 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
                                         </h3>
 
                                         {/* Card Summary with highlighted metrics & structured bullet labels */}
-                                        <AiFormattedText
+                                        <AIFormatText
                                             content={currentSummary}
-                                            theme="dark"
                                             className="text-xs text-slate-100 leading-relaxed font-normal"
                                         />
                                     </div>

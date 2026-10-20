@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Sparkles, AlertTriangle, CheckCircle2, Copy, Check, RefreshCw, Zap } from 'lucide-react';
 import type { AiDrillDownResponse } from '../../types/aiSummary';
 import { AiFormattedText } from './AiFormattedText';
+import AIFormatText from './AIFormatText';
 
 interface AiInsightDrawerProps {
     isOpen: boolean;
@@ -195,10 +196,9 @@ export const AiInsightDrawer: React.FC<AiInsightDrawerProps> = ({
                                         <Sparkles className="w-4 h-4 text-indigo-600 dark:text-cyan-400" />
                                         {t.diagnosticTitle}
                                     </div>
-                                    <AiFormattedText
+                                    <AIFormatText
                                         content={data.rootCauseAnalysis}
-                                        isDeepDive={true}
-                                        theme="auto"
+                                        isDeepAnalysis={true}
                                         className="text-xs leading-relaxed"
                                     />
                                 </div>

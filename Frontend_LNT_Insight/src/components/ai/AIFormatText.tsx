@@ -6,61 +6,75 @@ interface AIFormatTextProps {
     isDeepAnalysis?: boolean; // true if detail views
     // theme?: 'dark' | 'light' | 'auto'; // theme for css.
 }
-
 function hightlightMetrics(text: string): React.ReactNode[] {
-    // bieu thuc chinh quy:
-    // const metricRegex = /(?:[+\-−]?\d+(?:[.,]\d+)?%|\b(?:LINE|Line|Chuy[ềe]n)[-\s]?\d+(?:[&\+]\d+)?\b|\b\d{1,2}:\d{2}\b|\b\d+(?:[.,]\d+)*(?:\/\d+(?:[.,]\d+)*)(?:\s*(?:sản phẩm|sp|pcs|cái|áo))?|\b\d+(?:[.,]\d+)?(?:\s*(?:sản phẩm|sp|pcs(?:\/h)?|cái|áo|trường hợp|lỗi|giờ|h|chiếc|đơn vị))\b|\b\d{1,3}(?:[.,]\d{3})+\b|\b\d{2,}\b)/gi;
-    // 1. Tỷ lệ % (e.g. +296.07%, 95%, -30.5%)
-    const percentagePattern = /[+\-−]?\d+(?:[.,]\d+)?%/;
+    // 1. Tỷ lệ % (BẮT CẢ DẤU NGOẶC ĐƠN nếu có, ví dụ: "(206.4%)", "( 0.0% )", "+130.3%")
+    const percentagePattern = /(?:\(\s*)?[+\-−]?\d+(?:[.,]\d+)?\%\s*(?:\))?/;
 
-    // 2. Chuyền / Line (e.g. LINE-01, Line 1, Chuyền 01)
+    // 2. Chuyền / Line (Ví dụ: "LINE-01", "Line 02", "LINE-01&03")
     const lineNamePattern = /\b(?:LINE|Line|Chuy[ềe]n)[-\s]?\d+(?:[&\+]\d+)?\b/i;
 
-    // 3. Mốc giờ (e.g. 07:30, 16:57)
-    const timestampPattern = /\b\d{1,2}:\d{2}\b/;
+    // 3. Số lượng, số phân cách, mốc giờ (Chỉ bắt để IN ĐẬM, không đóng khung badge hộp)
+    const highlightNumberPattern = /\b\d{1,2}:\d{2}\b|\b\d+(?:[.,]\d+)*(?:\s*(?:pcs(?:\/h)?|sản phẩm|sp|cái|áo|lỗi|h|giờ))?\b/i;
 
-    // 4. Số lượng, tỷ lệ, số nghìn, số nguyên (Đã gộp gọn 4 trong 1)
-    const quantityAndNumberPattern = /\b(?:\d+(?:[.,]\d+)*(?:\s*\/\s*\d+(?:[.,]\d+)*)?\s*(?:pcs(?:\/h)?|sản phẩm|sp|cái|áo|lỗi|h|giờ)\b|\d{1,3}(?:[.,]\d{3})+\b|\d{2,}\b)/i;
-
-    const metricRegexTL = new RegExp(
-        `(${[percentagePattern.source, lineNamePattern.source, timestampPattern.source, quantityAndNumberPattern.source]
-            .join('|')
-        })`, `gi`
+    // Gộp Regex với ngoặc chụp () để split giữ lại các phần tử
+    const metricRegex = new RegExp(
+        `(${[
+            percentagePattern.source,
+            lineNamePattern.source,
+            highlightNumberPattern.source
+        ].join('|')})`,
+        'gi'
     );
 
-    const parts = text.split(metricRegexTL);
+    const parts = text.split(metricRegex);
 
     return parts.map((part, idx) => {
-        if (!part)
-            return null;
+        if (!part) return null;
 
-        // 1. Config for percentage value data:
+        // --- NHÓM 1: TỶ LỆ % (Badge mềm bo tròn, nuốt trọn cả ngoặc) ---
         if (percentagePattern.test(part)) {
-            const isNegative = part.startsWith('-') || part.startsWith('−');
-            let badgeClass = isNegative ? 'text-rose-700 bg-rose-100 border border-rose-300 shadow-xs'
-                : 'text-emerald-700 bg-emerald-100 border border-emerald-300 shadow-xs';
-            return <span key={idx} className={`inline-flex items-center font-bold px-1.5 py-0.5 rounded text-[11px] font-mono mx-0.5 transition-colors ${badgeClass}`}>{part}</span>
+            // Kiểm tra xem có phải 0% hoặc số âm không
+            const isWarning = part.includes('-') || part.includes('−') || /^\(?\s*0(?:[.,]0+)?\%\s*\)?$/.test(part);
+            
+            const badgeClass = isWarning
+                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' // Đỏ hồng cảnh báo nếu âm hoặc 0%
+                : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'; // Xanh ngọc nếu đạt
+
+            return (
+                <span
+                    key={idx}
+                    className={`inline-flex items-center font-bold px-1.5 py-0.5 rounded text-[11px] font-mono mx-1 ${badgeClass}`}
+                >
+                    {part}
+                </span>
+            );
         }
-        // 2. Team Name and Time:
+
+        // --- NHÓM 2: MÃ CHUYỀN (Badge Tím Indigo thanh lịch) ---
         if (lineNamePattern.test(part)) {
-            let badgeClass = 'text-purple-700 bg-purple-100 border border-purple-300 shadow-xs';
-            return <span key={idx} className={`inline-flex items-center font-bold px-1.5 py-0.5 rounded text-[11px] font-mono mx-0.5 ${badgeClass}`}>{part}</span>
+            return (
+                <span
+                    key={idx}
+                    className="inline-flex items-center font-bold px-1.5 py-0.5 rounded text-[11px] font-mono mx-1 bg-indigo-500/25 text-indigo-200 border border-indigo-400/30"
+                >
+                    {part}
+                </span>
+            );
         }
 
-        // 3. Clock:
-        if (timestampPattern.test(part)) {
-            let badgeClass = 'text-sky-700 bg-sky-100 border border-sky-300 shadow-xs';
-            return <span key={idx} className={`inline-flex items-center font-semibold px-1.5 py-0.5 rounded text-[11px] font-mono mx-0.5 ${badgeClass}`}>{part}</span>
+        // --- NHÓM 3: SỐ LƯỢNG / MỐC GIỜ (CHỈ IN ĐẬM & ĐỔI MÀU VÀNG/TRẮNG, KHÔNG DÙNG BADGE HỘP) ---
+        if (highlightNumberPattern.test(part)) {
+            return (
+                <strong key={idx} className="font-bold text-amber-300 font-mono mx-0.5">
+                    {part}
+                </strong>
+            );
         }
 
-        // 4: summary nummber value:
-        if (quantityAndNumberPattern.test(part)) {
-            let badgeClass = 'text-amber-800 bg-amber-100 border border-amber-300 shadow-xs';
-            return <span key={idx} className={`inline-flex items-center font-bold px-1.5 py-0.5 rounded text-[11px] font-mono mx-0.5 ${badgeClass}`}>{part}</span>
-        }
-    })
+        // Chữ thông thường trong câu
+        return <span key={idx}>{part}</span>;
+    });
 }
-
 
 
 function AIFormatText({ content, className = '', isDeepAnalysis = false }: AIFormatTextProps) {
@@ -72,13 +86,13 @@ function AIFormatText({ content, className = '', isDeepAnalysis = false }: AIFor
 
     // 3 Preset bảng màu cho các thành phần văn bản:
     const colors = {
-        bulletDot: 'text-indigo-600',
-        subLabel: 'text-slate-900',
-        restText: 'text-slate-800',
-        paragraph: 'text-slate-800',
-        headingBadge: 'bg-indigo-600 text-white',
-        headingText: 'text-slate-900',
-    }
+    bulletDot: 'text-cyan-400',       // Chấm tròn sáng màu cyan
+    subLabel: 'text-cyan-300 font-bold', // Nhãn phụ sáng rõ
+    restText: 'text-slate-200',       // Chữ nội dung màu trắng ngà
+    paragraph: 'text-slate-200',      // Đoạn văn màu trắng ngà
+    headingBadge: 'bg-indigo-500 text-white',
+    headingText: 'text-white font-bold',
+};
 
     return (
         <div className={`space-y-2.5 ${className}`}>
@@ -94,7 +108,7 @@ function AIFormatText({ content, className = '', isDeepAnalysis = false }: AIFor
                     return (
                         <div
                             key={lineIdx}
-                            className="pt-3 pb-1 border-b border-indigo-200/50 dark:border-slate-800 first:pt-0"
+                            className="pt-3 pb-1 border-b border-indigo-200/50 border-indigo-200/50 first:pt-0"
                         >
                             <div className="flex items-center gap-2">
                                 {/* Ô vuông nhỏ chứa số thứ tự mục */}
@@ -109,7 +123,58 @@ function AIFormatText({ content, className = '', isDeepAnalysis = false }: AIFor
                         </div>
                     );
                 }
-                return
+
+                // Nhận diện gạch đầu dòng có nhãn phụ:
+                const bulletMatch = trimmed.match(/^([•\-\*]\s*)(.+?):\s+(.*)$/);
+                if (bulletMatch) {
+                    const subLabel = bulletMatch[2].trim();
+                    let restText = bulletMatch[3].trim();
+
+                    // Guard chống lỗi AI vô tình lặp từ (Ví dụ: "• Hiệu suất: Hiệu suất: Tỷ lệ...")
+                    if (restText.toLowerCase().startsWith(subLabel.toLowerCase() + ':')) {
+                        restText = restText.slice(subLabel.length + 1).trim();
+                    }
+
+                    return (
+                        <div key={lineIdx} className="flex items-start gap-2 pl-1 leading-relaxed">
+                            {/* Dấu chấm tròn đầu dòng với màu nổi bật theo theme */}
+                            <span className={`${colors.bulletDot} font-bold shrink-0 mt-0.5`}>•</span>
+
+                            <div className="flex-1">
+                                {/* Nhãn phụ in đậm */}
+                                <span className={`font-bold ${colors.subLabel} mr-1.5 underline-offset-2`}>
+                                    {subLabel}:
+                                </span>
+
+                                {/* Nội dung phía sau: Tự động badge hóa các số liệu */}
+                                <span className={colors.restText}>
+                                    {hightlightMetrics(restText)}
+                                </span>
+                            </div>
+                        </div>
+                    );
+                }
+
+                // 3. Nhận diện Gạch đầu dòng đơn (Ví dụ: "• Đạt 1.732 sản phẩm hôm nay")
+                const simpleBulletMatch = trimmed.match(/^([•\-\*]\s*)(.*)$/);
+                if (simpleBulletMatch) {
+                    return (
+                        <div key={lineIdx} className="flex items-start gap-2 pl-1 leading-relaxed">
+                            <span className={`${colors.bulletDot} font-bold shrink-0 mt-0.5`}>•</span>
+                            <div className={`flex-1 ${colors.restText}`}>
+                                {hightlightMetrics(simpleBulletMatch[2])}
+                            </div>
+                        </div>
+                    );
+                }
+
+                // 4. Đoạn văn thông thường (Mặc định cho các dòng còn lại)
+                return (
+                    <p key={lineIdx} className={`leading-relaxed ${colors.paragraph}`}>
+                        {hightlightMetrics(trimmed)}
+                    </p>
+                );
+                
             })}
 
         </div>
