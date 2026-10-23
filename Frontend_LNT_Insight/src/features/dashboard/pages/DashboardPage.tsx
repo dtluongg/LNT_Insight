@@ -27,7 +27,7 @@ import {
   Tooltip
 } from 'recharts';
 import { StatCard } from '../../../components/ui/StatCard';
-import { companiesApi } from '../../../core/api/companies';
+// import { companiesApi } from '../../../core/api/companies';
 import { md3smd2Api } from '../../../core/api/md3smd2';
 import { comparisonTrendResult } from '../utils/compareUtils';
 import type { SewingTeamSummay, SewingTeamDetail } from '../../../types';

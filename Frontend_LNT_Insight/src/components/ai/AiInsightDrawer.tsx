@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, Sparkles, AlertTriangle, CheckCircle2, Copy, Check, RefreshCw, Zap } from 'lucide-react';
 import type { AiDrillDownResponse } from '../../types/aiSummary';
-import { AiFormattedText } from './AiFormattedText';
+// import { AiFormattedText } from './AiFormattedText';
 import AIFormatText from './AIFormatText';
 
 interface AiInsightDrawerProps {

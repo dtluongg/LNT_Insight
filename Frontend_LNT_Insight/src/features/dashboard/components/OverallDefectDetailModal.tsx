@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Treemap, Tooltip, ResponsiveContainer } from 'recharts';
-import { companiesApi } from '../../../core/api/companies';
+// import { companiesApi } from '../../../core/api/companies';
 import { md3smd2Api } from '../../../core/api/md3smd2';
 import type { DashboardFilter } from '../types/TeamSewingFilters';
 import type { OverallDefectAnalysis } from '../../../types';

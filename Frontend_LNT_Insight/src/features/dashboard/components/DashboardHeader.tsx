@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, RefreshCw, ChevronDown, MapPin, Layers, ChevronLeft, ChevronRight } from 'lucide-react';
 // import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../../app/providers/AuthProvider';
-import { companiesApi } from '../../../core/api/companies';
+// import { companiesApi } from '../../../core/api/companies';
 import { md3smd2Api } from '../../../core/api/md3smd2';
 // import { getPreviousWorkingDayClient } from '../../../utils/dateUtils';
 import { getNextWorkingDay, getPreviousWorkingDay } from '../utils/dateUtils';

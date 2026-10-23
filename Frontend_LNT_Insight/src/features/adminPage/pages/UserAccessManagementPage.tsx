@@ -17,7 +17,7 @@ import {
   Square,
 } from 'lucide-react';
 import { masterDataApi } from '../../../core/api/materData';
-import { companiesApi } from '../../../core/api/companies';
+// import { companiesApi } from '../../../core/api/companies';
 import type {
   CompanyInfo,
   ModuleMasterInfo,

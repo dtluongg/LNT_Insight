@@ -125,31 +125,31 @@ export const HomePage: React.FC = () => {
                                 border border-sky-100 dark:border-slate-700
                                 rounded-xl shadow-xl z-50">
 
-                                {(Object.entries(languages) as [
-                                    keyof typeof languages,
-                                    typeof languages.vi
-                                ]).map(([key, language]) => (
-                                    <button
-                                        key={key}
-                                        type="button"
-                                        onClick={() => {
-                                            setAiLanguage(key);
-                                            setLanguageOpen(false);
-                                        }}
-                                        className="w-full flex items-center gap-3
-                                            px-3 py-2.5 rounded-lg text-left
-                                            hover:bg-sky-50 dark:hover:bg-slate-800"
-                                    >
-                                        <ReactCountryFlag
-                                            countryCode={language.code}
-                                            svg
-                                            style={{ width: '1.4em', height: '1.4em' }}
-                                        />
-                                        <span className="text-sm font-medium text-slate-700 dark:text-white">
-                                            {language.label}
-                                        </span>
-                                    </button>
-                                ))}
+                                {(Object.keys(languages) as (keyof typeof languages)[]).map((key) => {
+                                    const language = languages[key];
+                                    return (
+                                        <button
+                                            key={key}
+                                            type="button"
+                                            onClick={() => {
+                                                setAiLanguage(key);
+                                                setLanguageOpen(false);
+                                            }}
+                                            className="w-full flex items-center gap-3
+                                                px-3 py-2.5 rounded-lg text-left
+                                                hover:bg-sky-50 dark:hover:bg-slate-800"
+                                        >
+                                            <ReactCountryFlag
+                                                countryCode={language.code}
+                                                svg
+                                                style={{ width: '1.4em', height: '1.4em' }}
+                                            />
+                                            <span className="text-sm font-medium text-slate-700 dark:text-white">
+                                                {language.label}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>

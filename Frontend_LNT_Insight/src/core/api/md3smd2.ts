@@ -1,5 +1,5 @@
 import { apiFetch } from './httpClient';
-import type { CompanyInfo, SiteInfo, SectionInfo, SewingTeamSummay, SewingTeamDetail, OverallDefectAnalysis, WorkshiftInfo, SewingTeamAnalysis } from '../../types';
+import type { SiteInfo, SectionInfo, SewingTeamSummay, SewingTeamDetail, OverallDefectAnalysis, WorkshiftInfo, SewingTeamAnalysis } from '../../types';
 import { getPreviousWorkingDay } from '../../features/dashboard/utils/dateUtils';
 
 export const md3smd2Api = {
