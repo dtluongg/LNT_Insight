@@ -1,4 +1,4 @@
-export type AiSeverity = 'SUCCESS' | 'WARNING' | 'DANGER' | 'INFO';
+export type AiSeverity = 'SUCCESS' | 'WARNING' | 'ATTENTION' | 'INFO';
 
 export interface AiCardItem {
     id: string;        // e.g. "card_production", "card_defect", "card_shift"

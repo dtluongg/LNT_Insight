@@ -64,6 +64,13 @@ namespace Backend_LNT_Insight.Services.AI
             2. "en" (English): Fluent, professional English using standard industry terms (Sewing Line, MO Target, Actual Output, Defect Rate, Run-rate, End-of-shift projection).
             3. "si" (Sinhala - Sri Lanka): Fluent, professional Sinhala (සිංහල) for Sri Lankan garment managers (මැහුම් කණ්ඩායම/පෙළ, MO ඉලක්කය, නිමි ඇඳුම් ප්‍රමාණය, දෝෂ අනුපාතය, වැඩ මුරයේ නිමාව).
 
+            AUTOMATIC TITLE & SUB-LABEL TRANSLATION RULE:
+            - Each item's instruction below may specify a fixed English title (e.g., 'Overall Production Analysis', 'Team Plan Vs. Output Comment', 'Inspection Analysis') or fixed introductory phrases/bullet sub-labels (e.g., 'Total Target & Total Output', 'Performance:', 'Inspection:', 'Inspection Overview:', 'Pareto Defect Breakdown:', etc.).
+            - That exact English phrasing applies STRICTLY AND ONLY to the "en" (English) translation object.
+            - For "vi" (Vietnamese) and "si" (Sinhala), you MUST automatically translate both the Title, the introductory line, and ALL bullet sub-labels into the target language using standard apparel industry equivalents:
+              * Vietnamese ("vi"): Translate the Title (e.g., 'Đánh giá Hiệu suất Toàn nhà máy', 'Đánh giá Tiến độ & Kế hoạch Chuyền', 'Phân tích Kiểm tra & Lỗi May'), introductory line, and bullet sub-labels (e.g., '• Hiệu suất:', '• Kiểm tra:', '• Danh sách chuyền chưa có sản lượng:', '• Tổng quan kiểm tra:', etc.). NEVER leave the title or bullet sub-labels in English for the "vi" object!
+              * Sinhala ("si"): Translate the Title (e.g., 'සමස්ත නිෂ්පාදන විශ්ලේෂණය', 'කණ්ඩායම් සැලැස්ම සහ ප්‍රතිදාන සමාලෝචනය', 'තත්ත්ව සහ දෝෂ විශ්ලේෂණය'), introductory line, and bullet sub-labels (e.g., '• කාර්ය සාධනය:', '• තත්ත්ව පරීක්ෂාව:', '• නිෂ්පාදනයක් නොමැති කණ්ඩායම්:', etc.). NEVER leave the title or bullet sub-labels in English for the "si" object!
+
             Strict Operational Rules:
             1. High-Value Analytical Rigor: Do NOT generate rigid, robotic or fill-in-the-blank canned text. Deeply evaluate the numbers, explain what they mean for factory momentum (expansion vs decline, line balance, plan vs actual mismatch, defect containment), and provide actionable executive insights.
             2. Bullet Formatting & Headings:
@@ -75,20 +82,20 @@ namespace Backend_LNT_Insight.Services.AI
             5. You MUST return ONLY a valid JSON object matching this exact schema:
             {
               "<item_id>": {
-                "title": "Short descriptive title (Vietnamese)",
+                "title": "Short descriptive title in Vietnamese (translated from item's English title)",
                 "summary": "Detailed executive analytical report with line breaks following the item instruction (Vietnamese)",
-                "severity": "SUCCESS" | "WARNING" | "DANGER" | "INFO",
+                "severity": "SUCCESS" | "WARNING" | "ATTENTION" | "INFO",
                 "translations": {
                   "vi": {
-                    "title": "Tiêu đề tiếng Việt",
-                    "summary": "Báo cáo phân tích chi tiết bằng tiếng Việt..."
+                    "title": "Tiêu đề tiếng Việt đã dịch (Ví dụ: 'Đánh giá Hiệu suất Toàn nhà máy')",
+                    "summary": "Báo cáo phân tích chi tiết bằng tiếng Việt với nhãn phụ tiếng Việt..."
                   },
                   "en": {
-                    "title": "English title",
-                    "summary": "Detailed executive analytical report in English..."
+                    "title": "Exact English title from item instruction (e.g. 'Overall Production Analysis')",
+                    "summary": "Detailed executive analytical report in English with English sub-labels..."
                   },
                   "si": {
-                    "title": "සිංහල මාතෘකාව",
+                    "title": "සිංහල මාතෘකාව (උදා: 'සමස්ත නිෂ්පාදන විශ්ලේෂණය')",
                     "summary": "සිංහලෙන් විස්තරාත්මක විධායක විශ්ලේෂණ වාර්තාව..."
                   }
                 }

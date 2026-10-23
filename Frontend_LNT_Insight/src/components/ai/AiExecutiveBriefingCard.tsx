@@ -203,7 +203,7 @@ export const AiExecutiveBriefingCard: React.FC<AiExecutiveBriefingCardProps> = (
 
     const getSeverityBadge = (severity: AiSeverity) => {
         switch (severity) {
-            case 'DANGER':
+            case 'ATTENTION':
                 return {
                     border: 'border-rose-500/40 hover:border-rose-500',
                     bg: 'bg-gradient-to-b from-rose-950/40 to-slate-900/90',

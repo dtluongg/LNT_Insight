@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../app/providers/AuthProvider';
 import { AiExecutiveBriefingCard } from '../../../components/ai/AiExecutiveBriefingCard';
-import { Activity, ShieldCheck, FileText, ArrowRight, Layers, Building2, Calendar, Clock, Sparkles } from 'lucide-react';
+import { Activity, ShieldCheck, FileText, ArrowRight, Layers, Building2, Calendar, Clock, Sparkles, ChevronDown } from 'lucide-react';
+import ReactCountryFlag from 'react-country-flag';
 
 export const HomePage: React.FC = () => {
     const { user, selectedCompanyID, authorizedCompanies } = useAuth();
@@ -12,6 +13,32 @@ export const HomePage: React.FC = () => {
     const [currentTime, setCurrentTime] = useState<Date>(new Date());
     // AI Language Switcher (VI - EN - SI)
     const [aiLanguage, setAiLanguage] = useState<'vi' | 'en' | 'si'>('vi');
+
+    const [languageOpen, setLanguageOpen] = useState(false);
+    const languageDropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (languageDropdownRef.current && !languageDropdownRef.current.contains(event.target as Node)) {
+                setLanguageOpen(false);
+            }
+        };
+
+        if (languageOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [languageOpen]);
+
+    const languages = {
+        vi: { code: 'VN', label: 'Tiếng Việt' },
+        en: { code: 'GB', label: 'English' },
+        si: { code: 'LK', label: 'සිංහල' },
+    };
+
+    const selectedLanguage = languages[aiLanguage];
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -35,7 +62,7 @@ export const HomePage: React.FC = () => {
         <div className="p-6 space-y-6 max-w-7xl mx-auto">
             
             {/* Top Welcome Banner with Light Blue Accent Theme */}
-            <div className="relative overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-5 bg-gradient-to-r from-sky-500/10 via-blue-500/5 to-cyan-500/10 dark:from-slate-900 dark:via-sky-950/30 dark:to-slate-900 p-6 rounded-2xl border border-sky-200/80 dark:border-sky-900/50 shadow-sm backdrop-blur-sm">
+            <div className="relative z-20 overflow-visible flex flex-col lg:flex-row lg:items-center justify-between gap-5 bg-gradient-to-r from-sky-500/10 via-blue-500/5 to-cyan-500/10 dark:from-slate-900 dark:via-sky-950/30 dark:to-slate-900 p-6 rounded-2xl border border-sky-200/80 dark:border-sky-900/50 shadow-sm backdrop-blur-sm">
                 
                 {/* Decorative Light Blue Glow Elements */}
                 <div className="absolute -top-16 -left-16 w-48 h-48 bg-sky-400/20 rounded-full blur-2xl pointer-events-none" />
@@ -55,7 +82,7 @@ export const HomePage: React.FC = () => {
                 </div>
 
                 {/* Real-time Running Clock & Company Info & Language Selector */}
-                <div className="relative z-10 flex flex-wrap items-center gap-3">
+                <div className="relative z-[100] flex flex-wrap items-center gap-3">
                     
                     {/* Live Clock Badge */}
                     <div className="flex items-center gap-2 bg-white dark:bg-slate-800/90 px-4 py-2 rounded-xl border border-sky-200 dark:border-sky-800 shadow-xs text-slate-800 dark:text-slate-100 font-mono">
@@ -67,46 +94,64 @@ export const HomePage: React.FC = () => {
                     </div>
 
                     {/* Language Switcher for AI Insights (Placed next to Clock) */}
-                    <div className="flex items-center p-1 bg-white dark:bg-slate-800/90 rounded-xl border border-sky-200 dark:border-sky-800 shadow-xs">
+                    {/* Language ComboBox */}
+                    <div className="relative" ref={languageDropdownRef}>
                         <button
                             type="button"
-                            onClick={() => setAiLanguage('vi')}
-                            className={`flex items-center gap-1 px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                aiLanguage === 'vi'
-                                    ? 'bg-sky-500 text-white font-bold shadow-xs'
-                                    : 'text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400'
-                            }`}
-                            title="Tiếng Việt (Vietnamese)"
+                            onClick={() => setLanguageOpen(prev => !prev)}
+                            className="flex items-center gap-2 px-3 py-2
+                                bg-white dark:bg-slate-800
+                                border border-sky-200 dark:border-sky-800
+                                rounded-xl shadow-sm hover:border-sky-400"
                         >
-                            <span>🇻🇳</span>
-                            <span className="text-[11px] font-bold">VI</span>
+                            <ReactCountryFlag
+                                countryCode={selectedLanguage.code}
+                                svg
+                                style={{ width: '1.4em', height: '1.4em' }}
+                            />
+                            <span className="text-sm font-semibold text-slate-700 dark:text-white">
+                                {selectedLanguage.label}
+                            </span>
+                            <ChevronDown
+                                className={`w-4 h-4 transition-transform ${
+                                    languageOpen ? 'rotate-180' : ''
+                                }`}
+                            />
                         </button>
-                        <button
-                            type="button"
-                            onClick={() => setAiLanguage('en')}
-                            className={`flex items-center gap-1 px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                aiLanguage === 'en'
-                                    ? 'bg-sky-500 text-white font-bold shadow-xs'
-                                    : 'text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400'
-                            }`}
-                            title="English"
-                        >
-                            <span>🇬🇧</span>
-                            <span className="text-[11px] font-bold">EN</span>
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setAiLanguage('si')}
-                            className={`flex items-center gap-1 px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                aiLanguage === 'si'
-                                    ? 'bg-sky-500 text-white font-bold shadow-xs'
-                                    : 'text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400'
-                            }`}
-                            title="Sinhala (සිංහල - Sri Lanka)"
-                        >
-                            <span>🇱🇰</span>
-                            <span className="text-[11px] font-bold">SI</span>
-                        </button>
+
+                        {languageOpen && (
+                            <div className="absolute right-0 top-full mt-2 w-44
+                                p-1.5 bg-white dark:bg-slate-900
+                                border border-sky-100 dark:border-slate-700
+                                rounded-xl shadow-xl z-50">
+
+                                {(Object.entries(languages) as [
+                                    keyof typeof languages,
+                                    typeof languages.vi
+                                ]).map(([key, language]) => (
+                                    <button
+                                        key={key}
+                                        type="button"
+                                        onClick={() => {
+                                            setAiLanguage(key);
+                                            setLanguageOpen(false);
+                                        }}
+                                        className="w-full flex items-center gap-3
+                                            px-3 py-2.5 rounded-lg text-left
+                                            hover:bg-sky-50 dark:hover:bg-slate-800"
+                                    >
+                                        <ReactCountryFlag
+                                            countryCode={language.code}
+                                            svg
+                                            style={{ width: '1.4em', height: '1.4em' }}
+                                        />
+                                        <span className="text-sm font-medium text-slate-700 dark:text-white">
+                                            {language.label}
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Company & Date Info Badge */}
