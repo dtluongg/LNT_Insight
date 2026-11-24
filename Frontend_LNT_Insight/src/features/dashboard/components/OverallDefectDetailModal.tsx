@@ -203,7 +203,7 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                         <div className="rounded-xl border border-purple-500/20 dark:border-purple-500/30 bg-purple-500/10 dark:bg-purple-950/40 p-5 transition-all hover:shadow-xs">
                             <p className="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
-                                Inspected Qty
+                                Inspected GMT
                             </p>
                             <p className="mt-1.5 text-2xl font-semibold text-purple-600 dark:text-purple-400">
                                 {inspectedQty.toLocaleString()}
@@ -213,7 +213,7 @@ export const OverallDefectDetailModal: React.FC<OverallDefectDetailModalProps> =
 
                         <div className="rounded-xl border border-rose-100 dark:border-rose-900/60 bg-rose-50/50 dark:bg-rose-950/40 p-5 transition-all hover:shadow-xs">
                             <p className="text-xs font-bold uppercase tracking-wider text-rose-400 dark:text-rose-400">
-                                Defect Qty
+                                Defect GMT
                             </p>
                             <p className="mt-1.5 text-2xl font-semibold text-rose-600 dark:text-rose-400">
                                 {defectQty.toLocaleString()}

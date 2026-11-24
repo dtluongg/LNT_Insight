@@ -24,7 +24,9 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip
+  Tooltip,
+  Cell,
+  ReferenceLine
 } from 'recharts';
 import { StatCard } from '../../../components/ui/StatCard';
 // import { companiesApi } from '../../../core/api/companies';
@@ -58,7 +60,7 @@ export const DashboardPage: React.FC = () => {
   useEffect(() => {
     if (selectedCompanyID && selectedCompanyID !== filter.CompanyID) {
       // find company:
-      const findCurrentCompany = authorizedCompanies.find((comp) => comp.companyID === selectedCompanyID );
+      const findCurrentCompany = authorizedCompanies.find((comp) => comp.companyID === selectedCompanyID);
       const newCompanyName = findCurrentCompany?.companyName ?? '';
       setFilter(prev => ({
         ...prev,
@@ -83,6 +85,7 @@ export const DashboardPage: React.FC = () => {
   const [selectedProduction, setSelectedProduction] = useState<SewingTeamDetail | null>(null);
   const [isDefectModalOpen, setIsDefectModalOpen] = useState(false);
   const [isTableModalOpen, setIsTableModalOpen] = useState(false);
+  const [chartView, setChartView] = useState<'output' | 'defect'>('output');
 
   // Load Dashboard Data
   useEffect(() => {
@@ -191,6 +194,105 @@ export const DashboardPage: React.FC = () => {
   const highestContrib = (totalOutput > 0 && highestTeam?.OutputQty)
     ? ((highestTeam.OutputQty / totalOutput) * 100).toFixed(1)
     : '';
+
+  // Custom Tooltip cho Biểu đồ Sản lượng (Chart 1)
+  const renderOutputTooltip = ({ active, payload }: any) => {
+    if (!active || !payload || !payload.length) return null;
+    const data = payload[0]?.payload as SewingTeamDetail;
+    if (!data) return null;
+
+    return (
+      <div className="bg-slate-900/95 backdrop-blur-md px-3.5 py-3 rounded-xl border border-slate-700/80 shadow-2xl min-w-[200px] text-xs">
+        <div className="font-bold text-white text-[13px] pb-2 mb-2 border-b border-slate-700/70">
+          {data.TeamName}
+        </div>
+        <div className="space-y-2">
+          {/* Target */}
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-1.5 text-slate-300 font-medium">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b] shrink-0" />
+              <span>Target:</span>
+            </div>
+            <span className="font-bold text-[#f59e0b] text-[13px]">
+              {data.MOPlanQty != null ? data.MOPlanQty.toLocaleString() : '-'}
+            </span>
+          </div>
+
+          {/* Actual Output */}
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-1.5 text-slate-300 font-medium">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#38BDF8] shrink-0" />
+              <span>Actual Output:</span>
+            </div>
+            <span className="font-bold text-[#38BDF8] text-[13px]">
+              {data.OutputQty != null ? data.OutputQty.toLocaleString() : '0'}
+            </span>
+          </div>
+
+          {/* Inspected */}
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-1.5 text-slate-300 font-medium">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E] shrink-0" />
+              <span>Inspected:</span>
+            </div>
+            <span className="font-bold text-[#22C55E] text-[13px]">
+              {data.InspectedQty != null ? data.InspectedQty.toLocaleString() : '0'}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Custom Tooltip cho Biểu đồ Defect Rate (Chart 2) - Đúng màu tương ứng với từng cột
+  const renderDefectTooltip = ({ active, payload }: any) => {
+    if (!active || !payload || !payload.length) return null;
+    const data = payload[0]?.payload as SewingTeamDetail;
+    if (!data) return null;
+
+    const rate = data.DefectRate != null ? Number(data.DefectRate) : 0;
+    // Màu tương ứng theo mức độ lỗi: < 2% Xanh, 2 - 4% Vàng, >= 4% Đỏ
+    const statusColor = rate >= 4 ? '#EF4444' : rate >= 2 ? '#F59E0B' : '#22C55E';
+    const statusBg = rate >= 4 ? 'bg-[#EF4444]' : rate >= 2 ? 'bg-[#F59E0B]' : 'bg-[#22C55E]';
+    const statusLabel = rate >= 4 ? 'High Risk' : rate >= 2 ? 'Warning' : 'Good';
+
+    return (
+      <div className="bg-slate-900/95 backdrop-blur-md px-3.5 py-3 rounded-xl border border-slate-700/80 shadow-2xl min-w-[200px] text-xs">
+        <div className="font-bold text-white text-[13px] pb-2 mb-2 border-b border-slate-700/70 flex items-center justify-between gap-3">
+          <span>{data.TeamName}</span>
+          <span
+            className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider text-white"
+            style={{ backgroundColor: statusColor }}
+          >
+            {statusLabel}
+          </span>
+        </div>
+
+        <div className="space-y-2">
+          {/* Defect Rate hiển thị ĐÚNG MÀU TƯƠNG ỨNG với cột */}
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-1.5 text-slate-300 font-medium">
+              <span className={`w-2.5 h-2.5 rounded-full ${statusBg} shrink-0`} />
+              <span>Defect Rate:</span>
+            </div>
+            <span className="font-extrabold text-[14px]" style={{ color: statusColor }}>
+              {`${rate}%`}
+            </span>
+          </div>
+
+          {/* Chi tiết số lỗi / số kiểm tra nếu có */}
+          {(data.DefectQty != null || data.InspectedQty != null) && (
+            <div className="flex items-center justify-between gap-4 pt-1.5 border-t border-slate-800 text-[11px] text-slate-400">
+              <span>Defect / Inspected:</span>
+              <span className="font-semibold text-slate-200">
+                {`${(data.DefectQty || 0).toLocaleString()} / ${(data.InspectedQty || 0).toLocaleString()} PCS`}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   // Render
   return (
@@ -305,9 +407,9 @@ export const DashboardPage: React.FC = () => {
                 // const rate = (item.DayPercent ?? 0);
                 // const displayRate = `${((output / target) * 100).toFixed(1)}%`;
                 // const displayRate = `${((output / target) * 100).toFixed(1)}%`;
-                
+
                 // calculate when output and target > 0
-                const calculatedRate = target > 0 && output > 0 ? (output/target)*100 : 0;
+                const calculatedRate = target > 0 && output > 0 ? (output / target) * 100 : 0;
                 // format view number and %
                 const displayRate = `${calculatedRate.toFixed(1)}%`;
                 // calculate width progress
@@ -349,40 +451,113 @@ export const DashboardPage: React.FC = () => {
             </div>
           </div>
 
-          {/* PRODUCTION OUTPUT STATUS (Chart) */}
+          {/* PRODUCTION OUTPUT STATUS / DEFECT RATE (Chart with Switcher) */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs p-4 flex flex-col gap-4 transition-colors duration-200">
-            {/* Chart Header: Title & Custom Legend & Ellipsis Button */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2">
-              {/* Left: Icon & Title */}
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-blue-500 text-white flex items-center justify-center shadow-xs shrink-0">
-                  <BarChart2 size={18} />
-                </div>
-                <h2 className="text-sm font-extrabold text-slate-800 dark:text-slate-100 uppercase tracking-wider">
-                  PRODUCTION OUTPUT STATUS
-                </h2>
+            {/* Chart Header: Title & Switcher & Custom Legend & Ellipsis Button */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-2 border-b border-slate-100 dark:border-slate-800/80">
+              {/* Left: 2 Interactive Header Tabs */}
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+                {/* Header Tab 1: PRODUCTION OUTPUT STATUS */}
+                <button
+                  type="button"
+                  onClick={() => setChartView('output')}
+                  className={`group flex items-center gap-2.5 pb-2 -mb-2 relative transition-all cursor-pointer ${chartView === 'output' ? 'opacity-100' : 'opacity-40 hover:opacity-80'
+                    }`}
+                >
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shadow-xs shrink-0 transition-all ${chartView === 'output'
+                    ? 'bg-blue-500 text-white ring-2 ring-blue-400/30'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700'
+                    }`}>
+                    <BarChart2 size={18} />
+                  </div>
+                  <h2 className={`text-sm font-extrabold uppercase tracking-wider transition-colors ${chartView === 'output'
+                    ? 'text-slate-800 dark:text-slate-100'
+                    : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300'
+                    }`}>
+                    PRODUCTION OUTPUT STATUS
+                  </h2>
+                  {/* Active Underline Indicator */}
+                  {chartView === 'output' && (
+                    <span className="absolute -bottom-2 left-0 right-0 h-0.5 bg-blue-500 rounded-full" />
+                  )}
+                </button>
+
+                {/* Vertical Divider */}
+                <div className="hidden sm:block h-5 w-px bg-slate-200 dark:bg-slate-700" />
+
+                {/* Header Tab 2: END LINE DEFECT RATE ANALYSIS */}
+                <button
+                  type="button"
+                  onClick={() => setChartView('defect')}
+                  className={`group flex items-center gap-2.5 pb-2 -mb-2 relative transition-all cursor-pointer ${chartView === 'defect' ? 'opacity-100' : 'opacity-40 hover:opacity-80'
+                    }`}
+                >
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shadow-xs shrink-0 transition-all ${chartView === 'defect'
+                    ? 'bg-rose-500 text-white ring-2 ring-rose-400/30'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700'
+                    }`}>
+                    <AlertTriangle size={18} />
+                  </div>
+                  <h2 className={`text-sm font-extrabold uppercase tracking-wider transition-colors ${chartView === 'defect'
+                    ? 'text-slate-800 dark:text-slate-100'
+                    : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300'
+                    }`}>
+                    END LINE DEFECT RATE ANALYSIS
+                  </h2>
+                  {/* Active Underline Indicator */}
+                  {chartView === 'defect' && (
+                    <span className="absolute -bottom-2 left-0 right-0 h-0.5 bg-rose-500 rounded-full" />
+                  )}
+                </button>
               </div>
 
               {/* Right: Legend & Table modal trigger */}
-              <div className="flex items-center gap-6">
-                {/* 4 Legend Items: Target, Output, Achieved, Defect */}
-                <div className="flex items-center gap-4 text-xs font-medium">
-                  {/* Target (Brown) */}
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#d6951b]" />
-                    <span className="text-slate-600 dark:text-slate-300">Target</span>
+              <div className="flex items-center gap-4 sm:gap-6 justify-between lg:justify-end">
+                {chartView === 'output' ? (
+                  /* Legend for Output */
+                  <div className="flex items-center gap-4 text-xs font-medium">
+                    {/* Target (Amber) */}
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]" />
+                      <span className="text-slate-700 dark:text-slate-200 font-semibold">Target</span>
+                    </div>
+                    {/* Output (Blue) */}
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#38BDF8]" />
+                      <span className="text-slate-700 dark:text-slate-200 font-semibold">Output</span>
+                    </div>
+                    {/* Inspected Qty (Green) */}
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E]" />
+                      <span className="text-slate-700 dark:text-slate-200 font-semibold">Inspected Qty</span>
+                    </div>
                   </div>
-                  {/* Output (Blue) */}
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#38BDF8]" />
-                    <span className="text-slate-600 dark:text-slate-300">Output</span>
+                ) : (
+                  /* Legend for Defect Rate */
+                  <div className="flex items-center gap-3 text-xs font-semibold">
+                    <span className="text-slate-500 dark:text-slate-400 font-bold uppercase text-[11px] mr-0.5">Defect:</span>
+                    {/* Good (<2%) */}
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E]" />
+                      <span className="text-emerald-600 dark:text-emerald-400">&lt; 2%</span>
+                    </div>
+                    {/* Warning (2-4%) */}
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" />
+                      <span className="text-amber-600 dark:text-amber-400">2% - 4%</span>
+                    </div>
+                    {/* Danger (>=4%) */}
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444]" />
+                      <span className="text-rose-600 dark:text-rose-400">&ge; 4%</span>
+                    </div>
+                    {/* Target KPI */}
+                    <div className="flex items-center gap-1.5 pl-1 border-l border-slate-200 dark:border-slate-700">
+                      <span className="w-3.5 h-0.5 border-t-2 border-dashed border-[#F43F5E]" />
+                      <span className="text-rose-500 dark:text-rose-400 font-bold">KPI: 3%</span>
+                    </div>
                   </div>
-                  {/* Inspected Qty (Green) */}
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E]" />
-                    <span className="text-slate-600 dark:text-slate-300">Inspected Qty </span>
-                  </div>
-                </div>
+                )}
 
                 <button
                   type="button"
@@ -396,25 +571,29 @@ export const DashboardPage: React.FC = () => {
             </div>
 
             {/* Chart Canvas */}
-            <div className="h-[300px] w-full">
+            <div className="h-[360px] w-full">
               {productionData.length === 0 ? (
                 <div className="flex items-center justify-center h-full text-slate-400 font-medium">
                   No production data found for this company and site.
                 </div>
-              ) : (
+              ) : chartView === 'output' ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart
                     data={productionData}
-                    margin={{ top: 25, right: 20, bottom: 10, left: 0 }}
+                    margin={{ top: 25, right: 20, bottom: 15, left: 0 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} opacity={0.3} />
                     <XAxis
                       dataKey="TeamName"
+                      interval={0}
+                      angle={-35}
+                      textAnchor="end"
+                      height={60}
                       stroke="#94a3b8"
-                      fontSize={11}
+                      fontSize={10}
                       fontWeight={700}
                       tickLine={false}
-                      dy={8}
+                      dy={4}
                     />
                     <YAxis
                       stroke="#94a3b8"
@@ -424,34 +603,18 @@ export const DashboardPage: React.FC = () => {
                       axisLine={false}
                       dx={-8}
                     />
-                    <Tooltip
-                      contentStyle={{
-                        borderRadius: '12px',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                        color: '#f8fafc',
-                        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.5)',
-                        fontSize: '12px',
-                        padding: '10px 14px'
-                      }}
-                      formatter={(value: any, name: any) => {
-                        if (name === "Target") return [value ? value.toLocaleString() : '-', 'Target'];
-                        if (name === "Output") return [value ? value.toLocaleString() : '0', 'Actual Output'];
-                        if (name === "Inspected") return [value ? value.toLocaleString() : '0', 'Inspected'];
-                        return [value, name];
-                      }}
-                    />
+                    <Tooltip content={renderOutputTooltip} />
 
-                    {/* Brown Target Line */}
+                    {/* Amber Target Line */}
                     <Line
                       type="monotone"
                       dataKey="MOPlanQty"
                       name="Target"
-                      stroke="#d6951b"
+                      stroke="#f59e0b"
                       strokeWidth={2.5}
-                      dot={{ r: 4, fill: "#d6951b", stroke: "#fff", strokeWidth: 1.5 }}
+                      dot={{ r: 4, fill: "#f59e0b", stroke: "#fff", strokeWidth: 1.5 }}
                       activeDot={{ r: 6 }}
-                      label={{ position: 'top', fill: '#d6951b', fontSize: 13, fontWeight: 700 }}
+                      label={{ position: 'top', fill: '#f59e0b', fontSize: 13, fontWeight: 700 }}
                     />
 
                     {/* Blue Output Bar */}
@@ -477,6 +640,87 @@ export const DashboardPage: React.FC = () => {
                       onClick={(data) => { setSelectedProduction(data.payload) }}
                       cursor="pointer"
                     />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              ) : (
+                /* DEFECT RATE CHART */
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart
+                    data={productionData}
+                    margin={{ top: 25, right: 20, bottom: 15, left: 0 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} opacity={0.3} />
+                    <XAxis
+                      dataKey="TeamName"
+                      interval={0}
+                      angle={-35}
+                      textAnchor="end"
+                      height={60}
+                      stroke="#94a3b8"
+                      fontSize={10}
+                      fontWeight={700}
+                      tickLine={false}
+                      dy={4}
+                    />
+                    <YAxis
+                      stroke="#94a3b8"
+                      fontSize={11}
+                      fontWeight={500}
+                      tickLine={false}
+                      axisLine={false}
+                      dx={-8}
+                      unit="%"
+                      domain={[0, (dataMax: number) => Math.max(Math.ceil((dataMax || 0) + 1), 6)]}
+                    />
+                    <Tooltip content={renderDefectTooltip} />
+
+                    {/* Vạch đỏ ngưỡng KPI trần 3% */}
+                    <ReferenceLine
+                      y={3}
+                      stroke="#F43F5E"
+                      strokeDasharray="4 4"
+                      strokeWidth={1.5}
+                      label={{
+                        value: 'KPI Target: 3.0%',
+                        position: 'insideTopRight',
+                        fill: '#F43F5E',
+                        fontSize: 11,
+                        fontWeight: 700
+                      }}
+                    />
+
+                    {/* Cột Defect Rate tự đổi màu theo % */}
+                    <Bar
+                      dataKey="DefectRate"
+                      name="Defect Rate"
+                      fill="#f43f5e"
+                      radius={[4, 4, 0, 0]}
+                      barSize={24}
+                      label={(props: any) => {
+                        const { x, y, width, value } = props;
+                        if (value == null) return null;
+                        const rate = Number(value) || 0;
+                        const color = rate >= 4 ? '#EF4444' : rate >= 2 ? '#F59E0B' : '#10B981';
+                        return (
+                          <text
+                            x={x + width / 2}
+                            y={y - 6}
+                            fill={color}
+                            textAnchor="middle"
+                            fontSize={11}
+                            fontWeight={700}
+                          >
+                            {`${rate}%`}
+                          </text>
+                        );
+                      }}
+                    >
+                      {productionData.map((entry, index) => {
+                        const rate = entry.DefectRate || 0;
+                        const color = rate >= 4 ? '#EF4444' : rate >= 2 ? '#F59E0B' : '#22C55E';
+                        return <Cell key={`defect-cell-${index}`} fill={color} />;
+                      })}
+                    </Bar>
                   </ComposedChart>
                 </ResponsiveContainer>
               )}
