@@ -11,7 +11,6 @@ import {
   ShieldCheck,
   Ellipsis,
   LayoutGrid,
-  Lightbulb,
   TrendingUp,
   CheckCircle2,
   BarChart2
