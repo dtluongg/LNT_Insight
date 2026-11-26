@@ -251,10 +251,32 @@ export const DashboardPage: React.FC = () => {
     if (!data) return null;
 
     const rate = data.DefectRate != null ? Number(data.DefectRate) : 0;
-    // Màu tương ứng theo mức độ lỗi: < 2% Xanh, 2 - 5% Vàng, >= 5% Đỏ
-    const statusColor = rate >= 5 ? '#EF4444' : rate >= 2 ? '#F59E0B' : '#22C55E';
-    const statusBg = rate >= 5 ? 'bg-[#EF4444]' : rate >= 2 ? 'bg-[#F59E0B]' : 'bg-[#22C55E]';
-    const statusLabel = rate >= 5 ? 'High Risk' : rate >= 2 ? 'Warning' : 'Good';
+    const roundedRate = Math.round(rate * 100) / 100;
+    // Màu tương ứng theo mức độ lỗi: < 2% Xanh đậm, 2 - <5% Xanh sáng, = 5% Vàng, > 5% Đỏ
+    const statusColor =
+      roundedRate > 5
+        ? '#EF4444'
+        : roundedRate === 5
+        ? '#EAB308'
+        : roundedRate >= 2
+        ? '#22C55E'
+        : '#15803D';
+    const statusBg =
+      roundedRate > 5
+        ? 'bg-[#EF4444]'
+        : roundedRate === 5
+        ? 'bg-[#EAB308]'
+        : roundedRate >= 2
+        ? 'bg-[#22C55E]'
+        : 'bg-[#15803D]';
+    const statusLabel =
+      roundedRate > 5
+        ? 'High Risk (> 5%)'
+        : roundedRate === 5
+        ? 'At Target (5%)'
+        : roundedRate >= 2
+        ? 'Normal (2% - 5%)'
+        : 'Good (< 2%)';
 
     return (
       <div className="bg-slate-900/95 backdrop-blur-md px-3.5 py-3 rounded-xl border border-slate-700/80 shadow-2xl min-w-[200px] text-xs">
@@ -536,20 +558,25 @@ export const DashboardPage: React.FC = () => {
                   /* Legend for Defect Rate */
                   <div className="flex items-center gap-3 text-xs font-semibold">
                     <span className="text-slate-500 dark:text-slate-400 font-bold uppercase text-[11px] mr-0.5">Defect:</span>
-                    {/* Good (<2%) */}
+                    {/* Dưới 2%: Xanh đậm */}
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#15803D]" />
+                      <span className="text-green-700 dark:text-green-400">&lt; 2%</span>
+                    </div>
+                    {/* 2% đến 5%: Xanh sáng */}
                     <div className="flex items-center gap-1.5">
                       <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E]" />
-                      <span className="text-emerald-600 dark:text-emerald-400">&lt; 2%</span>
+                      <span className="text-emerald-600 dark:text-emerald-400">2% - 5%</span>
                     </div>
-                    {/* Warning (2-5%) */}
+                    {/* = 5%: Vàng */}
                     <div className="flex items-center gap-1.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" />
-                      <span className="text-amber-600 dark:text-amber-400">2% - 5%</span>
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#EAB308]" />
+                      <span className="text-yellow-600 dark:text-yellow-400"> 5%</span>
                     </div>
-                    {/* Danger (>=5%) */}
+                    {/* Trên 5%: Đỏ */}
                     <div className="flex items-center gap-1.5">
                       <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444]" />
-                      <span className="text-rose-600 dark:text-rose-400">&ge; 5%</span>
+                      <span className="text-rose-600 dark:text-rose-400">&gt; 5%</span>
                     </div>
                     {/* Target KPI */}
                     <div className="flex items-center gap-1.5 pl-1 border-l border-slate-200 dark:border-slate-700">
@@ -700,7 +727,15 @@ export const DashboardPage: React.FC = () => {
                         const { x, y, width, value } = props;
                         if (value == null) return null;
                         const rate = Number(value) || 0;
-                        const color = rate >= 5 ? '#EF4444' : rate >= 2 ? '#F59E0B' : '#10B981';
+                        const rounded = Math.round(rate * 100) / 100;
+                        const color =
+                          rounded > 5
+                            ? '#EF4444'
+                            : rounded === 5
+                            ? '#EAB308'
+                            : rounded >= 2
+                            ? '#22C55E'
+                            : '#15803D';
                         return (
                           <text
                             x={x + width / 2}
@@ -717,7 +752,15 @@ export const DashboardPage: React.FC = () => {
                     >
                       {productionData.map((entry, index) => {
                         const rate = entry.DefectRate || 0;
-                        const color = rate >= 5 ? '#EF4444' : rate >= 2 ? '#F59E0B' : '#22C55E';
+                        const rounded = Math.round(rate * 100) / 100;
+                        const color =
+                          rounded > 5
+                            ? '#EF4444'
+                            : rounded === 5
+                            ? '#EAB308'
+                            : rounded >= 2
+                            ? '#22C55E'
+                            : '#15803D';
                         return <Cell key={`defect-cell-${index}`} fill={color} />;
                       })}
                     </Bar>

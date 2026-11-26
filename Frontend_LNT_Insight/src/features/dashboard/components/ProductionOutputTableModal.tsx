@@ -51,8 +51,24 @@ export const ProductionOutputTableModal: React.FC<ProductionOutputTableModalProp
     },
     {
       header: 'Defect Rate',
-      accessor: (row: SewingTeamDetail) =>
-        row.DefectRate != null ? `${row.DefectRate}%` : '-',
+      accessor: (row: SewingTeamDetail) => {
+        if (row.DefectRate == null) return '-';
+        const rate = Number(row.DefectRate) || 0;
+        const rounded = Math.round(rate * 100) / 100;
+        const colorClass =
+          rounded > 5
+            ? 'text-rose-600 dark:text-rose-400'
+            : rounded === 5
+            ? 'text-yellow-600 dark:text-yellow-400'
+            : rounded >= 2
+            ? 'text-emerald-500 dark:text-emerald-400'
+            : 'text-green-700 dark:text-green-400';
+        return (
+          <span className={`font-bold ${colorClass}`}>
+            {`${row.DefectRate}%`}
+          </span>
+        );
+      },
       className: 'text-right font-medium',
     },
   ];
@@ -195,7 +211,15 @@ export const ProductionOutputTableModal: React.FC<ProductionOutputTableModalProp
                 <td className="px-4 py-3.5 text-right font-bold text-amber-600 dark:text-amber-400">
                   {totalDefect.toLocaleString()}
                 </td>
-                <td className="px-4 py-3.5 text-right font-bold text-rose-600 dark:text-rose-400">
+                <td className={`px-4 py-3.5 text-right font-bold ${
+                  Number(overallDefectRate) > 5
+                    ? 'text-rose-600 dark:text-rose-400'
+                    : Number(overallDefectRate) === 5
+                    ? 'text-yellow-600 dark:text-yellow-400'
+                    : Number(overallDefectRate) >= 2
+                    ? 'text-emerald-500 dark:text-emerald-400'
+                    : 'text-green-700 dark:text-green-400'
+                }`}>
                   {overallDefectRate}%
                 </td>
               </tr>
