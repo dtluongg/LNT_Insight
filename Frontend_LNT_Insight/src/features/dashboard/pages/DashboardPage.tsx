@@ -251,10 +251,10 @@ export const DashboardPage: React.FC = () => {
     if (!data) return null;
 
     const rate = data.DefectRate != null ? Number(data.DefectRate) : 0;
-    // Màu tương ứng theo mức độ lỗi: < 2% Xanh, 2 - 4% Vàng, >= 4% Đỏ
-    const statusColor = rate >= 4 ? '#EF4444' : rate >= 2 ? '#F59E0B' : '#22C55E';
-    const statusBg = rate >= 4 ? 'bg-[#EF4444]' : rate >= 2 ? 'bg-[#F59E0B]' : 'bg-[#22C55E]';
-    const statusLabel = rate >= 4 ? 'High Risk' : rate >= 2 ? 'Warning' : 'Good';
+    // Màu tương ứng theo mức độ lỗi: < 2% Xanh, 2 - 5% Vàng, >= 5% Đỏ
+    const statusColor = rate >= 5 ? '#EF4444' : rate >= 2 ? '#F59E0B' : '#22C55E';
+    const statusBg = rate >= 5 ? 'bg-[#EF4444]' : rate >= 2 ? 'bg-[#F59E0B]' : 'bg-[#22C55E]';
+    const statusLabel = rate >= 5 ? 'High Risk' : rate >= 2 ? 'Warning' : 'Good';
 
     return (
       <div className="bg-slate-900/95 backdrop-blur-md px-3.5 py-3 rounded-xl border border-slate-700/80 shadow-2xl min-w-[200px] text-xs">
@@ -541,20 +541,20 @@ export const DashboardPage: React.FC = () => {
                       <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E]" />
                       <span className="text-emerald-600 dark:text-emerald-400">&lt; 2%</span>
                     </div>
-                    {/* Warning (2-4%) */}
+                    {/* Warning (2-5%) */}
                     <div className="flex items-center gap-1.5">
                       <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" />
-                      <span className="text-amber-600 dark:text-amber-400">2% - 4%</span>
+                      <span className="text-amber-600 dark:text-amber-400">2% - 5%</span>
                     </div>
-                    {/* Danger (>=4%) */}
+                    {/* Danger (>=5%) */}
                     <div className="flex items-center gap-1.5">
                       <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444]" />
-                      <span className="text-rose-600 dark:text-rose-400">&ge; 4%</span>
+                      <span className="text-rose-600 dark:text-rose-400">&ge; 5%</span>
                     </div>
                     {/* Target KPI */}
                     <div className="flex items-center gap-1.5 pl-1 border-l border-slate-200 dark:border-slate-700">
                       <span className="w-3.5 h-0.5 border-t-2 border-dashed border-[#F43F5E]" />
-                      <span className="text-rose-500 dark:text-rose-400 font-bold">KPI: 3%</span>
+                      <span className="text-rose-500 dark:text-rose-400 font-bold">KPI: 5%</span>
                     </div>
                   </div>
                 )}
@@ -674,14 +674,14 @@ export const DashboardPage: React.FC = () => {
                     />
                     <Tooltip content={renderDefectTooltip} />
 
-                    {/* Vạch đỏ ngưỡng KPI trần 3% */}
+                    {/* Vạch đỏ ngưỡng KPI trần 5% */}
                     <ReferenceLine
-                      y={3}
+                      y={5}
                       stroke="#F43F5E"
                       strokeDasharray="4 4"
                       strokeWidth={1.5}
                       label={{
-                        value: 'KPI Target: 3.0%',
+                        value: 'KPI Target: 5.0%',
                         position: 'insideTopRight',
                         fill: '#F43F5E',
                         fontSize: 11,
@@ -700,7 +700,7 @@ export const DashboardPage: React.FC = () => {
                         const { x, y, width, value } = props;
                         if (value == null) return null;
                         const rate = Number(value) || 0;
-                        const color = rate >= 4 ? '#EF4444' : rate >= 2 ? '#F59E0B' : '#10B981';
+                        const color = rate >= 5 ? '#EF4444' : rate >= 2 ? '#F59E0B' : '#10B981';
                         return (
                           <text
                             x={x + width / 2}
@@ -717,7 +717,7 @@ export const DashboardPage: React.FC = () => {
                     >
                       {productionData.map((entry, index) => {
                         const rate = entry.DefectRate || 0;
-                        const color = rate >= 4 ? '#EF4444' : rate >= 2 ? '#F59E0B' : '#22C55E';
+                        const color = rate >= 5 ? '#EF4444' : rate >= 2 ? '#F59E0B' : '#22C55E';
                         return <Cell key={`defect-cell-${index}`} fill={color} />;
                       })}
                     </Bar>
@@ -730,14 +730,14 @@ export const DashboardPage: React.FC = () => {
           {/* KEY INSIGHTS */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl border-white dark:border-slate-800 border-6 shadow-xs p-2 flex flex-col xl:flex-row items-stretch xl:items-center gap-6 transition-colors duration-200">
             {/* Header: Lightbulb Icon + Title */}
-            <div className="flex items-center gap-3 shrink-0 xl:pr-6 xl:border-r border-slate-100 dark:border-slate-800">
+            {/* <div className="flex items-center gap-3 shrink-0 xl:pr-6 xl:border-r border-slate-100 dark:border-slate-800">
               <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center shrink-0 shadow-xs">
                 <Lightbulb size={20} />
               </div>
               <span className="text-xs font-black text-slate-800 dark:text-slate-100 tracking-wider uppercase">
                 KEY INSIGHTS
               </span>
-            </div>
+            </div> */}
 
             {/* 4 Insights Columns */}
             <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 dark:divide-slate-800">
