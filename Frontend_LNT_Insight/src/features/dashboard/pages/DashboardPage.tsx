@@ -703,13 +703,13 @@ export const DashboardPage: React.FC = () => {
                     {/* Vạch đỏ ngưỡng KPI trần 5% */}
                     <ReferenceLine
                       y={5}
-                      stroke="#F43F5E"
+                      stroke="#EAB308"
                       strokeDasharray="4 4"
                       strokeWidth={1.5}
                       label={{
                         value: 'KPI Target: 5.0%',
                         position: 'insideTopRight',
-                        fill: '#F43F5E',
+                        fill: '#EAB308',
                         fontSize: 11,
                         fontWeight: 700
                       }}
