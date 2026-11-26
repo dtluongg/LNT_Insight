@@ -579,8 +579,8 @@ export const DashboardPage: React.FC = () => {
                     </div>
                     {/* Target KPI */}
                     <div className="flex items-center gap-1.5 pl-1 border-l border-slate-200 dark:border-slate-700">
-                      <span className="w-3.5 h-0.5 border-t-2 border-dashed border-[#F43F5E]" />
-                      <span className="text-rose-500 dark:text-rose-400 font-bold">KPI: 5%</span>
+                      <span className="w-3.5 h-0.5 border-t-2 border-dashed border-[#EAB308]" />
+                      <span className="text-yellow-600 dark:text-yellow-400">KPI: 5%</span>
                     </div>
                   </div>
                 )}
